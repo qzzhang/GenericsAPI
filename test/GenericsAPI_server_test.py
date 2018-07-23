@@ -4,6 +4,7 @@ import os  # noqa: F401
 import json  # noqa: F401
 import time
 import requests
+import inspect
 
 from os import environ
 try:
@@ -75,15 +76,27 @@ class GenericsAPITest(unittest.TestCase):
     def getContext(self):
         return self.__class__.ctx
 
-    # NOTE: According to Python unittest naming rules test method names should start from 'test'. # noqa
-    def test_your_method(self):
-        # Prepare test objects in workspace if needed using
-        # self.getWsClient().save_objects({'workspace': self.getWsName(),
-        #                                  'objects': []})
-        #
-        # Run your method by
-        # ret = self.getImpl().your_method(self.getContext(), parameters...)
-        #
-        # Check returned data with
-        # self.assertEqual(ret[...], ...) or other unittest methods
-        pass
+    def start_test(self):
+        testname = inspect.stack()[1][3]
+        print('\n*** starting test: ' + testname + ' **')
+
+    def fail_fetch_data(self, params, error, exception=ValueError,
+                        contains=False):
+        with self.assertRaises(exception) as context:
+            self.getImpl().fetch_data(self.ctx, params)
+        if contains:
+            self.assertIn(error, str(context.exception.message))
+        else:
+            self.assertEqual(error, str(context.exception.message))
+
+    def test_bad_fetch_data_params(self):
+        self.start_test()
+        invalidate_params = {'missing_obj_ref': 'obj_ref',
+                             'workspace_name': 'workspace_name'}
+        error_msg = '"obj_ref" parameter is required, but missing'
+        self.fail_fetch_data(invalidate_params, error_msg)
+
+        invalidate_params = {'obj_ref': 'obj_ref',
+                             'missing_workspace_name': 'workspace_name'}
+        error_msg = '"workspace_name" parameter is required, but missing'
+        self.fail_fetch_data(invalidate_params, error_msg)

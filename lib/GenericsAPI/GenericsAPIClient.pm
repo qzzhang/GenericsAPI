@@ -12,6 +12,7 @@ eval {
     $get_time = sub { Time::HiRes::gettimeofday() };
 };
 
+use Bio::KBase::AuthToken;
 
 # Client version should match Impl version
 # This is a Semantic Version number,
@@ -74,6 +75,27 @@ sub new
 	push(@{$self->{headers}}, 'Kbrpc-Errordest', $self->{kbrpc_error_dest});
     }
 
+    #
+    # This module requires authentication.
+    #
+    # We create an auth token, passing through the arguments that we were (hopefully) given.
+
+    {
+	my %arg_hash2 = @args;
+	if (exists $arg_hash2{"token"}) {
+	    $self->{token} = $arg_hash2{"token"};
+	} elsif (exists $arg_hash2{"user_id"}) {
+	    my $token = Bio::KBase::AuthToken->new(@args);
+	    if (!$token->error_message) {
+	        $self->{token} = $token->token;
+	    }
+	}
+	
+	if (exists $self->{token})
+	{
+	    $self->{client}->{token} = $self->{token};
+	}
+    }
 
     my $ua = $self->{client}->ua;	 
     my $timeout = $ENV{CDMI_TIMEOUT} || (30 * 60);	 
@@ -84,6 +106,102 @@ sub new
 }
 
 
+
+
+=head2 fetch_data
+
+  $returnVal = $obj->fetch_data($params)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$params is a GenericsAPI.FetchDataParams
+$returnVal is a GenericsAPI.FetchData
+FetchDataParams is a reference to a hash where the following keys are defined:
+	obj_ref has a value which is a GenericsAPI.obj_ref
+	workspace_name has a value which is a string
+	target_data_field has a value which is a string
+obj_ref is a string
+FetchData is a reference to a hash where the following keys are defined:
+	data_matrix has a value which is a reference to a hash where the key is a string and the value is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$params is a GenericsAPI.FetchDataParams
+$returnVal is a GenericsAPI.FetchData
+FetchDataParams is a reference to a hash where the following keys are defined:
+	obj_ref has a value which is a GenericsAPI.obj_ref
+	workspace_name has a value which is a string
+	target_data_field has a value which is a string
+obj_ref is a string
+FetchData is a reference to a hash where the following keys are defined:
+	data_matrix has a value which is a reference to a hash where the key is a string and the value is a string
+
+
+=end text
+
+=item Description
+
+fetch_data: fetch generics data as pandas dataframe for a generics data object
+
+=back
+
+=cut
+
+ sub fetch_data
+{
+    my($self, @args) = @_;
+
+# Authentication: required
+
+    if ((my $n = @args) != 1)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function fetch_data (received $n, expecting 1)");
+    }
+    {
+	my($params) = @args;
+
+	my @_bad_arguments;
+        (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument 1 \"params\" (value was \"$params\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to fetch_data:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'fetch_data');
+	}
+    }
+
+    my $url = $self->{url};
+    my $result = $self->{client}->call($url, $self->{headers}, {
+	    method => "GenericsAPI.fetch_data",
+	    params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'fetch_data',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method fetch_data",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'fetch_data',
+				       );
+    }
+}
+ 
   
 sub status
 {
@@ -119,7 +237,7 @@ sub status
 sub version {
     my ($self) = @_;
     my $result = $self->{client}->call($self->{url}, $self->{headers}, {
-        method => "${last_module.module_name}.version",
+        method => "GenericsAPI.version",
         params => [],
     });
     if ($result) {
@@ -127,16 +245,16 @@ sub version {
             Bio::KBase::Exceptions::JSONRPC->throw(
                 error => $result->error_message,
                 code => $result->content->{code},
-                method_name => '${last_method.name}',
+                method_name => 'fetch_data',
             );
         } else {
             return wantarray ? @{$result->result} : $result->result->[0];
         }
     } else {
         Bio::KBase::Exceptions::HTTP->throw(
-            error => "Error invoking method ${last_method.name}",
+            error => "Error invoking method fetch_data",
             status_line => $self->{client}->status_line,
-            method_name => '${last_method.name}',
+            method_name => 'fetch_data',
         );
     }
 }
@@ -170,6 +288,155 @@ sub _validate_version {
 }
 
 =head1 TYPES
+
+
+
+=head2 boolean
+
+=over 4
+
+
+
+=item Description
+
+A boolean - 0 for false, 1 for true.
+@range (0, 1)
+
+
+=item Definition
+
+=begin html
+
+<pre>
+an int
+</pre>
+
+=end html
+
+=begin text
+
+an int
+
+=end text
+
+=back
+
+
+
+=head2 obj_ref
+
+=over 4
+
+
+
+=item Description
+
+An X/Y/Z style reference
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a string
+</pre>
+
+=end html
+
+=begin text
+
+a string
+
+=end text
+
+=back
+
+
+
+=head2 FetchDataParams
+
+=over 4
+
+
+
+=item Description
+
+Input of the fetch_data function
+obj_ref: generics object reference
+workspace_name: the name of the workspace
+
+Optional arguments:
+target_data_field: the data field to be retrieved from.
+                   fetch_data will try to auto find this field.
+                    e.g. for an given data type like below:
+                    typedef structure {
+                      FloatMatrix2D data;
+                    } SomeGenericsMatrix;
+                    data should be the target data field.
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+obj_ref has a value which is a GenericsAPI.obj_ref
+workspace_name has a value which is a string
+target_data_field has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+obj_ref has a value which is a GenericsAPI.obj_ref
+workspace_name has a value which is a string
+target_data_field has a value which is a string
+
+
+=end text
+
+=back
+
+
+
+=head2 FetchData
+
+=over 4
+
+
+
+=item Description
+
+Ouput of the fetch_data function
+data_matrix: a pandas dataframe
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+data_matrix has a value which is a reference to a hash where the key is a string and the value is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+data_matrix has a value which is a reference to a hash where the key is a string and the value is a string
+
+
+=end text
+
+=back
 
 
 
