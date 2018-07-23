@@ -2,6 +2,7 @@ import time
 import json
 
 from DataFileUtil.DataFileUtilClient import DataFileUtil
+from biokbase.workspace.client import Workspace as workspaceService
 
 
 def log(message, prefix_newline=False):
@@ -31,6 +32,7 @@ class GenericsUtil:
         self.srv_wiz_url = config['srv-wiz-url']
         self.scratch = config['scratch']
         self.dfu = DataFileUtil(self.callback_url)
+        self.wsClient = workspaceService(self.ws_url)
 
     def fetch_data(self, params):
         """
