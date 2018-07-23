@@ -33,6 +33,27 @@ class GenericsAPI(object):
             trust_all_ssl_certificates=trust_all_ssl_certificates,
             auth_svc=auth_svc)
 
+    def fetch_data(self, params, context=None):
+        """
+        fetch_data: fetch generics data as pandas dataframe for a generics data object
+        :param params: instance of type "FetchDataParams" (Input of the
+           fetch_data function obj_ref: generics object reference
+           workspace_name: the name of the workspace Optional arguments:
+           target_data_field: the data field to be retrieved from. fetch_data
+           will try to auto find this field. e.g. for an given data type like
+           below: typedef structure { FloatMatrix2D data; }
+           SomeGenericsMatrix; data should be the target data field.) ->
+           structure: parameter "obj_ref" of type "obj_ref" (An X/Y/Z style
+           reference), parameter "workspace_name" of String, parameter
+           "target_data_field" of String
+        :returns: instance of type "FetchData" (Ouput of the fetch_data
+           function data_matrix: a pandas dataframe) -> structure: parameter
+           "data_matrix" of mapping from String to String
+        """
+        return self._client.call_method(
+            'GenericsAPI.fetch_data',
+            [params], self._service_ver, context)
+
     def status(self, context=None):
         return self._client.call_method('GenericsAPI.status',
                                         [], self._service_ver, context)
