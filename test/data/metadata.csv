@@ -1,0 +1,39 @@
+﻿,Well_ID,Filter_Size_um,Volume_Filtered_L,Treatment,Week,Condition
+S1,FW222,10,10,Positive Control,1,Pre-Ethanol
+S2,FW222,0.2,10,Positive Control,1,Pre-Ethanol
+S3,FW224,10,5,Negative Control,1,Pre-Ethanol
+S4,FW224,0.2,5,Negative Control,1,Pre-Ethanol
+S5,FW220,10,7,Background,1,Pre-Ethanol
+S6,FW220,0.2,7,Background,1,Pre-Ethanol
+S7,FW221,10,1,Background,1,Pre-Ethanol
+S8,FW221,0.2,1,Background,1,Pre-Ethanol
+S9,FW223,10,3,Background,1,Pre-Ethanol
+S10,FW223,0.2,3,Background,1,Pre-Ethanol
+S11,FW222,10,10,Positive Control,4,3-Ethanol
+S12,FW222,0.2,10,Positive Control,4,3-Ethanol
+S13,FW224,10,5,Negative Control,4,Pre-Ethanol
+S14,FW224,0.2,5,Negative Control,4,Pre-Ethanol
+S15,FW222,10,10,Positive Control,7,6-Ethanol
+S16,FW222,0.2,10,Positive Control,7,6-Ethanol
+S17,FW224,10,5,Negative Control,7,Pre-Ethanol
+S18,FW224,0.2,5,Negative Control,7,Pre-Ethanol
+S19,FW222,10,10,Positive Control,8,6-Ethanol
+S20,FW222,0.2,10,Positive Control,8,6-Ethanol
+S21,FW224,10,5,Negative Control,8,Pre-Ethanol
+S22,FW224,0.2,5,Negative Control,8,Pre-Ethanol
+S23,FW222,10,10,Positive Control,9,6-Ethanol
+S24,FW222,0.2,10,Positive Control,9,6-Ethanol
+S25,FW224,10,5,Negative Control,9,Pre-Ethanol
+S26,FW224,0.2,5,Negative Control,9,Pre-Ethanol
+S27,FW222,10,10,Positive Control,10,6-Ethanol
+S28,FW222,0.2,10,Positive Control,10,6-Ethanol
+S29,FW224,10,5,Negative Control,10,Pre-Ethanol
+S30,FW224,0.2,5,Negative Control,10,Pre-Ethanol
+S31,FW222,10,10,Positive Control,14.1,6-Ethanol
+S32,FW222,0.2,10,Positive Control,14.1,6-Ethanol
+S33,FW224,10,5,Negative Control,14.1,Pre-Ethanol
+S34,FW224,0.2,5,Negative Control,14.1,Pre-Ethanol
+S35,FW222,10,10,Positive Control,14.2,7-Ethanol
+S36,FW222,0.2,10,Positive Control,14.2,7-Ethanol
+S37,FW224,10,5,Negative Control,14.2,1-Ethanol
+S38,FW224,0.2,5,Negative Control,14.2,1-Ethanol

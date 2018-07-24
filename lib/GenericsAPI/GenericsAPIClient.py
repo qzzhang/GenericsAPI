@@ -46,12 +46,26 @@ class GenericsAPI(object):
            structure: parameter "obj_ref" of type "obj_ref" (An X/Y/Z style
            reference), parameter "workspace_name" of String, parameter
            "target_data_field" of String
-        :returns: instance of type "FetchData" (Ouput of the fetch_data
+        :returns: instance of type "FetchDataReturn" (Ouput of the fetch_data
            function data_matrix: a pandas dataframe) -> structure: parameter
            "data_matrix" of mapping from String to String
         """
         return self._client.call_method(
             'GenericsAPI.fetch_data',
+            [params], self._service_ver, context)
+
+    def generate_matrix_html(self, params, context=None):
+        """
+        generate_matrix_html: generate a html page for given data
+        :param params: instance of type "GenMatrixHTMLParams" (Input of the
+           generate_matrix_html function df: a pandas dataframe) ->
+           structure: parameter "df" of mapping from String to String
+        :returns: instance of type "GenMatrixHTMLReturn" (Ouput of the
+           generate_matrix_html function html_string: html as a string
+           format) -> structure: parameter "html_string" of String
+        """
+        return self._client.call_method(
+            'GenericsAPI.generate_matrix_html',
             [params], self._service_ver, context)
 
     def status(self, context=None):

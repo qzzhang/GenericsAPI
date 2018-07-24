@@ -21,6 +21,8 @@ RUN pip install cffi --upgrade \
     && pip install requests --upgrade \
     && pip install 'requests[security]' --upgrade
 
+RUN pip install pandas \
+    && pip install xlrd
 # -----------------------------------------
 
 COPY ./ /kb/module
