@@ -168,15 +168,33 @@ public class GenericsAPIClient {
      * fetch_data: fetch generics data as pandas dataframe for a generics data object
      * </pre>
      * @param   params   instance of type {@link us.kbase.genericsapi.FetchDataParams FetchDataParams}
-     * @return   parameter "returnVal" of type {@link us.kbase.genericsapi.FetchData FetchData}
+     * @return   parameter "returnVal" of type {@link us.kbase.genericsapi.FetchDataReturn FetchDataReturn}
      * @throws IOException if an IO exception occurs
      * @throws JsonClientException if a JSON RPC exception occurs
      */
-    public FetchData fetchData(FetchDataParams params, RpcContext... jsonRpcContext) throws IOException, JsonClientException {
+    public FetchDataReturn fetchData(FetchDataParams params, RpcContext... jsonRpcContext) throws IOException, JsonClientException {
         List<Object> args = new ArrayList<Object>();
         args.add(params);
-        TypeReference<List<FetchData>> retType = new TypeReference<List<FetchData>>() {};
-        List<FetchData> res = caller.jsonrpcCall("GenericsAPI.fetch_data", args, retType, true, true, jsonRpcContext, this.serviceVersion);
+        TypeReference<List<FetchDataReturn>> retType = new TypeReference<List<FetchDataReturn>>() {};
+        List<FetchDataReturn> res = caller.jsonrpcCall("GenericsAPI.fetch_data", args, retType, true, true, jsonRpcContext, this.serviceVersion);
+        return res.get(0);
+    }
+
+    /**
+     * <p>Original spec-file function name: generate_matrix_html</p>
+     * <pre>
+     * generate_matrix_html: generate a html page for given data
+     * </pre>
+     * @param   params   instance of type {@link us.kbase.genericsapi.GenMatrixHTMLParams GenMatrixHTMLParams}
+     * @return   parameter "returnVal" of type {@link us.kbase.genericsapi.GenMatrixHTMLReturn GenMatrixHTMLReturn}
+     * @throws IOException if an IO exception occurs
+     * @throws JsonClientException if a JSON RPC exception occurs
+     */
+    public GenMatrixHTMLReturn generateMatrixHtml(GenMatrixHTMLParams params, RpcContext... jsonRpcContext) throws IOException, JsonClientException {
+        List<Object> args = new ArrayList<Object>();
+        args.add(params);
+        TypeReference<List<GenMatrixHTMLReturn>> retType = new TypeReference<List<GenMatrixHTMLReturn>>() {};
+        List<GenMatrixHTMLReturn> res = caller.jsonrpcCall("GenericsAPI.generate_matrix_html", args, retType, true, true, jsonRpcContext, this.serviceVersion);
         return res.get(0);
     }
 

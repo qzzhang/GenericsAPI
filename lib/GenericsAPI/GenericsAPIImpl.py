@@ -23,7 +23,7 @@ class GenericsAPI:
     ######################################### noqa
     VERSION = "0.0.1"
     GIT_URL = "git@github.com:Tianhao-Gu/GenericsAPI.git"
-    GIT_COMMIT_HASH = "f320f0321e9ee37418ea9286fbdc63ff88eb8e33"
+    GIT_COMMIT_HASH = "ff00a997232e190d2095b566a0e8805282c63aca"
 
     #BEGIN_CLASS_HEADER
     #END_CLASS_HEADER
@@ -52,7 +52,7 @@ class GenericsAPI:
            structure: parameter "obj_ref" of type "obj_ref" (An X/Y/Z style
            reference), parameter "workspace_name" of String, parameter
            "target_data_field" of String
-        :returns: instance of type "FetchData" (Ouput of the fetch_data
+        :returns: instance of type "FetchDataReturn" (Ouput of the fetch_data
            function data_matrix: a pandas dataframe) -> structure: parameter
            "data_matrix" of mapping from String to String
         """
@@ -66,6 +66,33 @@ class GenericsAPI:
         # At some point might do deeper type checking...
         if not isinstance(returnVal, dict):
             raise ValueError('Method fetch_data return value ' +
+                             'returnVal is not type dict as required.')
+        # return the results
+        return [returnVal]
+
+    def generate_matrix_html(self, ctx, params):
+        """
+        generate_matrix_html: generate a html page for given data
+        :param params: instance of type "GenMatrixHTMLParams" (Input of the
+           generate_matrix_html function data_matrix: a pandas dataframe e.g.
+           {'Department': 'string', 'Revenues':'number'} data: data used to
+           generate html report e.g. [['Shoes', 10700], ['Sports', -15400]])
+           -> structure: parameter "data_matrix" of mapping from String to
+           String
+        :returns: instance of type "GenMatrixHTMLReturn" (Ouput of the
+           generate_matrix_html function html_string: html as a string
+           format) -> structure: parameter "html_string" of String
+        """
+        # ctx is the context object
+        # return variables are: returnVal
+        #BEGIN generate_matrix_html
+        generics_api = GenericsUtil(self.config)
+        returnVal = generics_api.generate_matrix_html(params)
+        #END generate_matrix_html
+
+        # At some point might do deeper type checking...
+        if not isinstance(returnVal, dict):
+            raise ValueError('Method generate_matrix_html return value ' +
                              'returnVal is not type dict as required.')
         # return the results
         return [returnVal]

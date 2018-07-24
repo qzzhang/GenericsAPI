@@ -6,6 +6,7 @@ import time
 import requests
 import inspect
 import shutil
+import pandas as pd
 
 from os import environ
 try:
@@ -61,7 +62,7 @@ class GenericsAPITest(unittest.TestCase):
         suffix = int(time.time() * 1000)
         cls.wsName = "test_kb_ke_apps_" + str(suffix)
         cls.wsClient.create_workspace({'workspace': cls.wsName})
-        cls.prepare_data()
+        # cls.prepare_data()
 
     @classmethod
     def tearDownClass(cls):
@@ -145,3 +146,16 @@ class GenericsAPITest(unittest.TestCase):
                              'missing_workspace_name': 'workspace_name'}
         error_msg = '"workspace_name" parameter is required, but missing'
         self.fail_fetch_data(invalidate_params, error_msg)
+
+    def test_generate_matrix_html(self):
+        self.start_test()
+
+        csv_file_name = 'metadata.csv'
+        df = pd.read_csv(os.path.join('data', csv_file_name))
+
+        returnVal = self.getImpl().generate_matrix_html(self.ctx, {'df': df})[0]
+
+        self.assertTrue('html_string' in returnVal)
+        self.assertTrue('ADD_COL' not in returnVal.get('html_string'))
+        self.assertTrue('ADD_DATA' not in returnVal.get('html_string'))
+        self.assertTrue('ADD_FORMATTER' not in returnVal.get('html_string'))

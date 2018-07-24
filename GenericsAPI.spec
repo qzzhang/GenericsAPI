@@ -32,14 +32,30 @@ module GenericsAPI {
     string target_data_field;
   } FetchDataParams;
 
-
   /* Ouput of the fetch_data function
     data_matrix: a pandas dataframe
   */
   typedef structure {
     mapping<string, string> data_matrix;
-  } FetchData;
+  } FetchDataReturn;
 
   /* fetch_data: fetch generics data as pandas dataframe for a generics data object*/
-  funcdef fetch_data(FetchDataParams params) returns(FetchData returnVal) authentication required;
+  funcdef fetch_data(FetchDataParams params) returns(FetchDataReturn returnVal) authentication required;
+
+  /* Input of the generate_matrix_html function
+    df: a pandas dataframe
+  */
+  typedef structure {
+    mapping<string, string> df;
+  } GenMatrixHTMLParams;
+
+  /* Ouput of the generate_matrix_html function
+    html_string: html as a string format
+  */
+  typedef structure {
+    string html_string;
+  } GenMatrixHTMLReturn;
+
+  /* generate_matrix_html: generate a html page for given data*/
+  funcdef generate_matrix_html(GenMatrixHTMLParams params) returns(GenMatrixHTMLReturn returnVal) authentication required;
 };
