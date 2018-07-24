@@ -23,7 +23,7 @@ class GenericsAPI:
     ######################################### noqa
     VERSION = "0.0.1"
     GIT_URL = "git@github.com:Tianhao-Gu/GenericsAPI.git"
-    GIT_COMMIT_HASH = "ff00a997232e190d2095b566a0e8805282c63aca"
+    GIT_COMMIT_HASH = "7daaaadb5da1454d3c317179bd2ecdb28142efae"
 
     #BEGIN_CLASS_HEADER
     #END_CLASS_HEADER
@@ -74,11 +74,8 @@ class GenericsAPI:
         """
         generate_matrix_html: generate a html page for given data
         :param params: instance of type "GenMatrixHTMLParams" (Input of the
-           generate_matrix_html function data_matrix: a pandas dataframe e.g.
-           {'Department': 'string', 'Revenues':'number'} data: data used to
-           generate html report e.g. [['Shoes', 10700], ['Sports', -15400]])
-           -> structure: parameter "data_matrix" of mapping from String to
-           String
+           generate_matrix_html function df: a pandas dataframe) ->
+           structure: parameter "df" of mapping from String to String
         :returns: instance of type "GenMatrixHTMLReturn" (Ouput of the
            generate_matrix_html function html_string: html as a string
            format) -> structure: parameter "html_string" of String

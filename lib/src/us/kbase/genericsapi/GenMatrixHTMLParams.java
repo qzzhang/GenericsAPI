@@ -15,36 +15,33 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
  * <p>Original spec-file type: GenMatrixHTMLParams</p>
  * <pre>
  * Input of the generate_matrix_html function
- * data_matrix: a pandas dataframe
- *         e.g. {'Department': 'string', 'Revenues':'number'}
- * data: data used to generate html report
- *       e.g. [['Shoes', 10700], ['Sports', -15400]]
+ * df: a pandas dataframe
  * </pre>
  * 
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Generated("com.googlecode.jsonschema2pojo")
 @JsonPropertyOrder({
-    "data_matrix"
+    "df"
 })
 public class GenMatrixHTMLParams {
 
-    @JsonProperty("data_matrix")
-    private Map<String, String> dataMatrix;
+    @JsonProperty("df")
+    private Map<String, String> df;
     private Map<java.lang.String, Object> additionalProperties = new HashMap<java.lang.String, Object>();
 
-    @JsonProperty("data_matrix")
-    public Map<String, String> getDataMatrix() {
-        return dataMatrix;
+    @JsonProperty("df")
+    public Map<String, String> getDf() {
+        return df;
     }
 
-    @JsonProperty("data_matrix")
-    public void setDataMatrix(Map<String, String> dataMatrix) {
-        this.dataMatrix = dataMatrix;
+    @JsonProperty("df")
+    public void setDf(Map<String, String> df) {
+        this.df = df;
     }
 
-    public GenMatrixHTMLParams withDataMatrix(Map<String, String> dataMatrix) {
-        this.dataMatrix = dataMatrix;
+    public GenMatrixHTMLParams withDf(Map<String, String> df) {
+        this.df = df;
         return this;
     }
 
@@ -60,7 +57,7 @@ public class GenMatrixHTMLParams {
 
     @Override
     public java.lang.String toString() {
-        return ((((("GenMatrixHTMLParams"+" [dataMatrix=")+ dataMatrix)+", additionalProperties=")+ additionalProperties)+"]");
+        return ((((("GenMatrixHTMLParams"+" [df=")+ df)+", additionalProperties=")+ additionalProperties)+"]");
     }
 
 }

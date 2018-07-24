@@ -218,7 +218,7 @@ fetch_data: fetch generics data as pandas dataframe for a generics data object
 $params is a GenericsAPI.GenMatrixHTMLParams
 $returnVal is a GenericsAPI.GenMatrixHTMLReturn
 GenMatrixHTMLParams is a reference to a hash where the following keys are defined:
-	data_matrix has a value which is a reference to a hash where the key is a string and the value is a string
+	df has a value which is a reference to a hash where the key is a string and the value is a string
 GenMatrixHTMLReturn is a reference to a hash where the following keys are defined:
 	html_string has a value which is a string
 
@@ -231,7 +231,7 @@ GenMatrixHTMLReturn is a reference to a hash where the following keys are define
 $params is a GenericsAPI.GenMatrixHTMLParams
 $returnVal is a GenericsAPI.GenMatrixHTMLReturn
 GenMatrixHTMLParams is a reference to a hash where the following keys are defined:
-	data_matrix has a value which is a reference to a hash where the key is a string and the value is a string
+	df has a value which is a reference to a hash where the key is a string and the value is a string
 GenMatrixHTMLReturn is a reference to a hash where the following keys are defined:
 	html_string has a value which is a string
 
@@ -539,10 +539,7 @@ data_matrix has a value which is a reference to a hash where the key is a string
 =item Description
 
 Input of the generate_matrix_html function
-data_matrix: a pandas dataframe
-        e.g. {'Department': 'string', 'Revenues':'number'}
-data: data used to generate html report
-      e.g. [['Shoes', 10700], ['Sports', -15400]]
+df: a pandas dataframe
 
 
 =item Definition
@@ -551,7 +548,7 @@ data: data used to generate html report
 
 <pre>
 a reference to a hash where the following keys are defined:
-data_matrix has a value which is a reference to a hash where the key is a string and the value is a string
+df has a value which is a reference to a hash where the key is a string and the value is a string
 
 </pre>
 
@@ -560,7 +557,7 @@ data_matrix has a value which is a reference to a hash where the key is a string
 =begin text
 
 a reference to a hash where the following keys are defined:
-data_matrix has a value which is a reference to a hash where the key is a string and the value is a string
+df has a value which is a reference to a hash where the key is a string and the value is a string
 
 
 =end text

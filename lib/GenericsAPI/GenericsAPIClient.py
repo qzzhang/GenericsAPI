@@ -58,11 +58,8 @@ class GenericsAPI(object):
         """
         generate_matrix_html: generate a html page for given data
         :param params: instance of type "GenMatrixHTMLParams" (Input of the
-           generate_matrix_html function data_matrix: a pandas dataframe e.g.
-           {'Department': 'string', 'Revenues':'number'} data: data used to
-           generate html report e.g. [['Shoes', 10700], ['Sports', -15400]])
-           -> structure: parameter "data_matrix" of mapping from String to
-           String
+           generate_matrix_html function df: a pandas dataframe) ->
+           structure: parameter "df" of mapping from String to String
         :returns: instance of type "GenMatrixHTMLReturn" (Ouput of the
            generate_matrix_html function html_string: html as a string
            format) -> structure: parameter "html_string" of String
