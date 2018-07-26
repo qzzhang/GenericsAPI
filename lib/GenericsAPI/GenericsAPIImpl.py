@@ -23,7 +23,7 @@ class GenericsAPI:
     ######################################### noqa
     VERSION = "0.0.1"
     GIT_URL = "git@github.com:Tianhao-Gu/GenericsAPI.git"
-    GIT_COMMIT_HASH = "628ac4e9aecfa4cffb22cc114e3c41b3ffd8c64f"
+    GIT_COMMIT_HASH = "dc19ece6e912d84b06877d6c891a04fccc52447c"
 
     #BEGIN_CLASS_HEADER
     #END_CLASS_HEADER
@@ -44,12 +44,14 @@ class GenericsAPI:
         fetch_data: fetch generics data as pandas dataframe for a generics data object
         :param params: instance of type "FetchDataParams" (Input of the
            fetch_data function obj_ref: generics object reference Optional
-           arguments: target_data_field: the data field to be retrieved from.
-           fetch_data will try to auto find this field. e.g. for an given
-           data type like below: typedef structure { FloatMatrix2D data; }
-           SomeGenericsMatrix; data should be the target data field.) ->
-           structure: parameter "obj_ref" of type "obj_ref" (An X/Y/Z style
-           reference), parameter "target_data_field" of String
+           arguments: generics_type: the data type to be retrieved from
+           generics_type_name: the name of the data type to be retrieved from
+           e.g. for an given data type like below: typedef structure {
+           FloatMatrix2D data; } SomeGenericsMatrix; generics_type should be
+           'FloatMatrix2D' generics_type_name should be 'data') -> structure:
+           parameter "obj_ref" of type "obj_ref" (An X/Y/Z style reference),
+           parameter "generics_type" of String, parameter
+           "generics_type_name" of String
         :returns: instance of type "FetchDataReturn" (Ouput of the fetch_data
            function data_matrix: a pandas dataframe in json format) ->
            structure: parameter "data_matrix" of String

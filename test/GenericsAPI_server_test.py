@@ -204,3 +204,9 @@ class GenericsAPITest(unittest.TestCase):
         params = {'obj_ref': self.diff_expr_matrix_ref}
         returnVal = self.getImpl().fetch_data(self.ctx, params)[0]
         self.check_fetch_data_output(returnVal)
+
+        params = {'obj_ref': self.expression_matrix_ref,
+                  'generics_type': 'FloatMatrix2D',
+                  'generics_type_name': 'data'}
+        returnVal = self.getImpl().fetch_data(self.ctx, params)[0]
+        self.check_fetch_data_output(returnVal)

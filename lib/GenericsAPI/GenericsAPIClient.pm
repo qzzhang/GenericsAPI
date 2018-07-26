@@ -123,7 +123,8 @@ $params is a GenericsAPI.FetchDataParams
 $returnVal is a GenericsAPI.FetchDataReturn
 FetchDataParams is a reference to a hash where the following keys are defined:
 	obj_ref has a value which is a GenericsAPI.obj_ref
-	target_data_field has a value which is a string
+	generics_type has a value which is a string
+	generics_type_name has a value which is a string
 obj_ref is a string
 FetchDataReturn is a reference to a hash where the following keys are defined:
 	data_matrix has a value which is a string
@@ -138,7 +139,8 @@ $params is a GenericsAPI.FetchDataParams
 $returnVal is a GenericsAPI.FetchDataReturn
 FetchDataParams is a reference to a hash where the following keys are defined:
 	obj_ref has a value which is a GenericsAPI.obj_ref
-	target_data_field has a value which is a string
+	generics_type has a value which is a string
+	generics_type_name has a value which is a string
 obj_ref is a string
 FetchDataReturn is a reference to a hash where the following keys are defined:
 	data_matrix has a value which is a string
@@ -454,13 +456,14 @@ Input of the fetch_data function
 obj_ref: generics object reference
 
 Optional arguments:
-target_data_field: the data field to be retrieved from.
-                   fetch_data will try to auto find this field.
+generics_type: the data type to be retrieved from
+generics_type_name: the name of the data type to be retrieved from
                     e.g. for an given data type like below:
                     typedef structure {
                       FloatMatrix2D data;
                     } SomeGenericsMatrix;
-                    data should be the target data field.
+                    generics_type should be 'FloatMatrix2D'
+                    generics_type_name should be 'data'
 
 
 =item Definition
@@ -470,7 +473,8 @@ target_data_field: the data field to be retrieved from.
 <pre>
 a reference to a hash where the following keys are defined:
 obj_ref has a value which is a GenericsAPI.obj_ref
-target_data_field has a value which is a string
+generics_type has a value which is a string
+generics_type_name has a value which is a string
 
 </pre>
 
@@ -480,7 +484,8 @@ target_data_field has a value which is a string
 
 a reference to a hash where the following keys are defined:
 obj_ref has a value which is a GenericsAPI.obj_ref
-target_data_field has a value which is a string
+generics_type has a value which is a string
+generics_type_name has a value which is a string
 
 
 =end text

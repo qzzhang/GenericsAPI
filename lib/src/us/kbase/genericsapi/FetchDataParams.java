@@ -17,13 +17,14 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
  * Input of the fetch_data function
  * obj_ref: generics object reference
  * Optional arguments:
- * target_data_field: the data field to be retrieved from.
- *                    fetch_data will try to auto find this field.
+ * generics_type: the data type to be retrieved from
+ * generics_type_name: the name of the data type to be retrieved from
  *                     e.g. for an given data type like below:
  *                     typedef structure {
  *                       FloatMatrix2D data;
  *                     } SomeGenericsMatrix;
- *                     data should be the target data field.
+ *                     generics_type should be 'FloatMatrix2D'
+ *                     generics_type_name should be 'data'
  * </pre>
  * 
  */
@@ -31,14 +32,17 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 @Generated("com.googlecode.jsonschema2pojo")
 @JsonPropertyOrder({
     "obj_ref",
-    "target_data_field"
+    "generics_type",
+    "generics_type_name"
 })
 public class FetchDataParams {
 
     @JsonProperty("obj_ref")
     private String objRef;
-    @JsonProperty("target_data_field")
-    private String targetDataField;
+    @JsonProperty("generics_type")
+    private String genericsType;
+    @JsonProperty("generics_type_name")
+    private String genericsTypeName;
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     @JsonProperty("obj_ref")
@@ -56,18 +60,33 @@ public class FetchDataParams {
         return this;
     }
 
-    @JsonProperty("target_data_field")
-    public String getTargetDataField() {
-        return targetDataField;
+    @JsonProperty("generics_type")
+    public String getGenericsType() {
+        return genericsType;
     }
 
-    @JsonProperty("target_data_field")
-    public void setTargetDataField(String targetDataField) {
-        this.targetDataField = targetDataField;
+    @JsonProperty("generics_type")
+    public void setGenericsType(String genericsType) {
+        this.genericsType = genericsType;
     }
 
-    public FetchDataParams withTargetDataField(String targetDataField) {
-        this.targetDataField = targetDataField;
+    public FetchDataParams withGenericsType(String genericsType) {
+        this.genericsType = genericsType;
+        return this;
+    }
+
+    @JsonProperty("generics_type_name")
+    public String getGenericsTypeName() {
+        return genericsTypeName;
+    }
+
+    @JsonProperty("generics_type_name")
+    public void setGenericsTypeName(String genericsTypeName) {
+        this.genericsTypeName = genericsTypeName;
+    }
+
+    public FetchDataParams withGenericsTypeName(String genericsTypeName) {
+        this.genericsTypeName = genericsTypeName;
         return this;
     }
 
@@ -83,7 +102,7 @@ public class FetchDataParams {
 
     @Override
     public String toString() {
-        return ((((((("FetchDataParams"+" [objRef=")+ objRef)+", targetDataField=")+ targetDataField)+", additionalProperties=")+ additionalProperties)+"]");
+        return ((((((((("FetchDataParams"+" [objRef=")+ objRef)+", genericsType=")+ genericsType)+", genericsTypeName=")+ genericsTypeName)+", additionalProperties=")+ additionalProperties)+"]");
     }
 
 }

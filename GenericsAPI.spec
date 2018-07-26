@@ -16,17 +16,19 @@ module GenericsAPI {
     obj_ref: generics object reference
 
     Optional arguments:
-    target_data_field: the data field to be retrieved from.
-                       fetch_data will try to auto find this field.
+    generics_type: the data type to be retrieved from
+    generics_type_name: the name of the data type to be retrieved from
                         e.g. for an given data type like below:
                         typedef structure {
                           FloatMatrix2D data;
                         } SomeGenericsMatrix;
-                        data should be the target data field.
+                        generics_type should be 'FloatMatrix2D'
+                        generics_type_name should be 'data'
   */
   typedef structure {
     obj_ref obj_ref;
-    string target_data_field;
+    string generics_type;
+    string generics_type_name;
   } FetchDataParams;
 
   /* Ouput of the fetch_data function
