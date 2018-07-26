@@ -123,11 +123,10 @@ $params is a GenericsAPI.FetchDataParams
 $returnVal is a GenericsAPI.FetchDataReturn
 FetchDataParams is a reference to a hash where the following keys are defined:
 	obj_ref has a value which is a GenericsAPI.obj_ref
-	workspace_name has a value which is a string
 	target_data_field has a value which is a string
 obj_ref is a string
 FetchDataReturn is a reference to a hash where the following keys are defined:
-	data_matrix has a value which is a reference to a hash where the key is a string and the value is a string
+	data_matrix has a value which is a string
 
 </pre>
 
@@ -139,11 +138,10 @@ $params is a GenericsAPI.FetchDataParams
 $returnVal is a GenericsAPI.FetchDataReturn
 FetchDataParams is a reference to a hash where the following keys are defined:
 	obj_ref has a value which is a GenericsAPI.obj_ref
-	workspace_name has a value which is a string
 	target_data_field has a value which is a string
 obj_ref is a string
 FetchDataReturn is a reference to a hash where the following keys are defined:
-	data_matrix has a value which is a reference to a hash where the key is a string and the value is a string
+	data_matrix has a value which is a string
 
 
 =end text
@@ -454,7 +452,6 @@ a string
 
 Input of the fetch_data function
 obj_ref: generics object reference
-workspace_name: the name of the workspace
 
 Optional arguments:
 target_data_field: the data field to be retrieved from.
@@ -473,7 +470,6 @@ target_data_field: the data field to be retrieved from.
 <pre>
 a reference to a hash where the following keys are defined:
 obj_ref has a value which is a GenericsAPI.obj_ref
-workspace_name has a value which is a string
 target_data_field has a value which is a string
 
 </pre>
@@ -484,7 +480,6 @@ target_data_field has a value which is a string
 
 a reference to a hash where the following keys are defined:
 obj_ref has a value which is a GenericsAPI.obj_ref
-workspace_name has a value which is a string
 target_data_field has a value which is a string
 
 
@@ -503,7 +498,7 @@ target_data_field has a value which is a string
 =item Description
 
 Ouput of the fetch_data function
-data_matrix: a pandas dataframe
+data_matrix: a pandas dataframe in json format
 
 
 =item Definition
@@ -512,7 +507,7 @@ data_matrix: a pandas dataframe
 
 <pre>
 a reference to a hash where the following keys are defined:
-data_matrix has a value which is a reference to a hash where the key is a string and the value is a string
+data_matrix has a value which is a string
 
 </pre>
 
@@ -521,7 +516,7 @@ data_matrix has a value which is a reference to a hash where the key is a string
 =begin text
 
 a reference to a hash where the following keys are defined:
-data_matrix has a value which is a reference to a hash where the key is a string and the value is a string
+data_matrix has a value which is a string
 
 
 =end text

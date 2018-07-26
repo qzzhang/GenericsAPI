@@ -3,10 +3,10 @@ import unittest
 import os  # noqa: F401
 import json  # noqa: F401
 import time
-import requests
+import requests  # noqa: F401
 import inspect
-import shutil
-import pandas as pd
+import json
+
 
 from os import environ
 try:
@@ -62,7 +62,7 @@ class GenericsAPITest(unittest.TestCase):
         suffix = int(time.time() * 1000)
         cls.wsName = "test_kb_ke_apps_" + str(suffix)
         cls.wsClient.create_workspace({'workspace': cls.wsName})
-        # cls.prepare_data()
+        cls.prepare_data()
 
     @classmethod
     def tearDownClass(cls):
@@ -72,34 +72,20 @@ class GenericsAPITest(unittest.TestCase):
 
     @classmethod
     def prepare_data(cls):
-        # upload genome object
-        genbank_file_name = 'minimal.gbff'
-        genbank_file_path = os.path.join(cls.scratch, genbank_file_name)
-        shutil.copy(os.path.join('data', genbank_file_name), genbank_file_path)
-
-        genome_object_name = 'test_Genome'
-        cls.genome_ref = cls.gfu.genbank_to_genome({'file': {'path': genbank_file_path},
-                                                    'workspace_name': cls.wsName,
-                                                    'genome_name': genome_object_name,
-                                                    'generate_ids_if_needed': 1
-                                                    })['genome_ref']
-
         # upload expression matrix object
         workspace_id = cls.dfu.ws_name_to_id(cls.wsName)
         object_type = 'KBaseFeatureValues.ExpressionMatrix'
         expression_matrix_object_name = 'test_expression_matrix'
-        expression_matrix_data = {'genome_ref': cls.genome_ref,
-                                  'scale': 'log2',
+        cls.col_ids = ['condition_1', 'condition_2', 'condition_3', 'condition_4']
+        cls.row_ids = ['gene_1', 'gene_2', 'gene_3']
+        expression_matrix_data = {'scale': 'log2',
                                   'type': 'level',
-                                  'data': {'row_ids': ['gene_1', 'gene_2', 'gene_3'],
-                                           'col_ids': ['condition_1', 'condition_2',
-                                                       'condition_3', 'condition_4'],
+                                  'data': {'row_ids': cls.row_ids,
+                                           'col_ids': cls.col_ids,
                                            'values': [[0.1, 0.2, 0.3, 0.4],
                                                       [0.3, 0.4, 0.5, 0.6],
                                                       [None, None, None, None]]
-                                           },
-                                  'feature_mapping': {},
-                                  'condition_mapping': {}}
+                                           }}
         save_object_params = {
             'id': workspace_id,
             'objects': [{'type': object_type,
@@ -135,27 +121,38 @@ class GenericsAPITest(unittest.TestCase):
         else:
             self.assertEqual(error, str(context.exception.message))
 
-    def test_bad_fetch_data_params(self):
+    # def test_bad_fetch_data_params(self):
+    #     self.start_test()
+    #     invalidate_params = {'missing_obj_ref': 'obj_ref'}
+    #     error_msg = '"obj_ref" parameter is required, but missing'
+    #     self.fail_fetch_data(invalidate_params, error_msg)
+
+    # def test_generate_matrix_html(self):
+    #     self.start_test()
+
+    #     csv_file_name = 'metadata.csv'
+    #     df = pd.read_csv(os.path.join('data', csv_file_name))
+
+    #     returnVal = self.getImpl().generate_matrix_html(self.ctx, {'df': df})[0]
+
+    #     self.assertTrue('html_string' in returnVal)
+    #     self.assertTrue('ADD_COL' not in returnVal.get('html_string'))
+    #     self.assertTrue('ADD_DATA' not in returnVal.get('html_string'))
+    #     self.assertTrue('ADD_FORMATTER' not in returnVal.get('html_string'))
+
+    def test_fetch_data(self):
         self.start_test()
-        invalidate_params = {'missing_obj_ref': 'obj_ref',
-                             'workspace_name': 'workspace_name'}
-        error_msg = '"obj_ref" parameter is required, but missing'
-        self.fail_fetch_data(invalidate_params, error_msg)
 
-        invalidate_params = {'obj_ref': 'obj_ref',
-                             'missing_workspace_name': 'workspace_name'}
-        error_msg = '"workspace_name" parameter is required, but missing'
-        self.fail_fetch_data(invalidate_params, error_msg)
+        params = {'obj_ref': self.expression_matrix_ref}
 
-    def test_generate_matrix_html(self):
-        self.start_test()
+        returnVal = self.getImpl().fetch_data(self.ctx, params)[0]
 
-        csv_file_name = 'metadata.csv'
-        df = pd.read_csv(os.path.join('data', csv_file_name))
+        self.assertTrue('data_matrix' in returnVal)
+        data_matrix = json.loads(returnVal.get('data_matrix'))
 
-        returnVal = self.getImpl().generate_matrix_html(self.ctx, {'df': df})[0]
+        col_ids = data_matrix.keys()
+        self.assertItemsEqual(col_ids, self.col_ids)
+        for col_id in col_ids:
+            self.assertItemsEqual(data_matrix.get(col_id).keys(), self.row_ids)
 
-        self.assertTrue('html_string' in returnVal)
-        self.assertTrue('ADD_COL' not in returnVal.get('html_string'))
-        self.assertTrue('ADD_DATA' not in returnVal.get('html_string'))
-        self.assertTrue('ADD_FORMATTER' not in returnVal.get('html_string'))
+        print returnVal

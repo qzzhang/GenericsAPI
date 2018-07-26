@@ -23,7 +23,7 @@ class GenericsAPI:
     ######################################### noqa
     VERSION = "0.0.1"
     GIT_URL = "git@github.com:Tianhao-Gu/GenericsAPI.git"
-    GIT_COMMIT_HASH = "7daaaadb5da1454d3c317179bd2ecdb28142efae"
+    GIT_COMMIT_HASH = "628ac4e9aecfa4cffb22cc114e3c41b3ffd8c64f"
 
     #BEGIN_CLASS_HEADER
     #END_CLASS_HEADER
@@ -43,18 +43,16 @@ class GenericsAPI:
         """
         fetch_data: fetch generics data as pandas dataframe for a generics data object
         :param params: instance of type "FetchDataParams" (Input of the
-           fetch_data function obj_ref: generics object reference
-           workspace_name: the name of the workspace Optional arguments:
-           target_data_field: the data field to be retrieved from. fetch_data
-           will try to auto find this field. e.g. for an given data type like
-           below: typedef structure { FloatMatrix2D data; }
+           fetch_data function obj_ref: generics object reference Optional
+           arguments: target_data_field: the data field to be retrieved from.
+           fetch_data will try to auto find this field. e.g. for an given
+           data type like below: typedef structure { FloatMatrix2D data; }
            SomeGenericsMatrix; data should be the target data field.) ->
            structure: parameter "obj_ref" of type "obj_ref" (An X/Y/Z style
-           reference), parameter "workspace_name" of String, parameter
-           "target_data_field" of String
+           reference), parameter "target_data_field" of String
         :returns: instance of type "FetchDataReturn" (Ouput of the fetch_data
-           function data_matrix: a pandas dataframe) -> structure: parameter
-           "data_matrix" of mapping from String to String
+           function data_matrix: a pandas dataframe in json format) ->
+           structure: parameter "data_matrix" of String
         """
         # ctx is the context object
         # return variables are: returnVal

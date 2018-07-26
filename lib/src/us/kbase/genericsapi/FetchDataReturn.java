@@ -15,7 +15,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
  * <p>Original spec-file type: FetchDataReturn</p>
  * <pre>
  * Ouput of the fetch_data function
- * data_matrix: a pandas dataframe
+ * data_matrix: a pandas dataframe in json format
  * </pre>
  * 
  */
@@ -27,36 +27,36 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 public class FetchDataReturn {
 
     @JsonProperty("data_matrix")
-    private Map<String, String> dataMatrix;
-    private Map<java.lang.String, Object> additionalProperties = new HashMap<java.lang.String, Object>();
+    private String dataMatrix;
+    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     @JsonProperty("data_matrix")
-    public Map<String, String> getDataMatrix() {
+    public String getDataMatrix() {
         return dataMatrix;
     }
 
     @JsonProperty("data_matrix")
-    public void setDataMatrix(Map<String, String> dataMatrix) {
+    public void setDataMatrix(String dataMatrix) {
         this.dataMatrix = dataMatrix;
     }
 
-    public FetchDataReturn withDataMatrix(Map<String, String> dataMatrix) {
+    public FetchDataReturn withDataMatrix(String dataMatrix) {
         this.dataMatrix = dataMatrix;
         return this;
     }
 
     @JsonAnyGetter
-    public Map<java.lang.String, Object> getAdditionalProperties() {
+    public Map<String, Object> getAdditionalProperties() {
         return this.additionalProperties;
     }
 
     @JsonAnySetter
-    public void setAdditionalProperties(java.lang.String name, Object value) {
+    public void setAdditionalProperties(String name, Object value) {
         this.additionalProperties.put(name, value);
     }
 
     @Override
-    public java.lang.String toString() {
+    public String toString() {
         return ((((("FetchDataReturn"+" [dataMatrix=")+ dataMatrix)+", additionalProperties=")+ additionalProperties)+"]");
     }
 
