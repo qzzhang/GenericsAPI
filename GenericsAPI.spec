@@ -14,7 +14,6 @@ module GenericsAPI {
 
   /* Input of the fetch_data function
     obj_ref: generics object reference
-    workspace_name: the name of the workspace
 
     Optional arguments:
     target_data_field: the data field to be retrieved from.
@@ -27,16 +26,14 @@ module GenericsAPI {
   */
   typedef structure {
     obj_ref obj_ref;
-    string workspace_name;
-
     string target_data_field;
   } FetchDataParams;
 
   /* Ouput of the fetch_data function
-    data_matrix: a pandas dataframe
+    data_matrix: a pandas dataframe in json format
   */
   typedef structure {
-    mapping<string, string> data_matrix;
+    string data_matrix;
   } FetchDataReturn;
 
   /* fetch_data: fetch generics data as pandas dataframe for a generics data object*/

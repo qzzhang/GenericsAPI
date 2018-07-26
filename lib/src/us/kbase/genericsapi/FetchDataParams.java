@@ -16,7 +16,6 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
  * <pre>
  * Input of the fetch_data function
  * obj_ref: generics object reference
- * workspace_name: the name of the workspace
  * Optional arguments:
  * target_data_field: the data field to be retrieved from.
  *                    fetch_data will try to auto find this field.
@@ -32,15 +31,12 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 @Generated("com.googlecode.jsonschema2pojo")
 @JsonPropertyOrder({
     "obj_ref",
-    "workspace_name",
     "target_data_field"
 })
 public class FetchDataParams {
 
     @JsonProperty("obj_ref")
     private String objRef;
-    @JsonProperty("workspace_name")
-    private String workspaceName;
     @JsonProperty("target_data_field")
     private String targetDataField;
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
@@ -57,21 +53,6 @@ public class FetchDataParams {
 
     public FetchDataParams withObjRef(String objRef) {
         this.objRef = objRef;
-        return this;
-    }
-
-    @JsonProperty("workspace_name")
-    public String getWorkspaceName() {
-        return workspaceName;
-    }
-
-    @JsonProperty("workspace_name")
-    public void setWorkspaceName(String workspaceName) {
-        this.workspaceName = workspaceName;
-    }
-
-    public FetchDataParams withWorkspaceName(String workspaceName) {
-        this.workspaceName = workspaceName;
         return this;
     }
 
@@ -102,7 +83,7 @@ public class FetchDataParams {
 
     @Override
     public String toString() {
-        return ((((((((("FetchDataParams"+" [objRef=")+ objRef)+", workspaceName=")+ workspaceName)+", targetDataField=")+ targetDataField)+", additionalProperties=")+ additionalProperties)+"]");
+        return ((((((("FetchDataParams"+" [objRef=")+ objRef)+", targetDataField=")+ targetDataField)+", additionalProperties=")+ additionalProperties)+"]");
     }
 
 }
