@@ -42,7 +42,7 @@ class GenericsAPI(object):
            retrieved from e.g. for an given data type like below: typedef
            structure { FloatMatrix2D data; condition_set_ref
            condition_set_ref; } SomeGenericsMatrix; generics_module should be
-           {'FloatMatrix2D': 'data', 'condition_set_ref':
+           {'data': 'FloatMatrix2D', 'condition_set_ref':
            'condition_set_ref'}) -> structure: parameter "obj_ref" of type
            "obj_ref" (An X/Y/Z style reference), parameter "generics_module"
            of mapping from String to String
@@ -76,7 +76,7 @@ class GenericsAPI(object):
            retrieved from e.g. for an given data type like below: typedef
            structure { FloatMatrix2D data; condition_set_ref
            condition_set_ref; } SomeGenericsMatrix; and only 'FloatMatrix2D'
-           is needed generics_module should be {'FloatMatrix2D': 'data'}) ->
+           is needed generics_module should be {'data': FloatMatrix2D'}) ->
            structure: parameter "obj_ref" of type "obj_ref" (An X/Y/Z style
            reference), parameter "generics_module" of mapping from String to
            String

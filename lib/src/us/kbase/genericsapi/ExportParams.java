@@ -25,7 +25,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
  *                     } SomeGenericsMatrix;
  *                     and only 'FloatMatrix2D' is needed
  *                     generics_module should be
- *                     {'FloatMatrix2D': 'data'}
+ *                     {'data': FloatMatrix2D'}
  * </pre>
  * 
  */

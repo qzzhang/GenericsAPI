@@ -23,7 +23,7 @@ module GenericsAPI {
                       condition_set_ref condition_set_ref;
                     } SomeGenericsMatrix;
                     generics_module should be
-                    {'FloatMatrix2D': 'data',
+                    {'data': 'FloatMatrix2D',
                      'condition_set_ref': 'condition_set_ref'}
   */
   typedef structure {
@@ -71,7 +71,7 @@ module GenericsAPI {
                         } SomeGenericsMatrix;
                         and only 'FloatMatrix2D' is needed
                         generics_module should be
-                        {'FloatMatrix2D': 'data'}
+                        {'data': FloatMatrix2D'}
   */
   typedef structure {
       obj_ref obj_ref;

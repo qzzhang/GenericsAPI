@@ -221,7 +221,7 @@ class GenericsAPITest(unittest.TestCase):
         self.check_fetch_data_output(returnVal)
 
         params = {'obj_ref': self.expression_matrix_ref,
-                  'generics_module': {'FloatMatrix2D': 'data'}}
+                  'generics_module': {'data': 'FloatMatrix2D'}}
         returnVal = self.getImpl().fetch_data(self.ctx, params)[0]
         self.check_fetch_data_output(returnVal)
 

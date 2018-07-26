@@ -23,7 +23,7 @@ class GenericsAPI:
     ######################################### noqa
     VERSION = "0.0.1"
     GIT_URL = "git@github.com:Tianhao-Gu/GenericsAPI.git"
-    GIT_COMMIT_HASH = "4d14a0fd5fc396be63c467d198140025257d7a02"
+    GIT_COMMIT_HASH = "58928302201f391b4f01845bdc72fab263466fe9"
 
     #BEGIN_CLASS_HEADER
     #END_CLASS_HEADER
@@ -48,7 +48,7 @@ class GenericsAPI:
            retrieved from e.g. for an given data type like below: typedef
            structure { FloatMatrix2D data; condition_set_ref
            condition_set_ref; } SomeGenericsMatrix; generics_module should be
-           {'FloatMatrix2D': 'data', 'condition_set_ref':
+           {'data': 'FloatMatrix2D', 'condition_set_ref':
            'condition_set_ref'}) -> structure: parameter "obj_ref" of type
            "obj_ref" (An X/Y/Z style reference), parameter "generics_module"
            of mapping from String to String
@@ -102,7 +102,7 @@ class GenericsAPI:
            retrieved from e.g. for an given data type like below: typedef
            structure { FloatMatrix2D data; condition_set_ref
            condition_set_ref; } SomeGenericsMatrix; and only 'FloatMatrix2D'
-           is needed generics_module should be {'FloatMatrix2D': 'data'}) ->
+           is needed generics_module should be {'data': FloatMatrix2D'}) ->
            structure: parameter "obj_ref" of type "obj_ref" (An X/Y/Z style
            reference), parameter "generics_module" of mapping from String to
            String
