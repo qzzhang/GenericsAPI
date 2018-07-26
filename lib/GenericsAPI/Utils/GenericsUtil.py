@@ -5,6 +5,7 @@ import re
 import pandas as pd
 import uuid
 import errno
+import traceback
 
 from DataFileUtil.DataFileUtilClient import DataFileUtil
 from biokbase.workspace.client import Workspace as workspaceService
@@ -13,7 +14,7 @@ from biokbase.workspace.client import Workspace as workspaceService
 def log(message, prefix_newline=False):
     print(('\n' if prefix_newline else '') + str(time.time()) + ': ' + message)
 
-GENERICS_TYPE = ['FloatMatrix2D']  # add case in _convert_data for each additional type
+GENERICS_TYPE = ['FloatMatrix2D', 'ws_conditionset_id']  # add case in _convert_data for each additional type
 
 
 class GenericsUtil:
@@ -149,8 +150,9 @@ class GenericsUtil:
 
         generics_module = dict()
         for generics_type in generics_types:
-            generics_type_name = obj_type_spec.split(generics_type)[1].split(';')[0].strip()
-            generics_module.update({generics_type: generics_type_name})
+            for item in obj_type_spec.split(generics_type)[1:]:
+                generics_type_name = item.split(';')[0].strip()
+                generics_module.update({generics_type_name: generics_type})
 
         log('Found generics type:\n{}\n'.format(generics_module))
 
@@ -161,17 +163,25 @@ class GenericsUtil:
         _convert_data: convert data to df based on data_type
         """
 
-        data_types = generics_module.keys()
+        data_types = generics_module.values()
 
         if not set(GENERICS_TYPE) >= set(data_types):
             raise ValueError('Found unknown generics data type in:\n{}\n'.format(data_types))
 
         if data_types == ['FloatMatrix2D']:
-            key = generics_module['FloatMatrix2D']
+            key = generics_module.keys()[generics_module.values().index('FloatMatrix2D')]
             values = data[key]['values']
             index = data[key]['row_ids']
             columns = data[key]['col_ids']
             df = pd.DataFrame(values, index=index, columns=columns)
+        elif 'FloatMatrix2D' in data_types:  # default case
+            key = generics_module.keys()[generics_module.values().index('FloatMatrix2D')]
+            values = data[key]['values']
+            index = data[key]['row_ids']
+            columns = data[key]['col_ids']
+            df = pd.DataFrame(values, index=index, columns=columns)
+        else:
+            raise ValueError('Unexpected Error')
 
         return df.to_json()
 
@@ -190,7 +200,7 @@ class GenericsUtil:
             generics_module = self._find_generics_type(obj_info[2])
 
         try:
-            data = {k: v for k, v in obj_data.items() if k in generics_module.values()}
+            data = {k: v for k, v in obj_data.items() if k in generics_module.keys()}
         except KeyError:
             raise ValueError('Retrieved wrong generics type name')
 
@@ -247,7 +257,7 @@ class GenericsUtil:
                           condition_set_ref condition_set_ref;
                         } SomeGenericsMatrix;
                         generics_module should be
-                        {'FloatMatrix2D': 'data',
+                        {'data': 'FloatMatrix2D',
                          'condition_set_ref': 'condition_set_ref'}
 
         return:
@@ -262,8 +272,9 @@ class GenericsUtil:
         try:
             data_matrix = self._retrieve_data(params.get('obj_ref'),
                                               params.get('generics_module'))
-        except Exception as e:
-            error_msg = 'Running fetch_data returned an error:\n{}\n'.format(str(e))
+        except Exception:
+            error_msg = 'Running fetch_data returned an error:\n{}\n'.format(
+                                                                traceback.format_exc())
             error_msg += 'Please try to specify generics type and name as generics_module\n'
             raise ValueError(error_msg)
 
@@ -287,7 +298,7 @@ class GenericsUtil:
                         } SomeGenericsMatrix;
                         and only data is needed
                         generics_module should be
-                        {'FloatMatrix2D': 'data'}
+                        {'data': 'FloatMatrix2D'}
         """
 
         data_matrix = self.fetch_data(params).get('data_matrix')

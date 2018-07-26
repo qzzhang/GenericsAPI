@@ -24,7 +24,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
  *                   condition_set_ref condition_set_ref;
  *                 } SomeGenericsMatrix;
  *                 generics_module should be
- *                 {'FloatMatrix2D': 'data',
+ *                 {'data': 'FloatMatrix2D',
  *                  'condition_set_ref': 'condition_set_ref'}
  * </pre>
  * 

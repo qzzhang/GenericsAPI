@@ -555,7 +555,7 @@ generics_module: the generics data module to be retrieved from
                   condition_set_ref condition_set_ref;
                 } SomeGenericsMatrix;
                 generics_module should be
-                {'FloatMatrix2D': 'data',
+                {'data': 'FloatMatrix2D',
                  'condition_set_ref': 'condition_set_ref'}
 
 
@@ -713,7 +713,7 @@ generics_module: select the generics data to be retrieved from
                     } SomeGenericsMatrix;
                     and only 'FloatMatrix2D' is needed
                     generics_module should be
-                    {'FloatMatrix2D': 'data'}
+                    {'data': FloatMatrix2D'}
 
 
 =item Definition
