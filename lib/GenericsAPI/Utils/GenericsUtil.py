@@ -127,7 +127,7 @@ class GenericsUtil:
 
         return df.to_json()
 
-    def _retrieve_data(self, obj_ref):
+    def _retrieve_data(self, obj_ref, generics_type=None, generics_type_name=None):
         """
         _retrieve_data: retrieve object data and return a dataframe
         """
@@ -138,7 +138,8 @@ class GenericsUtil:
         obj_info = obj_source.get('info')
         obj_data = obj_source.get('data')
 
-        generics_type, generics_type_name = self._find_generics_type(obj_info[2])
+        if not (generics_type and generics_type_name):
+            generics_type, generics_type_name = self._find_generics_type(obj_info[2])
 
         try:
             data = obj_data[generics_type_name]
@@ -191,13 +192,14 @@ class GenericsUtil:
         obj_ref: generics object reference
 
         optional arguments:
-        target_data_field: the data field to be retrieved from.
-                           fetch_data will try to auto find this field.
+        generics_type: the data type to be retrieved from
+        generics_type_name: the name of the data type to be retrieved from
                             e.g. for an given data type like below:
                             typedef structure {
                               FloatMatrix2D data;
                             } SomeGenericsMatrix;
-                            data should be the target data field.
+                            generics_type should be 'FloatMatrix2D'
+                            generics_type_name should be 'data'
 
         return:
         data_matrix: a pandas dataframe in json format
@@ -208,6 +210,15 @@ class GenericsUtil:
 
         self._validate_fetch_data_params(params)
 
-        returnVal = {'data_matrix': self._retrieve_data(params.get('obj_ref'))}
+        try:
+            data_matrix = self._retrieve_data(params.get('obj_ref'),
+                                              params.get('generics_type'),
+                                              params.get('generics_type_name'))
+        except Exception as e:
+            error_msg = 'Running fetch_data returned an error:\n{}\n'.format(str(e))
+            error_msg += 'Please try to specify generics type and name\n'
+            raise ValueError(error_msg)
+
+        returnVal = {'data_matrix': data_matrix}
 
         return returnVal
