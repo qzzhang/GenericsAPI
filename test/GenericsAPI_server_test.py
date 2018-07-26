@@ -5,7 +5,7 @@ import json  # noqa: F401
 import time
 import requests  # noqa: F401
 import inspect
-import json
+import pandas as pd
 
 
 from os import environ
@@ -121,24 +121,24 @@ class GenericsAPITest(unittest.TestCase):
         else:
             self.assertEqual(error, str(context.exception.message))
 
-    # def test_bad_fetch_data_params(self):
-    #     self.start_test()
-    #     invalidate_params = {'missing_obj_ref': 'obj_ref'}
-    #     error_msg = '"obj_ref" parameter is required, but missing'
-    #     self.fail_fetch_data(invalidate_params, error_msg)
+    def test_bad_fetch_data_params(self):
+        self.start_test()
+        invalidate_params = {'missing_obj_ref': 'obj_ref'}
+        error_msg = '"obj_ref" parameter is required, but missing'
+        self.fail_fetch_data(invalidate_params, error_msg)
 
-    # def test_generate_matrix_html(self):
-    #     self.start_test()
+    def test_generate_matrix_html(self):
+        self.start_test()
 
-    #     csv_file_name = 'metadata.csv'
-    #     df = pd.read_csv(os.path.join('data', csv_file_name))
+        csv_file_name = 'metadata.csv'
+        df = pd.read_csv(os.path.join('data', csv_file_name))
 
-    #     returnVal = self.getImpl().generate_matrix_html(self.ctx, {'df': df})[0]
+        returnVal = self.getImpl().generate_matrix_html(self.ctx, {'df': df})[0]
 
-    #     self.assertTrue('html_string' in returnVal)
-    #     self.assertTrue('ADD_COL' not in returnVal.get('html_string'))
-    #     self.assertTrue('ADD_DATA' not in returnVal.get('html_string'))
-    #     self.assertTrue('ADD_FORMATTER' not in returnVal.get('html_string'))
+        self.assertTrue('html_string' in returnVal)
+        self.assertTrue('ADD_COL' not in returnVal.get('html_string'))
+        self.assertTrue('ADD_DATA' not in returnVal.get('html_string'))
+        self.assertTrue('ADD_FORMATTER' not in returnVal.get('html_string'))
 
     def test_fetch_data(self):
         self.start_test()
@@ -154,5 +154,3 @@ class GenericsAPITest(unittest.TestCase):
         self.assertItemsEqual(col_ids, self.col_ids)
         for col_id in col_ids:
             self.assertItemsEqual(data_matrix.get(col_id).keys(), self.row_ids)
-
-        print returnVal
