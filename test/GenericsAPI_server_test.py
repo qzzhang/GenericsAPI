@@ -72,19 +72,21 @@ class GenericsAPITest(unittest.TestCase):
 
     @classmethod
     def prepare_data(cls):
-        # upload expression matrix object
+        cls.col_ids = ['condition_1', 'condition_2', 'condition_3', 'condition_4']
+        cls.row_ids = ['gene_1', 'gene_2', 'gene_3']
+        cls.values = [[0.1, 0.2, 0.3, 0.4],
+                      [0.3, 0.4, 0.5, 0.6],
+                      [None, None, None, None]]
+
+        # upload ExpressionMatrix object
         workspace_id = cls.dfu.ws_name_to_id(cls.wsName)
         object_type = 'KBaseFeatureValues.ExpressionMatrix'
         expression_matrix_object_name = 'test_expression_matrix'
-        cls.col_ids = ['condition_1', 'condition_2', 'condition_3', 'condition_4']
-        cls.row_ids = ['gene_1', 'gene_2', 'gene_3']
         expression_matrix_data = {'scale': 'log2',
                                   'type': 'level',
                                   'data': {'row_ids': cls.row_ids,
                                            'col_ids': cls.col_ids,
-                                           'values': [[0.1, 0.2, 0.3, 0.4],
-                                                      [0.3, 0.4, 0.5, 0.6],
-                                                      [None, None, None, None]]
+                                           'values': cls.values
                                            }}
         save_object_params = {
             'id': workspace_id,
@@ -95,6 +97,46 @@ class GenericsAPITest(unittest.TestCase):
 
         dfu_oi = cls.dfu.save_objects(save_object_params)[0]
         cls.expression_matrix_ref = str(dfu_oi[6]) + '/' + str(dfu_oi[0]) + '/' + str(dfu_oi[4])
+
+        # upload SingleKnockoutFitnessMatrix object
+        workspace_id = cls.dfu.ws_name_to_id(cls.wsName)
+        object_type = 'KBaseFeatureValues.SingleKnockoutFitnessMatrix'
+        fitness_matrix_object_name = 'test_fitness_matrix'
+        fitness_matrix_data = {'scale': 'log2',
+                               'type': 'level',
+                               'data': {'row_ids': cls.row_ids,
+                                        'col_ids': cls.col_ids,
+                                        'values': cls.values
+                                        }}
+        save_object_params = {
+            'id': workspace_id,
+            'objects': [{'type': object_type,
+                         'data': fitness_matrix_data,
+                         'name': fitness_matrix_object_name}]
+        }
+
+        dfu_oi = cls.dfu.save_objects(save_object_params)[0]
+        cls.fitness_matrix_ref = str(dfu_oi[6]) + '/' + str(dfu_oi[0]) + '/' + str(dfu_oi[4])
+
+        # upload DifferentialExpressionMatrix object
+        workspace_id = cls.dfu.ws_name_to_id(cls.wsName)
+        object_type = 'KBaseFeatureValues.DifferentialExpressionMatrix'
+        diff_expr_matrix_object_name = 'test_fitness_matrix'
+        diff_expr_matrix_data = {'scale': 'log2',
+                                 'type': 'level',
+                                 'data': {'row_ids': cls.row_ids,
+                                          'col_ids': cls.col_ids,
+                                          'values': cls.values
+                                          }}
+        save_object_params = {
+            'id': workspace_id,
+            'objects': [{'type': object_type,
+                         'data': diff_expr_matrix_data,
+                         'name': diff_expr_matrix_object_name}]
+        }
+
+        dfu_oi = cls.dfu.save_objects(save_object_params)[0]
+        cls.diff_expr_matrix_ref = str(dfu_oi[6]) + '/' + str(dfu_oi[0]) + '/' + str(dfu_oi[4])
 
     def getWsClient(self):
         return self.__class__.wsClient
@@ -121,6 +163,15 @@ class GenericsAPITest(unittest.TestCase):
         else:
             self.assertEqual(error, str(context.exception.message))
 
+    def check_fetch_data_output(self, returnVal):
+        self.assertTrue('data_matrix' in returnVal)
+        data_matrix = json.loads(returnVal.get('data_matrix'))
+
+        col_ids = data_matrix.keys()
+        self.assertItemsEqual(col_ids, self.col_ids)
+        for col_id in col_ids:
+            self.assertItemsEqual(data_matrix.get(col_id).keys(), self.row_ids)
+
     def test_bad_fetch_data_params(self):
         self.start_test()
         invalidate_params = {'missing_obj_ref': 'obj_ref'}
@@ -142,15 +193,14 @@ class GenericsAPITest(unittest.TestCase):
 
     def test_fetch_data(self):
         self.start_test()
-
         params = {'obj_ref': self.expression_matrix_ref}
-
         returnVal = self.getImpl().fetch_data(self.ctx, params)[0]
+        self.check_fetch_data_output(returnVal)
 
-        self.assertTrue('data_matrix' in returnVal)
-        data_matrix = json.loads(returnVal.get('data_matrix'))
+        params = {'obj_ref': self.fitness_matrix_ref}
+        returnVal = self.getImpl().fetch_data(self.ctx, params)[0]
+        self.check_fetch_data_output(returnVal)
 
-        col_ids = data_matrix.keys()
-        self.assertItemsEqual(col_ids, self.col_ids)
-        for col_id in col_ids:
-            self.assertItemsEqual(data_matrix.get(col_id).keys(), self.row_ids)
+        params = {'obj_ref': self.diff_expr_matrix_ref}
+        returnVal = self.getImpl().fetch_data(self.ctx, params)[0]
+        self.check_fetch_data_output(returnVal)

@@ -11,7 +11,7 @@ from biokbase.workspace.client import Workspace as workspaceService
 def log(message, prefix_newline=False):
     print(('\n' if prefix_newline else '') + str(time.time()) + ': ' + message)
 
-GENERICS_TYPE = ['FloatMatrix2D']
+GENERICS_TYPE = ['FloatMatrix2D']  # add case in _convert_data for each additional type
 
 
 class GenericsUtil:
