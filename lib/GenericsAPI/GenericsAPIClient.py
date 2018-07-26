@@ -38,14 +38,14 @@ class GenericsAPI(object):
         fetch_data: fetch generics data as pandas dataframe for a generics data object
         :param params: instance of type "FetchDataParams" (Input of the
            fetch_data function obj_ref: generics object reference Optional
-           arguments: generics_type: the data type to be retrieved from
-           generics_type_name: the name of the data type to be retrieved from
-           e.g. for an given data type like below: typedef structure {
-           FloatMatrix2D data; } SomeGenericsMatrix; generics_type should be
-           'FloatMatrix2D' generics_type_name should be 'data') -> structure:
-           parameter "obj_ref" of type "obj_ref" (An X/Y/Z style reference),
-           parameter "generics_type" of String, parameter
-           "generics_type_name" of String
+           arguments: generics_module: the generics data module to be
+           retrieved from e.g. for an given data type like below: typedef
+           structure { FloatMatrix2D data; condition_set_ref
+           condition_set_ref; } SomeGenericsMatrix; generics_module should be
+           {'FloatMatrix2D': 'data', 'condition_set_ref':
+           'condition_set_ref'}) -> structure: parameter "obj_ref" of type
+           "obj_ref" (An X/Y/Z style reference), parameter "generics_module"
+           of mapping from String to String
         :returns: instance of type "FetchDataReturn" (Ouput of the fetch_data
            function data_matrix: a pandas dataframe in json format) ->
            structure: parameter "data_matrix" of String
@@ -66,6 +66,25 @@ class GenericsAPI(object):
         """
         return self._client.call_method(
             'GenericsAPI.generate_matrix_html',
+            [params], self._service_ver, context)
+
+    def export_matrix(self, params, context=None):
+        """
+        :param params: instance of type "ExportParams" (Input of the
+           export_matrix function obj_ref: generics object reference Optional
+           arguments: generics_module: select the generics data to be
+           retrieved from e.g. for an given data type like below: typedef
+           structure { FloatMatrix2D data; condition_set_ref
+           condition_set_ref; } SomeGenericsMatrix; and only 'FloatMatrix2D'
+           is needed generics_module should be {'FloatMatrix2D': 'data'}) ->
+           structure: parameter "obj_ref" of type "obj_ref" (An X/Y/Z style
+           reference), parameter "generics_module" of mapping from String to
+           String
+        :returns: instance of type "ExportOutput" -> structure: parameter
+           "shock_id" of String
+        """
+        return self._client.call_method(
+            'GenericsAPI.export_matrix',
             [params], self._service_ver, context)
 
     def status(self, context=None):

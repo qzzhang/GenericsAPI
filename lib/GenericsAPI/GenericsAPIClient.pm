@@ -123,8 +123,7 @@ $params is a GenericsAPI.FetchDataParams
 $returnVal is a GenericsAPI.FetchDataReturn
 FetchDataParams is a reference to a hash where the following keys are defined:
 	obj_ref has a value which is a GenericsAPI.obj_ref
-	generics_type has a value which is a string
-	generics_type_name has a value which is a string
+	generics_module has a value which is a reference to a hash where the key is a string and the value is a string
 obj_ref is a string
 FetchDataReturn is a reference to a hash where the following keys are defined:
 	data_matrix has a value which is a string
@@ -139,8 +138,7 @@ $params is a GenericsAPI.FetchDataParams
 $returnVal is a GenericsAPI.FetchDataReturn
 FetchDataParams is a reference to a hash where the following keys are defined:
 	obj_ref has a value which is a GenericsAPI.obj_ref
-	generics_type has a value which is a string
-	generics_type_name has a value which is a string
+	generics_module has a value which is a reference to a hash where the key is a string and the value is a string
 obj_ref is a string
 FetchDataReturn is a reference to a hash where the following keys are defined:
 	data_matrix has a value which is a string
@@ -292,6 +290,100 @@ generate_matrix_html: generate a html page for given data
     }
 }
  
+
+
+=head2 export_matrix
+
+  $returnVal = $obj->export_matrix($params)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$params is a GenericsAPI.ExportParams
+$returnVal is a GenericsAPI.ExportOutput
+ExportParams is a reference to a hash where the following keys are defined:
+	obj_ref has a value which is a GenericsAPI.obj_ref
+	generics_module has a value which is a reference to a hash where the key is a string and the value is a string
+obj_ref is a string
+ExportOutput is a reference to a hash where the following keys are defined:
+	shock_id has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$params is a GenericsAPI.ExportParams
+$returnVal is a GenericsAPI.ExportOutput
+ExportParams is a reference to a hash where the following keys are defined:
+	obj_ref has a value which is a GenericsAPI.obj_ref
+	generics_module has a value which is a reference to a hash where the key is a string and the value is a string
+obj_ref is a string
+ExportOutput is a reference to a hash where the following keys are defined:
+	shock_id has a value which is a string
+
+
+=end text
+
+=item Description
+
+
+
+=back
+
+=cut
+
+ sub export_matrix
+{
+    my($self, @args) = @_;
+
+# Authentication: required
+
+    if ((my $n = @args) != 1)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function export_matrix (received $n, expecting 1)");
+    }
+    {
+	my($params) = @args;
+
+	my @_bad_arguments;
+        (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument 1 \"params\" (value was \"$params\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to export_matrix:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'export_matrix');
+	}
+    }
+
+    my $url = $self->{url};
+    my $result = $self->{client}->call($url, $self->{headers}, {
+	    method => "GenericsAPI.export_matrix",
+	    params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'export_matrix',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method export_matrix",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'export_matrix',
+				       );
+    }
+}
+ 
   
 sub status
 {
@@ -335,16 +427,16 @@ sub version {
             Bio::KBase::Exceptions::JSONRPC->throw(
                 error => $result->error_message,
                 code => $result->content->{code},
-                method_name => 'generate_matrix_html',
+                method_name => 'export_matrix',
             );
         } else {
             return wantarray ? @{$result->result} : $result->result->[0];
         }
     } else {
         Bio::KBase::Exceptions::HTTP->throw(
-            error => "Error invoking method generate_matrix_html",
+            error => "Error invoking method export_matrix",
             status_line => $self->{client}->status_line,
-            method_name => 'generate_matrix_html',
+            method_name => 'export_matrix',
         );
     }
 }
@@ -456,14 +548,15 @@ Input of the fetch_data function
 obj_ref: generics object reference
 
 Optional arguments:
-generics_type: the data type to be retrieved from
-generics_type_name: the name of the data type to be retrieved from
-                    e.g. for an given data type like below:
-                    typedef structure {
-                      FloatMatrix2D data;
-                    } SomeGenericsMatrix;
-                    generics_type should be 'FloatMatrix2D'
-                    generics_type_name should be 'data'
+generics_module: the generics data module to be retrieved from
+                e.g. for an given data type like below:
+                typedef structure {
+                  FloatMatrix2D data;
+                  condition_set_ref condition_set_ref;
+                } SomeGenericsMatrix;
+                generics_module should be
+                {'FloatMatrix2D': 'data',
+                 'condition_set_ref': 'condition_set_ref'}
 
 
 =item Definition
@@ -473,8 +566,7 @@ generics_type_name: the name of the data type to be retrieved from
 <pre>
 a reference to a hash where the following keys are defined:
 obj_ref has a value which is a GenericsAPI.obj_ref
-generics_type has a value which is a string
-generics_type_name has a value which is a string
+generics_module has a value which is a reference to a hash where the key is a string and the value is a string
 
 </pre>
 
@@ -484,8 +576,7 @@ generics_type_name has a value which is a string
 
 a reference to a hash where the following keys are defined:
 obj_ref has a value which is a GenericsAPI.obj_ref
-generics_type has a value which is a string
-generics_type_name has a value which is a string
+generics_module has a value which is a reference to a hash where the key is a string and the value is a string
 
 
 =end text
@@ -594,6 +685,85 @@ html_string has a value which is a string
 
 a reference to a hash where the following keys are defined:
 html_string has a value which is a string
+
+
+=end text
+
+=back
+
+
+
+=head2 ExportParams
+
+=over 4
+
+
+
+=item Description
+
+Input of the export_matrix function
+obj_ref: generics object reference
+
+Optional arguments:
+generics_module: select the generics data to be retrieved from
+                    e.g. for an given data type like below:
+                    typedef structure {
+                      FloatMatrix2D data;
+                      condition_set_ref condition_set_ref;
+                    } SomeGenericsMatrix;
+                    and only 'FloatMatrix2D' is needed
+                    generics_module should be
+                    {'FloatMatrix2D': 'data'}
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+obj_ref has a value which is a GenericsAPI.obj_ref
+generics_module has a value which is a reference to a hash where the key is a string and the value is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+obj_ref has a value which is a GenericsAPI.obj_ref
+generics_module has a value which is a reference to a hash where the key is a string and the value is a string
+
+
+=end text
+
+=back
+
+
+
+=head2 ExportOutput
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+shock_id has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+shock_id has a value which is a string
 
 
 =end text

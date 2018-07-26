@@ -23,7 +23,7 @@ class GenericsAPI:
     ######################################### noqa
     VERSION = "0.0.1"
     GIT_URL = "git@github.com:Tianhao-Gu/GenericsAPI.git"
-    GIT_COMMIT_HASH = "dc19ece6e912d84b06877d6c891a04fccc52447c"
+    GIT_COMMIT_HASH = "4d14a0fd5fc396be63c467d198140025257d7a02"
 
     #BEGIN_CLASS_HEADER
     #END_CLASS_HEADER
@@ -44,14 +44,14 @@ class GenericsAPI:
         fetch_data: fetch generics data as pandas dataframe for a generics data object
         :param params: instance of type "FetchDataParams" (Input of the
            fetch_data function obj_ref: generics object reference Optional
-           arguments: generics_type: the data type to be retrieved from
-           generics_type_name: the name of the data type to be retrieved from
-           e.g. for an given data type like below: typedef structure {
-           FloatMatrix2D data; } SomeGenericsMatrix; generics_type should be
-           'FloatMatrix2D' generics_type_name should be 'data') -> structure:
-           parameter "obj_ref" of type "obj_ref" (An X/Y/Z style reference),
-           parameter "generics_type" of String, parameter
-           "generics_type_name" of String
+           arguments: generics_module: the generics data module to be
+           retrieved from e.g. for an given data type like below: typedef
+           structure { FloatMatrix2D data; condition_set_ref
+           condition_set_ref; } SomeGenericsMatrix; generics_module should be
+           {'FloatMatrix2D': 'data', 'condition_set_ref':
+           'condition_set_ref'}) -> structure: parameter "obj_ref" of type
+           "obj_ref" (An X/Y/Z style reference), parameter "generics_module"
+           of mapping from String to String
         :returns: instance of type "FetchDataReturn" (Ouput of the fetch_data
            function data_matrix: a pandas dataframe in json format) ->
            structure: parameter "data_matrix" of String
@@ -90,6 +90,35 @@ class GenericsAPI:
         # At some point might do deeper type checking...
         if not isinstance(returnVal, dict):
             raise ValueError('Method generate_matrix_html return value ' +
+                             'returnVal is not type dict as required.')
+        # return the results
+        return [returnVal]
+
+    def export_matrix(self, ctx, params):
+        """
+        :param params: instance of type "ExportParams" (Input of the
+           export_matrix function obj_ref: generics object reference Optional
+           arguments: generics_module: select the generics data to be
+           retrieved from e.g. for an given data type like below: typedef
+           structure { FloatMatrix2D data; condition_set_ref
+           condition_set_ref; } SomeGenericsMatrix; and only 'FloatMatrix2D'
+           is needed generics_module should be {'FloatMatrix2D': 'data'}) ->
+           structure: parameter "obj_ref" of type "obj_ref" (An X/Y/Z style
+           reference), parameter "generics_module" of mapping from String to
+           String
+        :returns: instance of type "ExportOutput" -> structure: parameter
+           "shock_id" of String
+        """
+        # ctx is the context object
+        # return variables are: returnVal
+        #BEGIN export_matrix
+        generics_api = GenericsUtil(self.config)
+        returnVal = generics_api.export_matrix(params)
+        #END export_matrix
+
+        # At some point might do deeper type checking...
+        if not isinstance(returnVal, dict):
+            raise ValueError('Method export_matrix return value ' +
                              'returnVal is not type dict as required.')
         # return the results
         return [returnVal]

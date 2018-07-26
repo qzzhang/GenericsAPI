@@ -341,6 +341,10 @@ class Application(object):
                              name='GenericsAPI.generate_matrix_html',
                              types=[dict])
         self.method_authentication['GenericsAPI.generate_matrix_html'] = 'required'  # noqa
+        self.rpc_service.add(impl_GenericsAPI.export_matrix,
+                             name='GenericsAPI.export_matrix',
+                             types=[dict])
+        self.method_authentication['GenericsAPI.export_matrix'] = 'required'  # noqa
         self.rpc_service.add(impl_GenericsAPI.status,
                              name='GenericsAPI.status',
                              types=[dict])

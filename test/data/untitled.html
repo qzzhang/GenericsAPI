@@ -1,0 +1,34 @@
+<html>
+  <head>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript">
+      google.charts.load('current', {'packages':['table']});
+      google.charts.setOnLoadCallback(drawTable);
+
+      function drawTable() {
+        var data = new google.visualization.DataTable();
+        data.addColumn('string', 'Unnamed: 0')
+data.addColumn('string', 'Well_ID')
+data.addColumn('number', 'Filter_Size_um')
+data.addColumn('number', 'Volume_Filtered_L')
+data.addColumn('string', 'Treatment')
+data.addColumn('number', 'Week')
+data.addColumn('string', 'Condition')
+
+        data.addRows([['S1', 'FW222', 10.0, 10, 'Positive Control', 1.0, 'Pre-Ethanol'], ['S2', 'FW222', 0.2, 10, 'Positive Control', 1.0, 'Pre-Ethanol'], ['S3', 'FW224', 10.0, 5, 'Negative Control', 1.0, 'Pre-Ethanol'], ['S4', 'FW22', 0.2, 5, 'Negative Control', 1.0, 'Pre-Ethanol'], ['S5', 'FW220', 10.0, 7, 'Background', 1.0, 'Pre-Ethanol'], ['S6', 'FW220', 0.2, 7, 'Background', 1.0, 'Pre-Ethanol'], ['S7', 'FW221', 10.0, 1, 'Background', 1.0, 'Pre-Ethanol'], ['S8', 'FW221', 0.2, 1, 'Background', 1.0, 'Pre-Ethanol'], ['S9', 'FW223', 10.0, 3, 'Background', 1.0, 'Pre-Ethanol'], ['S10', 'FW223', 0.2, 3, 'Background', 1.0, 'Pre-Ethanol'], ['S11', 'FW222', 10.0, 10, 'Positive Control', 4.0, '3-Ethanol'], ['S12', 'FW222', 0.2, 10, 'Positive Control', 4.0, '3-Ethanol'], ['S13', 'FW224', 10.0, 5, 'Negative Control', 4.0, 'Pre-Ethanol'], ['S14', 'FW224', 0.2, 5, 'Negative Control', 4.0, 'Pre-Ethanol'], ['S15', 'FW222', 10.0, 10, 'Positive Control', 7.0, '6-Ethanol'], ['S16', 'FW222', 0.2, 10, 'Positive Control', 7.0, '6-Ethanol'], ['S17', 'FW224', 10.0, 5, 'Negative Control', 7.0, 'Pre-Ethanol'], ['S18', 'FW224', 0.2, 5, 'Negative Control', 7.0, 'Pre-Ethanol'], ['S19', 'FW222', 10.0, 10, 'Positive Control', 8.0, '6-Ethanol'], ['S20', 'FW222', 0.2, 10, 'Positive Control', 8.0, '6-Ethanol'], ['S21', 'FW224', 10.0, 5, 'Negative Control', 8.0, 'Pre-Ethanol'], ['S22', 'FW224', 0.2, 5, 'Negative Control', 8.0, 'Pre-Ethanol'], ['S23', 'FW222', 10.0, 10, 'Positive Control', 9.0, '6-Ethanol'], ['S24', 'FW222', 0.2, 10, 'Positive Control', 9.0, '6-Ethanol'], ['S25', 'FW224', 10.0, 5, 'Negative Control', 9.0, 'Pre-Ethanol'], ['S26', 'FW224', 0.2, 5, 'Negative Control', 9.0, 'Pre-Ethanol'], ['S27', 'FW222', 10.0, 10, 'Positive Control', 10.0, '6-Ethanol'], ['S28', 'FW222', 0.2, 10, 'Positive Control', 10.0, '6-Ethanol'], ['S29', 'FW224', 10.0, 5, 'Negative Control', 10.0, 'Pre-Ethanol'], ['S30', 'FW224', 0.2, 5, 'Negative Control', 10.0, 'Pre-Ethanol'], ['S31', 'FW222', 10.0, 10, 'Positive Control', 14.1, '6-Ethanol'], ['S32', 'FW222', 0.2, 10, 'Positive Control', 14.1, '6-Ethanol'], ['S33', 'FW224', 10.0, 5, 'Negative Control', 14.1, 'Pre-Ethanol'], ['S34', 'FW224', 0.2, 5, 'Negative Control', 14.1, 'Pre-Ethanol'], ['S35', 'FW222', 10.0, 10, 'Positive Control', 14.2, '7-Ethanol'], ['S36', 'FW222', 0.2, 10, 'Positive Control', 14.2, '7-Ethanol'], ['S37', 'FW224', 10.0, 5, 'Negative Control', 14.2, '1-Ethanol'], ['S38', 'FW224', 0.2, 5, 'Negative Control', 14.2, '1-Ethanol']])
+        var table = new google.visualization.Table(document.getElementById('table_div'));
+        var formatter_2 = new google.visualization.BarFormat({base: 5.1, width: 120});
+formatter_2.format(data, 2);
+var formatter_3 = new google.visualization.BarFormat({base: 6.89, width: 120});
+formatter_3.format(data, 3);
+var formatter_5 = new google.visualization.BarFormat({base: 7.24, width: 120});
+formatter_5.format(data, 5);
+
+        table.draw(data, {allowHtml: true, showRowNumber: true, width: '100%', height: '100%'});
+      }
+    </script>
+  </head>
+  <body>
+    <div id="table_div"></div>
+  </body>
+</html>

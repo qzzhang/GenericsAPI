@@ -172,6 +172,20 @@ class GenericsAPITest(unittest.TestCase):
         for col_id in col_ids:
             self.assertItemsEqual(data_matrix.get(col_id).keys(), self.row_ids)
 
+    def check_export_matrix_output(self, returnVal):
+        self.assertTrue('shock_id' in returnVal)
+
+        result_dir = os.path.join(self.scratch, 'export_matrix_result')
+        os.makedirs(result_dir)
+
+        shock_to_file_params = {
+            'shock_id': returnVal.get('shock_id'),
+            'file_path': result_dir}
+        shock_file = self.dfu.shock_to_file(shock_to_file_params)['file_path']
+        df = pd.read_excel(shock_file)
+        self.assertItemsEqual(df.columns.tolist(), self.col_ids)
+        self.assertItemsEqual(df.index.tolist(), self.row_ids)
+
     def test_bad_fetch_data_params(self):
         self.start_test()
         invalidate_params = {'missing_obj_ref': 'obj_ref'}
@@ -195,6 +209,7 @@ class GenericsAPITest(unittest.TestCase):
         self.start_test()
         params = {'obj_ref': self.expression_matrix_ref}
         returnVal = self.getImpl().fetch_data(self.ctx, params)[0]
+        print returnVal
         self.check_fetch_data_output(returnVal)
 
         params = {'obj_ref': self.fitness_matrix_ref}
@@ -206,7 +221,12 @@ class GenericsAPITest(unittest.TestCase):
         self.check_fetch_data_output(returnVal)
 
         params = {'obj_ref': self.expression_matrix_ref,
-                  'generics_type': 'FloatMatrix2D',
-                  'generics_type_name': 'data'}
+                  'generics_module': {'FloatMatrix2D': 'data'}}
         returnVal = self.getImpl().fetch_data(self.ctx, params)[0]
         self.check_fetch_data_output(returnVal)
+
+    def test_export_matrix(self):
+        self.start_test()
+        params = {'obj_ref': self.expression_matrix_ref}
+        returnVal = self.getImpl().export_matrix(self.ctx, params)[0]
+        self.check_export_matrix_output(returnVal)
