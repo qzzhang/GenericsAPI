@@ -12,20 +12,20 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 
 /**
- * <p>Original spec-file type: FetchDataParams</p>
+ * <p>Original spec-file type: ExportParams</p>
  * <pre>
- * Input of the fetch_data function
+ * Input of the export_matrix function
  * obj_ref: generics object reference
  * Optional arguments:
- * generics_module: the generics data module to be retrieved from
- *                 e.g. for an given data type like below:
- *                 typedef structure {
- *                   FloatMatrix2D data;
- *                   condition_set_ref condition_set_ref;
- *                 } SomeGenericsMatrix;
- *                 generics_module should be
- *                 {'FloatMatrix2D': 'data',
- *                  'condition_set_ref': 'condition_set_ref'}
+ * generics_module: select the generics data to be retrieved from
+ *                     e.g. for an given data type like below:
+ *                     typedef structure {
+ *                       FloatMatrix2D data;
+ *                       condition_set_ref condition_set_ref;
+ *                     } SomeGenericsMatrix;
+ *                     and only 'FloatMatrix2D' is needed
+ *                     generics_module should be
+ *                     {'FloatMatrix2D': 'data'}
  * </pre>
  * 
  */
@@ -35,7 +35,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
     "obj_ref",
     "generics_module"
 })
-public class FetchDataParams {
+public class ExportParams {
 
     @JsonProperty("obj_ref")
     private java.lang.String objRef;
@@ -53,7 +53,7 @@ public class FetchDataParams {
         this.objRef = objRef;
     }
 
-    public FetchDataParams withObjRef(java.lang.String objRef) {
+    public ExportParams withObjRef(java.lang.String objRef) {
         this.objRef = objRef;
         return this;
     }
@@ -68,7 +68,7 @@ public class FetchDataParams {
         this.genericsModule = genericsModule;
     }
 
-    public FetchDataParams withGenericsModule(Map<String, String> genericsModule) {
+    public ExportParams withGenericsModule(Map<String, String> genericsModule) {
         this.genericsModule = genericsModule;
         return this;
     }
@@ -85,7 +85,7 @@ public class FetchDataParams {
 
     @Override
     public java.lang.String toString() {
-        return ((((((("FetchDataParams"+" [objRef=")+ objRef)+", genericsModule=")+ genericsModule)+", additionalProperties=")+ additionalProperties)+"]");
+        return ((((((("ExportParams"+" [objRef=")+ objRef)+", genericsModule=")+ genericsModule)+", additionalProperties=")+ additionalProperties)+"]");
     }
 
 }

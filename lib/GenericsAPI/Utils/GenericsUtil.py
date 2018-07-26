@@ -3,6 +3,8 @@ import json
 import os
 import re
 import pandas as pd
+import uuid
+import errno
 
 from DataFileUtil.DataFileUtilClient import DataFileUtil
 from biokbase.workspace.client import Workspace as workspaceService
@@ -28,6 +30,51 @@ class GenericsUtil:
         for p in ['obj_ref']:
             if p not in params:
                 raise ValueError('"{}" parameter is required, but missing'.format(p))
+
+    def _upload_to_shock(self, file_path):
+        """
+        _upload_to_shock: upload target file to shock using DataFileUtil
+        """
+        log('Start uploading file to shock: {}'.format(file_path))
+
+        file_to_shock_params = {
+            'file_path': file_path
+        }
+        shock_file = self.dfu.file_to_shock(file_to_shock_params)
+
+        shock_id = shock_file.get('shock_id')
+
+        return shock_id
+
+    def _upload_dir_to_shock(self, directory):
+        """
+        _upload_dir_to_shock: upload target dir to shock using DataFileUtil
+        """
+        log('Start uploading directory to shock: {}'.format(directory))
+
+        file_to_shock_params = {
+            'file_path': directory,
+            'pack': 'zip'
+        }
+        shock_file = self.dfu.file_to_shock(file_to_shock_params)
+
+        shock_id = shock_file.get('shock_id')
+
+        return shock_id
+
+    def _mkdir_p(self, path):
+        """
+        _mkdir_p: make directory for given path
+        """
+        if not path:
+            return
+        try:
+            os.makedirs(path)
+        except OSError as exc:
+            if exc.errno == errno.EEXIST and os.path.isdir(path):
+                pass
+            else:
+                raise
 
     def _generate_html_string(self, df):
         """
@@ -93,43 +140,44 @@ class GenericsUtil:
             raise ValueError('Cannot retrieve spec for: {}'.format(obj_type))
         log('Found spec for {}\n{}\n'.format(obj_type, obj_type_spec))
 
-        generics_type = [generics_type for generics_type in GENERICS_TYPE
-                         if generics_type in obj_type_spec]
+        generics_types = [generics_type for generics_type in GENERICS_TYPE
+                          if generics_type in obj_type_spec]
 
-        if not generics_type:
+        if not generics_types:
             error_msg = 'Cannot find generics type in spec:\n{}\n'.format(obj_type_spec)
             raise ValueError(error_msg)
-        elif len(generics_type) > 1:
-            error_msg = 'More than 1 generics type found in spec:\n{}\n'.format(obj_type_spec)
-            raise ValueError(error_msg)
-        else:
-            generics_type = generics_type[0]
 
-        log('Found generics type: {}'.format(generics_type))
+        generics_module = dict()
+        for generics_type in generics_types:
+            generics_type_name = obj_type_spec.split(generics_type)[1].split(';')[0].strip()
+            generics_module.update({generics_type: generics_type_name})
 
-        generics_type_name = obj_type_spec.split(generics_type)[1].split(';')[0].strip()
-        log('Found generics type name: {}'.format(generics_type_name))
+        log('Found generics type:\n{}\n'.format(generics_module))
 
-        return generics_type, generics_type_name
+        return generics_module
 
-    def _convert_data(self, data, data_type):
+    def _convert_data(self, data, generics_module):
         """
         _convert_data: convert data to df based on data_type
         """
 
-        if data_type == 'FloatMatrix2D':
-            values = data['values']
-            index = data['row_ids']
-            columns = data['col_ids']
+        data_types = generics_module.keys()
+
+        if not set(GENERICS_TYPE) >= set(data_types):
+            raise ValueError('Found unknown generics data type in:\n{}\n'.format(data_types))
+
+        if data_types == ['FloatMatrix2D']:
+            key = generics_module['FloatMatrix2D']
+            values = data[key]['values']
+            index = data[key]['row_ids']
+            columns = data[key]['col_ids']
             df = pd.DataFrame(values, index=index, columns=columns)
-        else:
-            raise ValueError('Unknown generics data type: {}'.format(data_type))
 
         return df.to_json()
 
-    def _retrieve_data(self, obj_ref, generics_type=None, generics_type_name=None):
+    def _retrieve_data(self, obj_ref, generics_module=None):
         """
-        _retrieve_data: retrieve object data and return a dataframe
+        _retrieve_data: retrieve object data and return a dataframe in json format
         """
         log('Start retrieving data')
         obj_source = self.dfu.get_objects(
@@ -138,15 +186,15 @@ class GenericsUtil:
         obj_info = obj_source.get('info')
         obj_data = obj_source.get('data')
 
-        if not (generics_type and generics_type_name):
-            generics_type, generics_type_name = self._find_generics_type(obj_info[2])
+        if not generics_module:
+            generics_module = self._find_generics_type(obj_info[2])
 
         try:
-            data = obj_data[generics_type_name]
+            data = {k: v for k, v in obj_data.items() if k in generics_module.values()}
         except KeyError:
-            raise ValueError('Retrieved wrong generics type name!')
+            raise ValueError('Retrieved wrong generics type name')
 
-        data_matrix = self._convert_data(data, generics_type)
+        data_matrix = self._convert_data(data, generics_module)
 
         return data_matrix
 
@@ -192,14 +240,15 @@ class GenericsUtil:
         obj_ref: generics object reference
 
         optional arguments:
-        generics_type: the data type to be retrieved from
-        generics_type_name: the name of the data type to be retrieved from
-                            e.g. for an given data type like below:
-                            typedef structure {
-                              FloatMatrix2D data;
-                            } SomeGenericsMatrix;
-                            generics_type should be 'FloatMatrix2D'
-                            generics_type_name should be 'data'
+        generics_module: the generics data module to be retrieved from
+                        e.g. for an given data type like below:
+                        typedef structure {
+                          FloatMatrix2D data;
+                          condition_set_ref condition_set_ref;
+                        } SomeGenericsMatrix;
+                        generics_module should be
+                        {'FloatMatrix2D': 'data',
+                         'condition_set_ref': 'condition_set_ref'}
 
         return:
         data_matrix: a pandas dataframe in json format
@@ -212,13 +261,48 @@ class GenericsUtil:
 
         try:
             data_matrix = self._retrieve_data(params.get('obj_ref'),
-                                              params.get('generics_type'),
-                                              params.get('generics_type_name'))
+                                              params.get('generics_module'))
         except Exception as e:
             error_msg = 'Running fetch_data returned an error:\n{}\n'.format(str(e))
-            error_msg += 'Please try to specify generics type and name\n'
+            error_msg += 'Please try to specify generics type and name as generics_module\n'
             raise ValueError(error_msg)
 
         returnVal = {'data_matrix': data_matrix}
 
         return returnVal
+
+    def export_matrix(self, params):
+        """
+        export_matrix: univeral downloader for matrix data object
+
+        arguments:
+        obj_ref: generics object reference
+
+        optional arguments:
+        generics_module: select the generics data to be retrieved from
+                        e.g. for an given data type like below:
+                        typedef structure {
+                          FloatMatrix2D data;
+                          condition_set_ref condition_set_ref;
+                        } SomeGenericsMatrix;
+                        and only data is needed
+                        generics_module should be
+                        {'FloatMatrix2D': 'data'}
+        """
+
+        data_matrix = self.fetch_data(params).get('data_matrix')
+
+        df = pd.read_json(data_matrix)
+
+        result_directory = os.path.join(self.scratch, str(uuid.uuid4()))
+        self._mkdir_p(result_directory)
+
+        obj_source = self.dfu.get_objects(
+            {"object_refs": [params.get('obj_ref')]})['data'][0]
+        obj_name = obj_source.get('info')[1]
+        file_path = os.path.join(result_directory, '{}.xlsx'.format(obj_name))
+
+        df.to_excel(file_path)
+        shock_id = self._upload_to_shock(file_path)
+
+        return {'shock_id': shock_id}

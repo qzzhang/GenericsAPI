@@ -16,19 +16,19 @@ module GenericsAPI {
     obj_ref: generics object reference
 
     Optional arguments:
-    generics_type: the data type to be retrieved from
-    generics_type_name: the name of the data type to be retrieved from
-                        e.g. for an given data type like below:
-                        typedef structure {
-                          FloatMatrix2D data;
-                        } SomeGenericsMatrix;
-                        generics_type should be 'FloatMatrix2D'
-                        generics_type_name should be 'data'
+    generics_module: the generics data module to be retrieved from
+                    e.g. for an given data type like below:
+                    typedef structure {
+                      FloatMatrix2D data;
+                      condition_set_ref condition_set_ref;
+                    } SomeGenericsMatrix;
+                    generics_module should be
+                    {'FloatMatrix2D': 'data',
+                     'condition_set_ref': 'condition_set_ref'}
   */
   typedef structure {
     obj_ref obj_ref;
-    string generics_type;
-    string generics_type_name;
+    mapping<string, string> generics_module;
   } FetchDataParams;
 
   /* Ouput of the fetch_data function
@@ -57,4 +57,30 @@ module GenericsAPI {
 
   /* generate_matrix_html: generate a html page for given data*/
   funcdef generate_matrix_html(GenMatrixHTMLParams params) returns(GenMatrixHTMLReturn returnVal) authentication required;
+
+
+    /* Input of the export_matrix function
+    obj_ref: generics object reference
+
+    Optional arguments:
+    generics_module: select the generics data to be retrieved from
+                        e.g. for an given data type like below:
+                        typedef structure {
+                          FloatMatrix2D data;
+                          condition_set_ref condition_set_ref;
+                        } SomeGenericsMatrix;
+                        and only 'FloatMatrix2D' is needed
+                        generics_module should be
+                        {'FloatMatrix2D': 'data'}
+  */
+  typedef structure {
+      obj_ref obj_ref;
+      mapping<string, string> generics_module;
+  } ExportParams;
+
+  typedef structure {
+      string shock_id;
+  } ExportOutput;
+
+  funcdef export_matrix (ExportParams params) returns (ExportOutput returnVal) authentication required;
 };

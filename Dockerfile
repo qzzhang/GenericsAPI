@@ -22,7 +22,8 @@ RUN pip install cffi --upgrade \
     && pip install 'requests[security]' --upgrade
 
 RUN pip install pandas \
-    && pip install xlrd
+    && pip install xlrd \
+    && pip install openpyxl
 # -----------------------------------------
 
 COPY ./ /kb/module
