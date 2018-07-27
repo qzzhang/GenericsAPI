@@ -23,7 +23,8 @@ RUN pip install cffi --upgrade \
 
 RUN pip install pandas \
     && pip install xlrd \
-    && pip install openpyxl
+    && pip install openpyxl \
+    && pip install xlsxwriter
 # -----------------------------------------
 
 COPY ./ /kb/module

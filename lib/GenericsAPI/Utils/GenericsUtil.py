@@ -6,6 +6,7 @@ import pandas as pd
 import uuid
 import errno
 import traceback
+import xlsxwriter
 
 from DataFileUtil.DataFileUtilClient import DataFileUtil
 from biokbase.workspace.client import Workspace as workspaceService
@@ -14,7 +15,7 @@ from biokbase.workspace.client import Workspace as workspaceService
 def log(message, prefix_newline=False):
     print(('\n' if prefix_newline else '') + str(time.time()) + ': ' + message)
 
-GENERICS_TYPE = ['FloatMatrix2D', 'ws_conditionset_id']  # add case in _convert_data for each additional type
+GENERICS_TYPE = ['FloatMatrix2D']  # add case in _convert_data for each additional type
 
 
 class GenericsUtil:
@@ -174,12 +175,12 @@ class GenericsUtil:
             index = data[key]['row_ids']
             columns = data[key]['col_ids']
             df = pd.DataFrame(values, index=index, columns=columns)
-        elif 'FloatMatrix2D' in data_types:  # default case
-            key = generics_module.keys()[generics_module.values().index('FloatMatrix2D')]
-            values = data[key]['values']
-            index = data[key]['row_ids']
-            columns = data[key]['col_ids']
-            df = pd.DataFrame(values, index=index, columns=columns)
+        # elif 'FloatMatrix2D' in data_types:  # default case
+        #     key = generics_module.keys()[generics_module.values().index('FloatMatrix2D')]
+        #     values = data[key]['values']
+        #     index = data[key]['row_ids']
+        #     columns = data[key]['col_ids']
+        #     df = pd.DataFrame(values, index=index, columns=columns)
         else:
             raise ValueError('Unexpected Error')
 
@@ -207,6 +208,111 @@ class GenericsUtil:
         data_matrix = self._convert_data(data, generics_module)
 
         return data_matrix
+
+    def _get_col_cond_list(self, col_mapping, col_conditionset_ref, cols):
+        """
+        _get_col_cond_list: generate col condition list for excel
+        """
+        col_cond_list = []
+
+        conditionset_data = self.dfu.get_objects(
+                        {"object_refs": [col_conditionset_ref]})['data'][0]['data']
+        col_condition_names = [factor.get('factor') for factor in conditionset_data.get('factors')]
+        for col in cols:
+            condition_id = col_mapping.get(col)
+            if condition_id:
+                col_cond_list.append(conditionset_data.get('conditions').get(condition_id))
+            else:
+                col_cond_list.append(['']*len(col_condition_names))
+
+        col_cond_list = map(list, zip(*col_cond_list))
+        for idx, col_array in enumerate(col_cond_list):
+            col_array.insert(0, col_condition_names[idx])
+
+        return col_cond_list
+
+    def _get_row_cond_list(self, row_mapping, row_conditionset_ref, rows):
+        """
+        _get_row_cond_list: generate row condition list for excel
+        """
+        row_cond_list = []
+
+        conditionset_data = self.dfu.get_objects(
+                        {"object_refs": [row_conditionset_ref]})['data'][0]['data']
+        row_condition_names = [factor.get('factor') for factor in conditionset_data.get('factors')]
+
+        row_cond_list.append(row_condition_names)
+
+        for row in rows:
+            condition_id = row_mapping.get(row)
+            if condition_id:
+                row_cond_list.append(conditionset_data.get('conditions').get(condition_id))
+            else:
+                row_cond_list.append(['']*len(row_condition_names))
+
+        return row_cond_list
+
+    def _get_data_list(self, cols, rows, values):
+        """
+        _get_data_list: generate data value list for excel
+        """
+        data_arrays = []
+        cols.insert(0, '')
+        data_arrays.append(cols)
+        for idx, row in enumerate(rows):
+            values[idx].insert(0, row)
+        data_arrays += values
+
+        return data_arrays
+
+    def _merge_cond_list(self, excel_list, col_cond_list, row_cond_list):
+        """
+        _merge_cond_list: merge lists for excel
+        """
+        col_cond_len = len(col_cond_list)
+        for item in excel_list[:col_cond_len]:
+            row_len = len(row_cond_list[0]) if row_cond_list else 0
+            item[0:0] = [''] * row_len
+
+        if row_cond_list:
+            for idx, item in enumerate(excel_list[col_cond_len:]):
+                item[0:0] = row_cond_list[idx]
+
+    def _is_number(s):
+        """
+        _is_number: string is a numeric
+        """
+        try:
+            float(s)
+            return True
+        except ValueError:
+            pass
+
+        return False
+
+    def _gen_excel(self, excel_list, obj_name):
+        """
+        _gen_excel: create excel
+        """
+        result_directory = os.path.join(self.scratch, str(uuid.uuid4()))
+        self._mkdir_p(result_directory)
+        file_path = os.path.join(result_directory, '{}.xlsx'.format(obj_name))
+
+        log('Start writing to file: {}'.format(file_path))
+
+        workbook = xlsxwriter.Workbook(file_path, {'nan_inf_to_errors': True})
+        worksheet = workbook.add_worksheet()
+
+        row = 1
+        for data_entry in excel_list:
+            for idx, cell_data in enumerate(data_entry):
+                worksheet.write(row, idx, cell_data)
+
+            row += 1
+
+        workbook.close()
+
+        return file_path
 
     def __init__(self, config):
         self.ws_url = config["workspace-url"]
@@ -300,20 +406,39 @@ class GenericsUtil:
                         generics_module should be
                         {'data': 'FloatMatrix2D'}
         """
+        log('Start exporting matrix')
 
         data_matrix = self.fetch_data(params).get('data_matrix')
 
         df = pd.read_json(data_matrix)
+        cols = df.columns.tolist()
+        rows = df.index.tolist()
 
-        result_directory = os.path.join(self.scratch, str(uuid.uuid4()))
-        self._mkdir_p(result_directory)
+        excel_list = []
 
         obj_source = self.dfu.get_objects(
             {"object_refs": [params.get('obj_ref')]})['data'][0]
-        obj_name = obj_source.get('info')[1]
-        file_path = os.path.join(result_directory, '{}.xlsx'.format(obj_name))
+        obj_data = obj_source.get('data')
 
-        df.to_excel(file_path)
+        col_cond_list = []
+        if obj_data.get('col_mapping') and obj_data.get('col_conditionset_ref'):
+            col_cond_list = self._get_col_cond_list(obj_data.get('col_mapping'),
+                                                    obj_data.get('col_conditionset_ref'),
+                                                    cols)
+            excel_list += col_cond_list
+
+        excel_list += self._get_data_list(cols, rows, df.values.tolist())
+
+        row_cond_list = []
+        if obj_data.get('row_mapping') and obj_data.get('row_conditionset_ref'):
+            row_cond_list = self._get_row_cond_list(obj_data.get('row_mapping'),
+                                                    obj_data.get('row_conditionset_ref'),
+                                                    rows)
+
+        self._merge_cond_list(excel_list, col_cond_list, row_cond_list)
+
+        file_path = self._gen_excel(excel_list, obj_source.get('info')[1])
+
         shock_id = self._upload_to_shock(file_path)
 
         return {'shock_id': shock_id}

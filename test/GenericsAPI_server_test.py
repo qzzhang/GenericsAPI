@@ -72,18 +72,56 @@ class GenericsAPITest(unittest.TestCase):
 
     @classmethod
     def prepare_data(cls):
+
+        # upload ConditionSet object
+        workspace_id = cls.dfu.ws_name_to_id(cls.wsName)
+        object_type = 'KBaseExperiments.ConditionSet'
+        condition_set_object_name = 'test_condition_set'
+        condition_set_data = {'conditions': {'test_condition_1': ['1-1', '1-2', '1-3'],
+                                             'test_condition_2': ['2-1', '2-2', '2-3'],
+                                             'test_condition_3': ['3-1', '3-2', '3-3']},
+                              'factors': [{'factor': 'test_factor_1',
+                                           'factor_ont_ref': 'factor_ont_ref_1',
+                                           'factor_ont_id': 'factor_ont_id_1'},
+                                          {'factor': 'test_factor_2',
+                                           'factor_ont_ref': 'factor_ont_ref_2',
+                                           'factor_ont_id': 'factor_ont_id_2'},
+                                          {'factor': 'test_factor_3',
+                                           'factor_ont_ref': 'factor_ont_ref_3',
+                                           'factor_ont_id': 'factor_ont_id_3'}],
+                              'ontology_mapping_method': 'user curation'}
+        save_object_params = {
+            'id': workspace_id,
+            'objects': [{'type': object_type,
+                         'data': condition_set_data,
+                         'name': condition_set_object_name}]
+        }
+
+        dfu_oi = cls.dfu.save_objects(save_object_params)[0]
+        cls.condition_set_ref = str(dfu_oi[6]) + '/' + str(dfu_oi[0]) + '/' + str(dfu_oi[4])
+
         cls.col_ids = ['condition_1', 'condition_2', 'condition_3', 'condition_4']
         cls.row_ids = ['gene_1', 'gene_2', 'gene_3']
         cls.values = [[0.1, 0.2, 0.3, 0.4],
                       [0.3, 0.4, 0.5, 0.6],
                       [None, None, None, None]]
+        cls.row_mapping = {'gene_1': 'test_condition_1',
+                           'gene_2': 'test_condition_2',
+                           'gene_3': 'test_condition_3'}
+        cls.col_mapping = {'condition_1': 'test_condition_1',
+                           'condition_2': 'test_condition_2',
+                           'condition_3': 'test_condition_3',
+                           'condition_4': 'test_condition_3'}
 
         # upload ExpressionMatrix object
-        workspace_id = cls.dfu.ws_name_to_id(cls.wsName)
-        object_type = 'KBaseFeatureValues.ExpressionMatrix'
+        object_type = 'KBaseMatrices.ExpressionMatrix'
         expression_matrix_object_name = 'test_expression_matrix'
         expression_matrix_data = {'scale': 'log2',
                                   'type': 'level',
+                                  'col_conditionset_ref': cls.condition_set_ref,
+                                  'col_mapping': cls.col_mapping,
+                                  'row_conditionset_ref': cls.condition_set_ref,
+                                  'row_mapping': cls.row_mapping,
                                   'data': {'row_ids': cls.row_ids,
                                            'col_ids': cls.col_ids,
                                            'values': cls.values
@@ -98,12 +136,30 @@ class GenericsAPITest(unittest.TestCase):
         dfu_oi = cls.dfu.save_objects(save_object_params)[0]
         cls.expression_matrix_ref = str(dfu_oi[6]) + '/' + str(dfu_oi[0]) + '/' + str(dfu_oi[4])
 
-        # upload SingleKnockoutFitnessMatrix object
-        workspace_id = cls.dfu.ws_name_to_id(cls.wsName)
-        object_type = 'KBaseFeatureValues.SingleKnockoutFitnessMatrix'
+        expression_matrix_object_name = 'test_expression_matrix_no_condition'
+        expression_matrix_data = {'scale': 'log2',
+                                  'type': 'level',
+                                  'data': {'row_ids': cls.row_ids,
+                                           'col_ids': cls.col_ids,
+                                           'values': cls.values
+                                           }}
+        save_object_params = {
+            'id': workspace_id,
+            'objects': [{'type': object_type,
+                         'data': expression_matrix_data,
+                         'name': expression_matrix_object_name}]
+        }
+
+        dfu_oi = cls.dfu.save_objects(save_object_params)[0]
+        cls.expression_matrix_nc_ref = str(dfu_oi[6]) + '/' + str(dfu_oi[0]) + '/' + str(dfu_oi[4])
+
+        # upload FitnessMatrix object
+        object_type = 'KBaseMatrices.FitnessMatrix'
         fitness_matrix_object_name = 'test_fitness_matrix'
         fitness_matrix_data = {'scale': 'log2',
                                'type': 'level',
+                               'row_conditionset_ref': cls.condition_set_ref,
+                               'row_mapping': cls.row_mapping,
                                'data': {'row_ids': cls.row_ids,
                                         'col_ids': cls.col_ids,
                                         'values': cls.values
@@ -119,11 +175,12 @@ class GenericsAPITest(unittest.TestCase):
         cls.fitness_matrix_ref = str(dfu_oi[6]) + '/' + str(dfu_oi[0]) + '/' + str(dfu_oi[4])
 
         # upload DifferentialExpressionMatrix object
-        workspace_id = cls.dfu.ws_name_to_id(cls.wsName)
-        object_type = 'KBaseFeatureValues.DifferentialExpressionMatrix'
-        diff_expr_matrix_object_name = 'test_fitness_matrix'
+        object_type = 'KBaseMatrices.DifferentialExpressionMatrix'
+        diff_expr_matrix_object_name = 'test_diff_expr_matrix'
         diff_expr_matrix_data = {'scale': 'log2',
                                  'type': 'level',
+                                 'col_conditionset_ref': cls.condition_set_ref,
+                                 'col_mapping': cls.col_mapping,
                                  'data': {'row_ids': cls.row_ids,
                                           'col_ids': cls.col_ids,
                                           'values': cls.values
@@ -176,57 +233,78 @@ class GenericsAPITest(unittest.TestCase):
         self.assertTrue('shock_id' in returnVal)
 
         result_dir = os.path.join(self.scratch, 'export_matrix_result')
-        os.makedirs(result_dir)
+        if not os.path.exists(result_dir):
+            os.makedirs(result_dir)
 
         shock_to_file_params = {
             'shock_id': returnVal.get('shock_id'),
             'file_path': result_dir}
         shock_file = self.dfu.shock_to_file(shock_to_file_params)['file_path']
         df = pd.read_excel(shock_file)
-        self.assertItemsEqual(df.columns.tolist(), self.col_ids)
-        self.assertItemsEqual(df.index.tolist(), self.row_ids)
 
-    def test_bad_fetch_data_params(self):
-        self.start_test()
-        invalidate_params = {'missing_obj_ref': 'obj_ref'}
-        error_msg = '"obj_ref" parameter is required, but missing'
-        self.fail_fetch_data(invalidate_params, error_msg)
+        return len(df.index.tolist()), len(df.columns.tolist())
 
-    def test_generate_matrix_html(self):
-        self.start_test()
+    # def test_bad_fetch_data_params(self):
+    #     self.start_test()
+    #     invalidate_params = {'missing_obj_ref': 'obj_ref'}
+    #     error_msg = '"obj_ref" parameter is required, but missing'
+    #     self.fail_fetch_data(invalidate_params, error_msg)
 
-        csv_file_name = 'metadata.csv'
-        df = pd.read_csv(os.path.join('data', csv_file_name))
+    # def test_generate_matrix_html(self):
+    #     self.start_test()
 
-        returnVal = self.getImpl().generate_matrix_html(self.ctx, {'df': df})[0]
+    #     csv_file_name = 'metadata.csv'
+    #     df = pd.read_csv(os.path.join('data', csv_file_name))
 
-        self.assertTrue('html_string' in returnVal)
-        self.assertTrue('ADD_COL' not in returnVal.get('html_string'))
-        self.assertTrue('ADD_DATA' not in returnVal.get('html_string'))
-        self.assertTrue('ADD_FORMATTER' not in returnVal.get('html_string'))
+    #     returnVal = self.getImpl().generate_matrix_html(self.ctx, {'df': df})[0]
 
-    def test_fetch_data(self):
-        self.start_test()
-        params = {'obj_ref': self.expression_matrix_ref}
-        returnVal = self.getImpl().fetch_data(self.ctx, params)[0]
-        print returnVal
-        self.check_fetch_data_output(returnVal)
+    #     self.assertTrue('html_string' in returnVal)
+    #     self.assertTrue('ADD_COL' not in returnVal.get('html_string'))
+    #     self.assertTrue('ADD_DATA' not in returnVal.get('html_string'))
+    #     self.assertTrue('ADD_FORMATTER' not in returnVal.get('html_string'))
 
-        params = {'obj_ref': self.fitness_matrix_ref}
-        returnVal = self.getImpl().fetch_data(self.ctx, params)[0]
-        self.check_fetch_data_output(returnVal)
+    # def test_fetch_data(self):
+    #     self.start_test()
+    #     params = {'obj_ref': self.expression_matrix_ref}
+    #     returnVal = self.getImpl().fetch_data(self.ctx, params)[0]
+    #     print returnVal
+    #     self.check_fetch_data_output(returnVal)
 
-        params = {'obj_ref': self.diff_expr_matrix_ref}
-        returnVal = self.getImpl().fetch_data(self.ctx, params)[0]
-        self.check_fetch_data_output(returnVal)
+    #     params = {'obj_ref': self.fitness_matrix_ref}
+    #     returnVal = self.getImpl().fetch_data(self.ctx, params)[0]
+    #     self.check_fetch_data_output(returnVal)
 
-        params = {'obj_ref': self.expression_matrix_ref,
-                  'generics_module': {'data': 'FloatMatrix2D'}}
-        returnVal = self.getImpl().fetch_data(self.ctx, params)[0]
-        self.check_fetch_data_output(returnVal)
+    #     params = {'obj_ref': self.diff_expr_matrix_ref}
+    #     returnVal = self.getImpl().fetch_data(self.ctx, params)[0]
+    #     self.check_fetch_data_output(returnVal)
+
+    #     params = {'obj_ref': self.expression_matrix_ref,
+    #               'generics_module': {'data': 'FloatMatrix2D'}}
+    #     returnVal = self.getImpl().fetch_data(self.ctx, params)[0]
+    #     self.check_fetch_data_output(returnVal)
 
     def test_export_matrix(self):
         self.start_test()
+        params = {'obj_ref': self.expression_matrix_nc_ref}
+        returnVal = self.getImpl().export_matrix(self.ctx, params)[0]
+        row_len, col_len = self.check_export_matrix_output(returnVal)
+        self.assertEqual(row_len, 3)
+        self.assertEqual(col_len, 5)
+
         params = {'obj_ref': self.expression_matrix_ref}
         returnVal = self.getImpl().export_matrix(self.ctx, params)[0]
-        self.check_export_matrix_output(returnVal)
+        row_len, col_len = self.check_export_matrix_output(returnVal)
+        self.assertEqual(row_len, 6)
+        self.assertEqual(col_len, 8)
+
+        params = {'obj_ref': self.fitness_matrix_ref}
+        returnVal = self.getImpl().export_matrix(self.ctx, params)[0]
+        row_len, col_len = self.check_export_matrix_output(returnVal)
+        self.assertEqual(row_len, 3)
+        self.assertEqual(col_len, 8)
+
+        params = {'obj_ref': self.diff_expr_matrix_ref}
+        returnVal = self.getImpl().export_matrix(self.ctx, params)[0]
+        row_len, col_len = self.check_export_matrix_output(returnVal)
+        self.assertEqual(row_len, 6)
+        self.assertEqual(col_len, 5)
