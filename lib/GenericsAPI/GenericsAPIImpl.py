@@ -23,7 +23,7 @@ class GenericsAPI:
     ######################################### noqa
     VERSION = "0.0.1"
     GIT_URL = "git@github.com:Tianhao-Gu/GenericsAPI.git"
-    GIT_COMMIT_HASH = "58928302201f391b4f01845bdc72fab263466fe9"
+    GIT_COMMIT_HASH = "bdd0185c0acb1102bbeeeb4b20b30e48ce793dec"
 
     #BEGIN_CLASS_HEADER
     #END_CLASS_HEADER
