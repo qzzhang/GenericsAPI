@@ -244,44 +244,44 @@ class GenericsAPITest(unittest.TestCase):
 
         return len(df.index.tolist()), len(df.columns.tolist())
 
-    # def test_bad_fetch_data_params(self):
-    #     self.start_test()
-    #     invalidate_params = {'missing_obj_ref': 'obj_ref'}
-    #     error_msg = '"obj_ref" parameter is required, but missing'
-    #     self.fail_fetch_data(invalidate_params, error_msg)
+    def test_bad_fetch_data_params(self):
+        self.start_test()
+        invalidate_params = {'missing_obj_ref': 'obj_ref'}
+        error_msg = '"obj_ref" parameter is required, but missing'
+        self.fail_fetch_data(invalidate_params, error_msg)
 
-    # def test_generate_matrix_html(self):
-    #     self.start_test()
+    def test_generate_matrix_html(self):
+        self.start_test()
 
-    #     csv_file_name = 'metadata.csv'
-    #     df = pd.read_csv(os.path.join('data', csv_file_name))
+        csv_file_name = 'metadata.csv'
+        df = pd.read_csv(os.path.join('data', csv_file_name))
 
-    #     returnVal = self.getImpl().generate_matrix_html(self.ctx, {'df': df})[0]
+        returnVal = self.getImpl().generate_matrix_html(self.ctx, {'df': df})[0]
 
-    #     self.assertTrue('html_string' in returnVal)
-    #     self.assertTrue('ADD_COL' not in returnVal.get('html_string'))
-    #     self.assertTrue('ADD_DATA' not in returnVal.get('html_string'))
-    #     self.assertTrue('ADD_FORMATTER' not in returnVal.get('html_string'))
+        self.assertTrue('html_string' in returnVal)
+        self.assertTrue('ADD_COL' not in returnVal.get('html_string'))
+        self.assertTrue('ADD_DATA' not in returnVal.get('html_string'))
+        self.assertTrue('ADD_FORMATTER' not in returnVal.get('html_string'))
 
-    # def test_fetch_data(self):
-    #     self.start_test()
-    #     params = {'obj_ref': self.expression_matrix_ref}
-    #     returnVal = self.getImpl().fetch_data(self.ctx, params)[0]
-    #     print returnVal
-    #     self.check_fetch_data_output(returnVal)
+    def test_fetch_data(self):
+        self.start_test()
+        params = {'obj_ref': self.expression_matrix_ref}
+        returnVal = self.getImpl().fetch_data(self.ctx, params)[0]
+        print returnVal
+        self.check_fetch_data_output(returnVal)
 
-    #     params = {'obj_ref': self.fitness_matrix_ref}
-    #     returnVal = self.getImpl().fetch_data(self.ctx, params)[0]
-    #     self.check_fetch_data_output(returnVal)
+        params = {'obj_ref': self.fitness_matrix_ref}
+        returnVal = self.getImpl().fetch_data(self.ctx, params)[0]
+        self.check_fetch_data_output(returnVal)
 
-    #     params = {'obj_ref': self.diff_expr_matrix_ref}
-    #     returnVal = self.getImpl().fetch_data(self.ctx, params)[0]
-    #     self.check_fetch_data_output(returnVal)
+        params = {'obj_ref': self.diff_expr_matrix_ref}
+        returnVal = self.getImpl().fetch_data(self.ctx, params)[0]
+        self.check_fetch_data_output(returnVal)
 
-    #     params = {'obj_ref': self.expression_matrix_ref,
-    #               'generics_module': {'data': 'FloatMatrix2D'}}
-    #     returnVal = self.getImpl().fetch_data(self.ctx, params)[0]
-    #     self.check_fetch_data_output(returnVal)
+        params = {'obj_ref': self.expression_matrix_ref,
+                  'generics_module': {'data': 'FloatMatrix2D'}}
+        returnVal = self.getImpl().fetch_data(self.ctx, params)[0]
+        self.check_fetch_data_output(returnVal)
 
     def test_export_matrix(self):
         self.start_test()
