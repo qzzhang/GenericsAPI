@@ -6,6 +6,7 @@ import time
 import requests  # noqa: F401
 import inspect
 import pandas as pd
+import shutil
 
 
 from os import environ
@@ -72,6 +73,18 @@ class GenericsAPITest(unittest.TestCase):
 
     @classmethod
     def prepare_data(cls):
+
+        # upload genome object
+        genbank_file_name = 'minimal.gbff'
+        genbank_file_path = os.path.join(cls.scratch, genbank_file_name)
+        shutil.copy(os.path.join('data', genbank_file_name), genbank_file_path)
+
+        genome_object_name = 'test_Genome'
+        cls.genome_ref = cls.gfu.genbank_to_genome({'file': {'path': genbank_file_path},
+                                                    'workspace_name': cls.wsName,
+                                                    'genome_name': genome_object_name,
+                                                    'generate_ids_if_needed': 1
+                                                    })['genome_ref']
 
         # upload ConditionSet object
         workspace_id = cls.dfu.ws_name_to_id(cls.wsName)
@@ -331,7 +344,8 @@ class GenericsAPITest(unittest.TestCase):
                 'row_mapping': {'same_row_id': 'condition_1'},
                 'col_mapping': {'same_col_id': 'condition_1'},
                 'row_conditionset_ref': self.condition_set_ref,
-                'col_conditionset_ref': self.condition_set_ref}
+                'col_conditionset_ref': self.condition_set_ref,
+                'genome_ref': self.genome_ref}
         obj_type = 'KBaseMatrices.ExpressionMatrix-1.1'
         params = {'obj_type': obj_type,
                   'data': data}

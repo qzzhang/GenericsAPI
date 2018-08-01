@@ -11,7 +11,6 @@ from dotmap import DotMap
 
 from DataFileUtil.DataFileUtilClient import DataFileUtil
 from Workspace.WorkspaceClient import Workspace as workspaceService
-# from biokbase.workspace.client import Workspace as workspaceService
 
 
 def log(message, prefix_newline=False):
@@ -352,11 +351,19 @@ class GenericsUtil:
             obj_ref = getattr(m_data, value.split(':')[0])
             if obj_ref:
                 included = value.split(':')[1]
+                included = '/' + included.replace('.', '/')
                 ref_data = self.wsClient.get_objects2({'objects': [{'ref': obj_ref,
                                                        'included': [included]}]})['data'][0]['data']
-
                 m_ref_data = DotMap(ref_data)
-                retrieve_data = list(getattr(m_ref_data, included.split('.')[-1]))
+                if ref_data:
+                    if '*' not in included:
+                        for key in included.split('/')[1:]:
+                            m_ref_data = getattr(m_ref_data, key)
+                    else:
+                        keys = included.split('/')[1:]
+                        m_ref_data = [x.get(keys[2]) for x in ref_data.get(keys[0])]  # TODO: only works for 2 level nested data like '/features/[*]/id'
+
+                retrieve_data = list(m_ref_data)
         else:
             unique_list = value.split('.')
             m_data_cp = m_data.copy()
@@ -364,7 +371,7 @@ class GenericsUtil:
                 m_data_cp = getattr(m_data_cp, attr)
             retrieve_data = list(m_data_cp)
 
-        log('Retrieved value:\n{}\n'.format(retrieve_data))
+        log('Retrieved value (first 20):\n{}\n'.format(retrieve_data[:20]))
 
         return retrieve_data
 
