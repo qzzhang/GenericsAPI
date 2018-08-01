@@ -384,6 +384,102 @@ ExportOutput is a reference to a hash where the following keys are defined:
     }
 }
  
+
+
+=head2 validate_data
+
+  $returnVal = $obj->validate_data($params)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$params is a GenericsAPI.ValidateParams
+$returnVal is a GenericsAPI.ValidateOutput
+ValidateParams is a reference to a hash where the following keys are defined:
+	obj_type has a value which is a string
+	data has a value which is a reference to a hash where the key is a string and the value is a string
+ValidateOutput is a reference to a hash where the following keys are defined:
+	validated has a value which is a GenericsAPI.boolean
+	failed_constraint has a value which is a reference to a hash where the key is a string and the value is a string
+boolean is an int
+
+</pre>
+
+=end html
+
+=begin text
+
+$params is a GenericsAPI.ValidateParams
+$returnVal is a GenericsAPI.ValidateOutput
+ValidateParams is a reference to a hash where the following keys are defined:
+	obj_type has a value which is a string
+	data has a value which is a reference to a hash where the key is a string and the value is a string
+ValidateOutput is a reference to a hash where the following keys are defined:
+	validated has a value which is a GenericsAPI.boolean
+	failed_constraint has a value which is a reference to a hash where the key is a string and the value is a string
+boolean is an int
+
+
+=end text
+
+=item Description
+
+validate_data: validate data
+
+=back
+
+=cut
+
+ sub validate_data
+{
+    my($self, @args) = @_;
+
+# Authentication: required
+
+    if ((my $n = @args) != 1)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function validate_data (received $n, expecting 1)");
+    }
+    {
+	my($params) = @args;
+
+	my @_bad_arguments;
+        (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument 1 \"params\" (value was \"$params\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to validate_data:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'validate_data');
+	}
+    }
+
+    my $url = $self->{url};
+    my $result = $self->{client}->call($url, $self->{headers}, {
+	    method => "GenericsAPI.validate_data",
+	    params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'validate_data',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method validate_data",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'validate_data',
+				       );
+    }
+}
+ 
   
 sub status
 {
@@ -427,16 +523,16 @@ sub version {
             Bio::KBase::Exceptions::JSONRPC->throw(
                 error => $result->error_message,
                 code => $result->content->{code},
-                method_name => 'export_matrix',
+                method_name => 'validate_data',
             );
         } else {
             return wantarray ? @{$result->result} : $result->result->[0];
         }
     } else {
         Bio::KBase::Exceptions::HTTP->throw(
-            error => "Error invoking method export_matrix",
+            error => "Error invoking method validate_data",
             status_line => $self->{client}->status_line,
-            method_name => 'export_matrix',
+            method_name => 'validate_data',
         );
     }
 }
@@ -764,6 +860,77 @@ shock_id has a value which is a string
 
 a reference to a hash where the following keys are defined:
 shock_id has a value which is a string
+
+
+=end text
+
+=back
+
+
+
+=head2 ValidateParams
+
+=over 4
+
+
+
+=item Description
+
+Input of the validate_data function
+obj_type: obj type e.g.: 'KBaseMatrices.ExpressionMatrix-1.1'
+data: data to be validated
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+obj_type has a value which is a string
+data has a value which is a reference to a hash where the key is a string and the value is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+obj_type has a value which is a string
+data has a value which is a reference to a hash where the key is a string and the value is a string
+
+
+=end text
+
+=back
+
+
+
+=head2 ValidateOutput
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+validated has a value which is a GenericsAPI.boolean
+failed_constraint has a value which is a reference to a hash where the key is a string and the value is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+validated has a value which is a GenericsAPI.boolean
+failed_constraint has a value which is a reference to a hash where the key is a string and the value is a string
 
 
 =end text

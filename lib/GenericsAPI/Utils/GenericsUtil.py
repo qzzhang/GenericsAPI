@@ -7,9 +7,10 @@ import uuid
 import errno
 import traceback
 import xlsxwriter
+from dotmap import DotMap
 
 from DataFileUtil.DataFileUtilClient import DataFileUtil
-from biokbase.workspace.client import Workspace as workspaceService
+from Workspace.WorkspaceClient import Workspace as workspaceService
 
 
 def log(message, prefix_newline=False):
@@ -118,6 +119,39 @@ class GenericsUtil:
 
         return re.search('{}(.*){}'.format(start, end), s).group(1)
 
+    def _find_type_spec(self, obj_type):
+        """
+        _find_type_spec: find body spec of type
+        """
+        obj_type_name = self._find_between(obj_type, '\.', '\-')
+
+        type_info = self.wsClient.get_type_info(obj_type)
+        type_spec = type_info.get('spec_def')
+
+        type_spec_list = type_spec.split(obj_type_name + ';')
+        obj_type_spec = type_spec_list[0].split('structure')[-1]
+        log('Found spec for {}\n{}\n'.format(obj_type, obj_type_spec))
+
+        return obj_type_spec
+
+    def _find_constraints(self, obj_type):
+        """
+        _find_constraints: retrieve constraints (@contains, rowsum, unique)
+        """
+
+        type_info = self.wsClient.get_type_info(obj_type)
+        type_desc = type_info.get('description')
+
+        constraints = {'contains': [], 'rowsum': [], 'unique': []}
+
+        unique = [item.split('\n')[0].strip() for item in type_desc.split('@unique')[1:]]
+        constraints['unique'] = unique
+
+        contains = [item.split('\n')[0].strip() for item in type_desc.split('@contains')[1:]]
+        constraints['contains'] = contains
+
+        return constraints
+
     def _find_generics_type(self, obj_type):
         """
         _find_generics_type: try to find generics type in an object
@@ -125,22 +159,10 @@ class GenericsUtil:
 
         log('Start finding generics type and name')
 
-        obj_module = obj_type.split('.')[0]
-        obj_type_name = self._find_between(obj_type, '\.', '\-')
-
-        module_info = self.wsClient.get_module_info({'mod': obj_module})
-        module_spec = module_info.get('spec')
-
-        module_spec_list = module_spec.split(obj_type_name + ';')
-        obj_type_spec = ''
-        for module_spec in module_spec_list[:-1]:
-            if module_spec.endswith((' ', '}')):
-                obj_type_spec = module_spec.split('structure')[-1]
-                break
+        obj_type_spec = self._find_type_spec(obj_type)
 
         if not obj_type_spec:
             raise ValueError('Cannot retrieve spec for: {}'.format(obj_type))
-        log('Found spec for {}\n{}\n'.format(obj_type, obj_type_spec))
 
         generics_types = [generics_type for generics_type in GENERICS_TYPE
                           if generics_type in obj_type_spec]
@@ -314,6 +336,73 @@ class GenericsUtil:
 
         return file_path
 
+    def _retrieve_value(self, data, value):
+        log('Getting value for {}'.format(value))
+        retrieve_data = []
+        m_data = DotMap(data)
+        if value.startswith('values'):  # TODO: nested values e.g. values(values(ids))
+            search_value = re.search('{}(.*){}'.format('\(', '\)'), value).group(1)
+            unique_list = search_value.split('.')
+            m_data_cp = m_data.copy()
+            for attr in unique_list:
+                m_data_cp = getattr(m_data_cp, attr)
+            retrieve_data = m_data_cp.values()
+        elif ':' in value:
+            obj_ref = getattr(m_data, value.split(':')[0])
+            if obj_ref:
+                included = value.split(':')[1]
+                included = '/' + included.replace('.', '/')
+                ref_data = self.wsClient.get_objects2({'objects': [{'ref': obj_ref,
+                                                       'included': [included]}]})['data'][0]['data']
+                m_ref_data = DotMap(ref_data)
+                if ref_data:
+                    if '*' not in included:
+                        for key in included.split('/')[1:]:
+                            m_ref_data = getattr(m_ref_data, key)
+                    else:
+                        keys = included.split('/')[1:]
+                        m_ref_data = [x.get(keys[2]) for x in ref_data.get(keys[0])]  # TODO: only works for 2 level nested data like '/features/[*]/id'
+
+                retrieve_data = list(m_ref_data)
+        else:
+            unique_list = value.split('.')
+            m_data_cp = m_data.copy()
+            for attr in unique_list:
+                m_data_cp = getattr(m_data_cp, attr)
+            retrieve_data = list(m_data_cp)
+
+        log('Retrieved value (first 20):\n{}\n'.format(retrieve_data[:20]))
+
+        return retrieve_data
+
+    def _validate(self, constraints, data):
+        """
+        _validate: validate data
+        """
+
+        validated = True
+        failed_constraint = {'contains': [], 'rowsum': [], 'unique': []}
+
+        unique_constraints = constraints.get('unique')
+        for unique_constraint in unique_constraints:
+            retrieved_value = self._retrieve_value(data, unique_constraint)
+            if len(set(retrieved_value)) != len(retrieved_value):
+                validated = False
+                failed_constraint['unique'].append(unique_constraint)
+
+        contains_constraints = constraints.get('contains')
+        for contains_constraint in contains_constraints:
+            value = contains_constraint.split(' ')[0]
+            in_values = contains_constraint.split(' ')[1:]
+            retrieved_in_values = []
+            for in_value in in_values:
+                retrieved_in_values += self._retrieve_value(data, in_value)
+            if not (set(self._retrieve_value(data, value)) <= set(retrieved_in_values)):
+                validated = False
+                failed_constraint['contains'].append(contains_constraint)
+
+        return validated, failed_constraint
+
     def __init__(self, config):
         self.ws_url = config["workspace-url"]
         self.callback_url = config['SDK_CALLBACK_URL']
@@ -322,7 +411,29 @@ class GenericsUtil:
         self.srv_wiz_url = config['srv-wiz-url']
         self.scratch = config['scratch']
         self.dfu = DataFileUtil(self.callback_url)
-        self.wsClient = workspaceService(self.ws_url)
+        self.wsClient = workspaceService(self.ws_url, token=self.token)
+
+    def validate_data(self, params):
+        """
+        validate_data: validate data
+
+        arguments:
+        obj_type: obj type e.g.: 'KBaseMatrices.ExpressionMatrix-1.1'
+        data: obj data to be validated
+
+        return:
+        validated: True or False
+        """
+
+        constraints = self._find_constraints(params.get('obj_type'))
+        data = params.get('data')
+
+        validated, failed_constraint = self._validate(constraints, data)
+
+        returnVal = {'validated': validated,
+                     'failed_constraint': failed_constraint}
+
+        return returnVal
 
     def generate_matrix_html(self, params):
         """
@@ -407,6 +518,9 @@ class GenericsUtil:
                         {'data': 'FloatMatrix2D'}
         """
         log('Start exporting matrix')
+
+        if 'input_ref' in params:
+            params['obj_ref'] = params.pop('input_ref')
 
         data_matrix = self.fetch_data(params).get('data_matrix')
 

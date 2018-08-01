@@ -6,6 +6,7 @@ import time
 import requests  # noqa: F401
 import inspect
 import pandas as pd
+import shutil
 
 
 from os import environ
@@ -72,6 +73,18 @@ class GenericsAPITest(unittest.TestCase):
 
     @classmethod
     def prepare_data(cls):
+
+        # upload genome object
+        genbank_file_name = 'minimal.gbff'
+        genbank_file_path = os.path.join(cls.scratch, genbank_file_name)
+        shutil.copy(os.path.join('data', genbank_file_name), genbank_file_path)
+
+        genome_object_name = 'test_Genome'
+        cls.genome_ref = cls.gfu.genbank_to_genome({'file': {'path': genbank_file_path},
+                                                    'workspace_name': cls.wsName,
+                                                    'genome_name': genome_object_name,
+                                                    'generate_ids_if_needed': 1
+                                                    })['genome_ref']
 
         # upload ConditionSet object
         workspace_id = cls.dfu.ws_name_to_id(cls.wsName)
@@ -308,3 +321,40 @@ class GenericsAPITest(unittest.TestCase):
         row_len, col_len = self.check_export_matrix_output(returnVal)
         self.assertEqual(row_len, 6)
         self.assertEqual(col_len, 5)
+
+    def test_validate_data(self):
+        self.start_test()
+
+        # testing unique
+        data = {'data': {'row_ids': ['same_row_id', 'same_row_id'],
+                         'col_ids': ['same_col_id', 'same_col_id']}}
+        obj_type = 'KBaseMatrices.ExpressionMatrix-1.1'
+
+        params = {'obj_type': obj_type,
+                  'data': data}
+        returnVal = self.getImpl().validate_data(self.ctx, params)[0]
+        self.assertFalse(returnVal.get('validated'))
+        expected_failed_constraints = ['data.row_ids', 'data.col_ids']
+        self.assertItemsEqual(expected_failed_constraints,
+                              returnVal.get('failed_constraint').get('unique'))
+
+        # testing contains
+        data = {'data': {'row_ids': ['same_row_id', 'unknown_row_id'],
+                         'col_ids': ['same_col_id', 'unknown_col_id']},
+                'row_mapping': {'same_row_id': 'condition_1'},
+                'col_mapping': {'same_col_id': 'condition_1'},
+                'row_conditionset_ref': self.condition_set_ref,
+                'col_conditionset_ref': self.condition_set_ref,
+                'genome_ref': self.genome_ref}
+        obj_type = 'KBaseMatrices.ExpressionMatrix-1.1'
+        params = {'obj_type': obj_type,
+                  'data': data}
+        returnVal = self.getImpl().validate_data(self.ctx, params)[0]
+        self.assertFalse(returnVal.get('validated'))
+        expected_failed_constraints = ['data.row_ids row_mapping',
+                                       'data.col_ids col_mapping',
+                                       'values(row_mapping) row_conditionset_ref:conditions',
+                                       'values(col_mapping) col_conditionset_ref:conditions',
+                                       'data.row_ids genome_ref:features.[*].id genome_ref:mrnas.[*].id genome_ref:cdss.[*].id genome_ref:non_codeing_features.[*].id']
+        self.assertItemsEqual(expected_failed_constraints,
+                              returnVal.get('failed_constraint').get('contains'))
