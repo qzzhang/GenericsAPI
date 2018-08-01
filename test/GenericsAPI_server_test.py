@@ -326,18 +326,21 @@ class GenericsAPITest(unittest.TestCase):
                               returnVal.get('failed_constraint').get('unique'))
 
         # testing contains
-        data = {'data': {'row_ids': ['same_row_id', 'same_row_id'],
-                         'col_ids': ['same_col_id', 'same_col_id']},
-                'row_mapping': {'same_row_id': 'condition_1',
-                                'unknown_row_id': 'condition_1'},
-                'col_mapping': {'same_col_id': 'condition_1',
-                                'unknown_col_id': 'condition_1'}}
+        data = {'data': {'row_ids': ['same_row_id', 'unknown_row_id'],
+                         'col_ids': ['same_col_id', 'unknown_col_id']},
+                'row_mapping': {'same_row_id': 'condition_1'},
+                'col_mapping': {'same_col_id': 'condition_1'},
+                'row_conditionset_ref': self.condition_set_ref,
+                'col_conditionset_ref': self.condition_set_ref}
         obj_type = 'KBaseMatrices.ExpressionMatrix-1.1'
         params = {'obj_type': obj_type,
                   'data': data}
         returnVal = self.getImpl().validate_data(self.ctx, params)[0]
         self.assertFalse(returnVal.get('validated'))
         expected_failed_constraints = ['data.row_ids row_mapping',
-                                       'data.col_ids col_mapping']
+                                       'data.col_ids col_mapping',
+                                       'values(row_mapping) row_conditionset_ref:conditions',
+                                       'values(col_mapping) col_conditionset_ref:conditions',
+                                       'data.row_ids genome_ref:features.[*].id genome_ref:mrnas.[*].id genome_ref:cdss.[*].id genome_ref:non_codeing_features.[*].id']
         self.assertItemsEqual(expected_failed_constraints,
                               returnVal.get('failed_constraint').get('contains'))

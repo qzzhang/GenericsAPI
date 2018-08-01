@@ -10,7 +10,8 @@ import xlsxwriter
 from dotmap import DotMap
 
 from DataFileUtil.DataFileUtilClient import DataFileUtil
-from biokbase.workspace.client import Workspace as workspaceService
+from Workspace.WorkspaceClient import Workspace as workspaceService
+# from biokbase.workspace.client import Workspace as workspaceService
 
 
 def log(message, prefix_newline=False):
@@ -340,17 +341,30 @@ class GenericsUtil:
         log('Getting value for {}'.format(value))
         retrieve_data = []
         m_data = DotMap(data)
-        if value.startswith('values'):
-            pass
+        if value.startswith('values'):  # TODO: nested values e.g. values(values(ids))
+            search_value = re.search('{}(.*){}'.format('\(', '\)'), value).group(1)
+            unique_list = search_value.split('.')
+            m_data_cp = m_data.copy()
+            for attr in unique_list:
+                m_data_cp = getattr(m_data_cp, attr)
+            retrieve_data = m_data_cp.values()
         elif ':' in value:
-            pass
+            obj_ref = getattr(m_data, value.split(':')[0])
+            if obj_ref:
+                included = value.split(':')[1]
+                ref_data = self.wsClient.get_objects2({'objects': [{'ref': obj_ref,
+                                                       'included': [included]}]})['data'][0]['data']
+
+                m_ref_data = DotMap(ref_data)
+                retrieve_data = list(getattr(m_ref_data, included.split('.')[-1]))
         else:
             unique_list = value.split('.')
             m_data_cp = m_data.copy()
             for attr in unique_list:
                 m_data_cp = getattr(m_data_cp, attr)
             retrieve_data = list(m_data_cp)
-            log('Retrieved value:\n{}\n'.format(retrieve_data))
+
+        log('Retrieved value:\n{}\n'.format(retrieve_data))
 
         return retrieve_data
 
@@ -373,11 +387,12 @@ class GenericsUtil:
         for contains_constraint in contains_constraints:
             value = contains_constraint.split(' ')[0]
             in_values = contains_constraint.split(' ')[1:]
+            retrieved_in_values = []
             for in_value in in_values:
-                if not (set(self._retrieve_value(data, value)) >=
-                        set(self._retrieve_value(data, in_value))):
-                    validated = False
-                    failed_constraint['contains'].append(contains_constraint)
+                retrieved_in_values += self._retrieve_value(data, in_value)
+            if not (set(self._retrieve_value(data, value)) <= set(retrieved_in_values)):
+                validated = False
+                failed_constraint['contains'].append(contains_constraint)
 
         return validated, failed_constraint
 
@@ -389,7 +404,7 @@ class GenericsUtil:
         self.srv_wiz_url = config['srv-wiz-url']
         self.scratch = config['scratch']
         self.dfu = DataFileUtil(self.callback_url)
-        self.wsClient = workspaceService(self.ws_url)
+        self.wsClient = workspaceService(self.ws_url, token=self.token)
 
     def validate_data(self, params):
         """
