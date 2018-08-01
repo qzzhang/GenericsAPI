@@ -87,6 +87,23 @@ class GenericsAPI(object):
             'GenericsAPI.export_matrix',
             [params], self._service_ver, context)
 
+    def validate_data(self, params, context=None):
+        """
+        validate_data: validate data
+        :param params: instance of type "ValidateParams" (Input of the
+           validate_data function obj_type: obj type e.g.:
+           'KBaseMatrices.ExpressionMatrix-1.1' data: data to be validated)
+           -> structure: parameter "obj_type" of String, parameter "data" of
+           mapping from String to String
+        :returns: instance of type "ValidateOutput" -> structure: parameter
+           "validated" of type "boolean" (A boolean - 0 for false, 1 for
+           true. @range (0, 1)), parameter "failed_constraint" of mapping
+           from String to String
+        """
+        return self._client.call_method(
+            'GenericsAPI.validate_data',
+            [params], self._service_ver, context)
+
     def status(self, context=None):
         return self._client.call_method('GenericsAPI.status',
                                         [], self._service_ver, context)

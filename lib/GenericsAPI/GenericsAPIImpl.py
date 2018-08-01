@@ -23,7 +23,7 @@ class GenericsAPI:
     ######################################### noqa
     VERSION = "0.0.1"
     GIT_URL = "git@github.com:Tianhao-Gu/GenericsAPI.git"
-    GIT_COMMIT_HASH = "bdd0185c0acb1102bbeeeb4b20b30e48ce793dec"
+    GIT_COMMIT_HASH = "426356ca68e409d2a049f0a48f3a6e516fa214fe"
 
     #BEGIN_CLASS_HEADER
     #END_CLASS_HEADER
@@ -119,6 +119,33 @@ class GenericsAPI:
         # At some point might do deeper type checking...
         if not isinstance(returnVal, dict):
             raise ValueError('Method export_matrix return value ' +
+                             'returnVal is not type dict as required.')
+        # return the results
+        return [returnVal]
+
+    def validate_data(self, ctx, params):
+        """
+        validate_data: validate data
+        :param params: instance of type "ValidateParams" (Input of the
+           validate_data function obj_type: obj type e.g.:
+           'KBaseMatrices.ExpressionMatrix-1.1' data: data to be validated)
+           -> structure: parameter "obj_type" of String, parameter "data" of
+           mapping from String to String
+        :returns: instance of type "ValidateOutput" -> structure: parameter
+           "validated" of type "boolean" (A boolean - 0 for false, 1 for
+           true. @range (0, 1)), parameter "failed_constraint" of mapping
+           from String to String
+        """
+        # ctx is the context object
+        # return variables are: returnVal
+        #BEGIN validate_data
+        generics_api = GenericsUtil(self.config)
+        returnVal = generics_api.validate_data(params)
+        #END validate_data
+
+        # At some point might do deeper type checking...
+        if not isinstance(returnVal, dict):
+            raise ValueError('Method validate_data return value ' +
                              'returnVal is not type dict as required.')
         # return the results
         return [returnVal]

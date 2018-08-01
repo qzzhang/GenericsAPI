@@ -24,7 +24,8 @@ RUN pip install cffi --upgrade \
 RUN pip install pandas \
     && pip install xlrd \
     && pip install openpyxl \
-    && pip install xlsxwriter
+    && pip install xlsxwriter \
+    && pip install dotmap
 # -----------------------------------------
 
 COPY ./ /kb/module

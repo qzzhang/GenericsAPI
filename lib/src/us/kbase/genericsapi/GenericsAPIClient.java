@@ -215,6 +215,24 @@ public class GenericsAPIClient {
         return res.get(0);
     }
 
+    /**
+     * <p>Original spec-file function name: validate_data</p>
+     * <pre>
+     * validate_data: validate data
+     * </pre>
+     * @param   params   instance of type {@link us.kbase.genericsapi.ValidateParams ValidateParams}
+     * @return   parameter "returnVal" of type {@link us.kbase.genericsapi.ValidateOutput ValidateOutput}
+     * @throws IOException if an IO exception occurs
+     * @throws JsonClientException if a JSON RPC exception occurs
+     */
+    public ValidateOutput validateData(ValidateParams params, RpcContext... jsonRpcContext) throws IOException, JsonClientException {
+        List<Object> args = new ArrayList<Object>();
+        args.add(params);
+        TypeReference<List<ValidateOutput>> retType = new TypeReference<List<ValidateOutput>>() {};
+        List<ValidateOutput> res = caller.jsonrpcCall("GenericsAPI.validate_data", args, retType, true, true, jsonRpcContext, this.serviceVersion);
+        return res.get(0);
+    }
+
     public Map<String, Object> status(RpcContext... jsonRpcContext) throws IOException, JsonClientException {
         List<Object> args = new ArrayList<Object>();
         TypeReference<List<Map<String, Object>>> retType = new TypeReference<List<Map<String, Object>>>() {};

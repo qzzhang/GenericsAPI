@@ -308,3 +308,36 @@ class GenericsAPITest(unittest.TestCase):
         row_len, col_len = self.check_export_matrix_output(returnVal)
         self.assertEqual(row_len, 6)
         self.assertEqual(col_len, 5)
+
+    def test_validate_data(self):
+        self.start_test()
+
+        # testing unique
+        data = {'data': {'row_ids': ['same_row_id', 'same_row_id'],
+                         'col_ids': ['same_col_id', 'same_col_id']}}
+        obj_type = 'KBaseMatrices.ExpressionMatrix-1.1'
+
+        params = {'obj_type': obj_type,
+                  'data': data}
+        returnVal = self.getImpl().validate_data(self.ctx, params)[0]
+        self.assertFalse(returnVal.get('validated'))
+        expected_failed_constraints = ['data.row_ids', 'data.col_ids']
+        self.assertItemsEqual(expected_failed_constraints,
+                              returnVal.get('failed_constraint').get('unique'))
+
+        # testing contains
+        data = {'data': {'row_ids': ['same_row_id', 'same_row_id'],
+                         'col_ids': ['same_col_id', 'same_col_id']},
+                'row_mapping': {'same_row_id': 'condition_1',
+                                'unknown_row_id': 'condition_1'},
+                'col_mapping': {'same_col_id': 'condition_1',
+                                'unknown_col_id': 'condition_1'}}
+        obj_type = 'KBaseMatrices.ExpressionMatrix-1.1'
+        params = {'obj_type': obj_type,
+                  'data': data}
+        returnVal = self.getImpl().validate_data(self.ctx, params)[0]
+        self.assertFalse(returnVal.get('validated'))
+        expected_failed_constraints = ['data.row_ids row_mapping',
+                                       'data.col_ids col_mapping']
+        self.assertItemsEqual(expected_failed_constraints,
+                              returnVal.get('failed_constraint').get('contains'))

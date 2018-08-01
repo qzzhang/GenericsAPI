@@ -59,7 +59,7 @@ module GenericsAPI {
   funcdef generate_matrix_html(GenMatrixHTMLParams params) returns(GenMatrixHTMLReturn returnVal) authentication required;
 
 
-    /* Input of the export_matrix function
+  /* Input of the export_matrix function
     obj_ref: generics object reference
 
     Optional arguments:
@@ -83,4 +83,21 @@ module GenericsAPI {
   } ExportOutput;
 
   funcdef export_matrix (ExportParams params) returns (ExportOutput returnVal) authentication required;
+  
+  /* Input of the validate_data function
+    obj_type: obj type e.g.: 'KBaseMatrices.ExpressionMatrix-1.1'
+    data: data to be validated
+  */
+  typedef structure {
+      string obj_type;
+      mapping<string, string> data;
+  } ValidateParams;
+
+  typedef structure {
+      boolean validated;
+      mapping<string, string> failed_constraint;
+  } ValidateOutput;
+
+  /* validate_data: validate data*/
+  funcdef validate_data (ValidateParams params) returns (ValidateOutput returnVal) authentication required;
 };

@@ -345,6 +345,10 @@ class Application(object):
                              name='GenericsAPI.export_matrix',
                              types=[dict])
         self.method_authentication['GenericsAPI.export_matrix'] = 'required'  # noqa
+        self.rpc_service.add(impl_GenericsAPI.validate_data,
+                             name='GenericsAPI.validate_data',
+                             types=[dict])
+        self.method_authentication['GenericsAPI.validate_data'] = 'required'  # noqa
         self.rpc_service.add(impl_GenericsAPI.status,
                              name='GenericsAPI.status',
                              types=[dict])
