@@ -519,6 +519,9 @@ class GenericsUtil:
         """
         log('Start exporting matrix')
 
+        if 'input_ref' in params:
+            params['obj_ref'] = params.pop('input_ref')
+
         data_matrix = self.fetch_data(params).get('data_matrix')
 
         df = pd.read_json(data_matrix)
