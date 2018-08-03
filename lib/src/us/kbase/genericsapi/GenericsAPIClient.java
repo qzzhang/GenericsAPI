@@ -233,6 +233,42 @@ public class GenericsAPIClient {
         return res.get(0);
     }
 
+    /**
+     * <p>Original spec-file function name: import_matrix_from_excel</p>
+     * <pre>
+     * import_matrix_from_excel: import matrix object from excel
+     * </pre>
+     * @param   params   instance of type {@link us.kbase.genericsapi.ImportMatrixParams ImportMatrixParams}
+     * @return   parameter "returnVal" of type {@link us.kbase.genericsapi.ImportMatrixOutput ImportMatrixOutput}
+     * @throws IOException if an IO exception occurs
+     * @throws JsonClientException if a JSON RPC exception occurs
+     */
+    public ImportMatrixOutput importMatrixFromExcel(ImportMatrixParams params, RpcContext... jsonRpcContext) throws IOException, JsonClientException {
+        List<Object> args = new ArrayList<Object>();
+        args.add(params);
+        TypeReference<List<ImportMatrixOutput>> retType = new TypeReference<List<ImportMatrixOutput>>() {};
+        List<ImportMatrixOutput> res = caller.jsonrpcCall("GenericsAPI.import_matrix_from_excel", args, retType, true, true, jsonRpcContext, this.serviceVersion);
+        return res.get(0);
+    }
+
+    /**
+     * <p>Original spec-file function name: save_object</p>
+     * <pre>
+     * save_object: validate data constraints and save matrix object
+     * </pre>
+     * @param   params   instance of type {@link us.kbase.genericsapi.SaveObjectParams SaveObjectParams}
+     * @return   parameter "returnVal" of type {@link us.kbase.genericsapi.SaveObjectOutput SaveObjectOutput}
+     * @throws IOException if an IO exception occurs
+     * @throws JsonClientException if a JSON RPC exception occurs
+     */
+    public SaveObjectOutput saveObject(SaveObjectParams params, RpcContext... jsonRpcContext) throws IOException, JsonClientException {
+        List<Object> args = new ArrayList<Object>();
+        args.add(params);
+        TypeReference<List<SaveObjectOutput>> retType = new TypeReference<List<SaveObjectOutput>>() {};
+        List<SaveObjectOutput> res = caller.jsonrpcCall("GenericsAPI.save_object", args, retType, true, true, jsonRpcContext, this.serviceVersion);
+        return res.get(0);
+    }
+
     public Map<String, Object> status(RpcContext... jsonRpcContext) throws IOException, JsonClientException {
         List<Object> args = new ArrayList<Object>();
         TypeReference<List<Map<String, Object>>> retType = new TypeReference<List<Map<String, Object>>>() {};

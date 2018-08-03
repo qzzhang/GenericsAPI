@@ -480,6 +480,214 @@ validate_data: validate data
     }
 }
  
+
+
+=head2 import_matrix_from_excel
+
+  $returnVal = $obj->import_matrix_from_excel($params)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$params is a GenericsAPI.ImportMatrixParams
+$returnVal is a GenericsAPI.ImportMatrixOutput
+ImportMatrixParams is a reference to a hash where the following keys are defined:
+	obj_type has a value which is a string
+	input_shock_id has a value which is a string
+	input_file_path has a value which is a string
+	input_staging_file_path has a value which is a string
+	matrix_name has a value which is a string
+	workspace_name has a value which is a GenericsAPI.workspace_name
+workspace_name is a string
+ImportMatrixOutput is a reference to a hash where the following keys are defined:
+	report_name has a value which is a string
+	report_ref has a value which is a string
+	matrix_obj_ref has a value which is a GenericsAPI.obj_ref
+obj_ref is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$params is a GenericsAPI.ImportMatrixParams
+$returnVal is a GenericsAPI.ImportMatrixOutput
+ImportMatrixParams is a reference to a hash where the following keys are defined:
+	obj_type has a value which is a string
+	input_shock_id has a value which is a string
+	input_file_path has a value which is a string
+	input_staging_file_path has a value which is a string
+	matrix_name has a value which is a string
+	workspace_name has a value which is a GenericsAPI.workspace_name
+workspace_name is a string
+ImportMatrixOutput is a reference to a hash where the following keys are defined:
+	report_name has a value which is a string
+	report_ref has a value which is a string
+	matrix_obj_ref has a value which is a GenericsAPI.obj_ref
+obj_ref is a string
+
+
+=end text
+
+=item Description
+
+import_matrix_from_excel: import matrix object from excel
+
+=back
+
+=cut
+
+ sub import_matrix_from_excel
+{
+    my($self, @args) = @_;
+
+# Authentication: required
+
+    if ((my $n = @args) != 1)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function import_matrix_from_excel (received $n, expecting 1)");
+    }
+    {
+	my($params) = @args;
+
+	my @_bad_arguments;
+        (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument 1 \"params\" (value was \"$params\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to import_matrix_from_excel:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'import_matrix_from_excel');
+	}
+    }
+
+    my $url = $self->{url};
+    my $result = $self->{client}->call($url, $self->{headers}, {
+	    method => "GenericsAPI.import_matrix_from_excel",
+	    params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'import_matrix_from_excel',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method import_matrix_from_excel",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'import_matrix_from_excel',
+				       );
+    }
+}
+ 
+
+
+=head2 save_object
+
+  $returnVal = $obj->save_object($params)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$params is a GenericsAPI.SaveObjectParams
+$returnVal is a GenericsAPI.SaveObjectOutput
+SaveObjectParams is a reference to a hash where the following keys are defined:
+	obj_type has a value which is a string
+	obj_name has a value which is a string
+	data has a value which is a reference to a hash where the key is a string and the value is a string
+	workspace_name has a value which is a GenericsAPI.workspace_name
+workspace_name is a string
+SaveObjectOutput is a reference to a hash where the following keys are defined:
+	obj_ref has a value which is a GenericsAPI.obj_ref
+obj_ref is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$params is a GenericsAPI.SaveObjectParams
+$returnVal is a GenericsAPI.SaveObjectOutput
+SaveObjectParams is a reference to a hash where the following keys are defined:
+	obj_type has a value which is a string
+	obj_name has a value which is a string
+	data has a value which is a reference to a hash where the key is a string and the value is a string
+	workspace_name has a value which is a GenericsAPI.workspace_name
+workspace_name is a string
+SaveObjectOutput is a reference to a hash where the following keys are defined:
+	obj_ref has a value which is a GenericsAPI.obj_ref
+obj_ref is a string
+
+
+=end text
+
+=item Description
+
+save_object: validate data constraints and save matrix object
+
+=back
+
+=cut
+
+ sub save_object
+{
+    my($self, @args) = @_;
+
+# Authentication: required
+
+    if ((my $n = @args) != 1)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function save_object (received $n, expecting 1)");
+    }
+    {
+	my($params) = @args;
+
+	my @_bad_arguments;
+        (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument 1 \"params\" (value was \"$params\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to save_object:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'save_object');
+	}
+    }
+
+    my $url = $self->{url};
+    my $result = $self->{client}->call($url, $self->{headers}, {
+	    method => "GenericsAPI.save_object",
+	    params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'save_object',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method save_object",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'save_object',
+				       );
+    }
+}
+ 
   
 sub status
 {
@@ -523,16 +731,16 @@ sub version {
             Bio::KBase::Exceptions::JSONRPC->throw(
                 error => $result->error_message,
                 code => $result->content->{code},
-                method_name => 'validate_data',
+                method_name => 'save_object',
             );
         } else {
             return wantarray ? @{$result->result} : $result->result->[0];
         }
     } else {
         Bio::KBase::Exceptions::HTTP->throw(
-            error => "Error invoking method validate_data",
+            error => "Error invoking method save_object",
             status_line => $self->{client}->status_line,
-            method_name => 'validate_data',
+            method_name => 'save_object',
         );
     }
 }
@@ -610,6 +818,37 @@ an int
 =item Description
 
 An X/Y/Z style reference
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a string
+</pre>
+
+=end html
+
+=begin text
+
+a string
+
+=end text
+
+=back
+
+
+
+=head2 workspace_name
+
+=over 4
+
+
+
+=item Description
+
+workspace name of the object
 
 
 =item Definition
@@ -931,6 +1170,166 @@ failed_constraint has a value which is a reference to a hash where the key is a 
 a reference to a hash where the following keys are defined:
 validated has a value which is a GenericsAPI.boolean
 failed_constraint has a value which is a reference to a hash where the key is a string and the value is a string
+
+
+=end text
+
+=back
+
+
+
+=head2 ImportMatrixParams
+
+=over 4
+
+
+
+=item Description
+
+Input of the import_matrix_from_excel function
+obj_type: one of ExpressionMatrix, FitnessMatrix, DifferentialExpressionMatrix
+input_shock_id: file shock id
+input_file_path: absolute file path
+input_staging_file_path: staging area file path
+matrix_name: matrix object name
+workspace_name: workspace name matrix object to be saved to
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+obj_type has a value which is a string
+input_shock_id has a value which is a string
+input_file_path has a value which is a string
+input_staging_file_path has a value which is a string
+matrix_name has a value which is a string
+workspace_name has a value which is a GenericsAPI.workspace_name
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+obj_type has a value which is a string
+input_shock_id has a value which is a string
+input_file_path has a value which is a string
+input_staging_file_path has a value which is a string
+matrix_name has a value which is a string
+workspace_name has a value which is a GenericsAPI.workspace_name
+
+
+=end text
+
+=back
+
+
+
+=head2 ImportMatrixOutput
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+report_name has a value which is a string
+report_ref has a value which is a string
+matrix_obj_ref has a value which is a GenericsAPI.obj_ref
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+report_name has a value which is a string
+report_ref has a value which is a string
+matrix_obj_ref has a value which is a GenericsAPI.obj_ref
+
+
+=end text
+
+=back
+
+
+
+=head2 SaveObjectParams
+
+=over 4
+
+
+
+=item Description
+
+Input of the import_matrix_from_excel function
+obj_type: saving object data type
+obj_name: saving object name
+data: data to be saved
+workspace_name: workspace name matrix object to be saved to
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+obj_type has a value which is a string
+obj_name has a value which is a string
+data has a value which is a reference to a hash where the key is a string and the value is a string
+workspace_name has a value which is a GenericsAPI.workspace_name
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+obj_type has a value which is a string
+obj_name has a value which is a string
+data has a value which is a reference to a hash where the key is a string and the value is a string
+workspace_name has a value which is a GenericsAPI.workspace_name
+
+
+=end text
+
+=back
+
+
+
+=head2 SaveObjectOutput
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+obj_ref has a value which is a GenericsAPI.obj_ref
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+obj_ref has a value which is a GenericsAPI.obj_ref
 
 
 =end text

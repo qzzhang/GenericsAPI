@@ -23,7 +23,7 @@ class GenericsAPI:
     ######################################### noqa
     VERSION = "0.0.1"
     GIT_URL = "git@github.com:Tianhao-Gu/GenericsAPI.git"
-    GIT_COMMIT_HASH = "426356ca68e409d2a049f0a48f3a6e516fa214fe"
+    GIT_COMMIT_HASH = "5ffad5b22b9c72822d3e0d8546091be0c723aac3"
 
     #BEGIN_CLASS_HEADER
     #END_CLASS_HEADER
@@ -146,6 +146,67 @@ class GenericsAPI:
         # At some point might do deeper type checking...
         if not isinstance(returnVal, dict):
             raise ValueError('Method validate_data return value ' +
+                             'returnVal is not type dict as required.')
+        # return the results
+        return [returnVal]
+
+    def import_matrix_from_excel(self, ctx, params):
+        """
+        import_matrix_from_excel: import matrix object from excel
+        :param params: instance of type "ImportMatrixParams" (Input of the
+           import_matrix_from_excel function obj_type: one of
+           ExpressionMatrix, FitnessMatrix, DifferentialExpressionMatrix
+           input_shock_id: file shock id input_file_path: absolute file path
+           input_staging_file_path: staging area file path matrix_name:
+           matrix object name workspace_name: workspace name matrix object to
+           be saved to) -> structure: parameter "obj_type" of String,
+           parameter "input_shock_id" of String, parameter "input_file_path"
+           of String, parameter "input_staging_file_path" of String,
+           parameter "matrix_name" of String, parameter "workspace_name" of
+           type "workspace_name" (workspace name of the object)
+        :returns: instance of type "ImportMatrixOutput" -> structure:
+           parameter "report_name" of String, parameter "report_ref" of
+           String, parameter "matrix_obj_ref" of type "obj_ref" (An X/Y/Z
+           style reference)
+        """
+        # ctx is the context object
+        # return variables are: returnVal
+        #BEGIN import_matrix_from_excel
+        generics_api = GenericsUtil(self.config)
+        returnVal = generics_api.import_matrix_from_excel(params)
+        #END import_matrix_from_excel
+
+        # At some point might do deeper type checking...
+        if not isinstance(returnVal, dict):
+            raise ValueError('Method import_matrix_from_excel return value ' +
+                             'returnVal is not type dict as required.')
+        # return the results
+        return [returnVal]
+
+    def save_object(self, ctx, params):
+        """
+        save_object: validate data constraints and save matrix object
+        :param params: instance of type "SaveObjectParams" (Input of the
+           import_matrix_from_excel function obj_type: saving object data
+           type obj_name: saving object name data: data to be saved
+           workspace_name: workspace name matrix object to be saved to) ->
+           structure: parameter "obj_type" of String, parameter "obj_name" of
+           String, parameter "data" of mapping from String to String,
+           parameter "workspace_name" of type "workspace_name" (workspace
+           name of the object)
+        :returns: instance of type "SaveObjectOutput" -> structure: parameter
+           "obj_ref" of type "obj_ref" (An X/Y/Z style reference)
+        """
+        # ctx is the context object
+        # return variables are: returnVal
+        #BEGIN save_object
+        generics_api = GenericsUtil(self.config)
+        returnVal = generics_api.save_object(params)
+        #END save_object
+
+        # At some point might do deeper type checking...
+        if not isinstance(returnVal, dict):
+            raise ValueError('Method save_object return value ' +
                              'returnVal is not type dict as required.')
         # return the results
         return [returnVal]

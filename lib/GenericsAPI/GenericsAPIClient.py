@@ -104,6 +104,47 @@ class GenericsAPI(object):
             'GenericsAPI.validate_data',
             [params], self._service_ver, context)
 
+    def import_matrix_from_excel(self, params, context=None):
+        """
+        import_matrix_from_excel: import matrix object from excel
+        :param params: instance of type "ImportMatrixParams" (Input of the
+           import_matrix_from_excel function obj_type: one of
+           ExpressionMatrix, FitnessMatrix, DifferentialExpressionMatrix
+           input_shock_id: file shock id input_file_path: absolute file path
+           input_staging_file_path: staging area file path matrix_name:
+           matrix object name workspace_name: workspace name matrix object to
+           be saved to) -> structure: parameter "obj_type" of String,
+           parameter "input_shock_id" of String, parameter "input_file_path"
+           of String, parameter "input_staging_file_path" of String,
+           parameter "matrix_name" of String, parameter "workspace_name" of
+           type "workspace_name" (workspace name of the object)
+        :returns: instance of type "ImportMatrixOutput" -> structure:
+           parameter "report_name" of String, parameter "report_ref" of
+           String, parameter "matrix_obj_ref" of type "obj_ref" (An X/Y/Z
+           style reference)
+        """
+        return self._client.call_method(
+            'GenericsAPI.import_matrix_from_excel',
+            [params], self._service_ver, context)
+
+    def save_object(self, params, context=None):
+        """
+        save_object: validate data constraints and save matrix object
+        :param params: instance of type "SaveObjectParams" (Input of the
+           import_matrix_from_excel function obj_type: saving object data
+           type obj_name: saving object name data: data to be saved
+           workspace_name: workspace name matrix object to be saved to) ->
+           structure: parameter "obj_type" of String, parameter "obj_name" of
+           String, parameter "data" of mapping from String to String,
+           parameter "workspace_name" of type "workspace_name" (workspace
+           name of the object)
+        :returns: instance of type "SaveObjectOutput" -> structure: parameter
+           "obj_ref" of type "obj_ref" (An X/Y/Z style reference)
+        """
+        return self._client.call_method(
+            'GenericsAPI.save_object',
+            [params], self._service_ver, context)
+
     def status(self, context=None):
         return self._client.call_method('GenericsAPI.status',
                                         [], self._service_ver, context)

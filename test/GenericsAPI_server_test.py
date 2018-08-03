@@ -359,3 +359,16 @@ class GenericsAPITest(unittest.TestCase):
                                        'data.row_ids genome_ref:features.[*].id genome_ref:mrnas.[*].id genome_ref:cdss.[*].id genome_ref:non_codeing_features.[*].id']
         self.assertItemsEqual(expected_failed_constraints,
                               returnVal.get('failed_constraint').get('contains'))
+
+    def test_import_matrix_from_excel(self):
+        self.start_test()
+
+        obj_type = 'ExpressionMatrix'
+        params = {'obj_type': obj_type,
+                  'matrix_name': 'test_ExpressionMatrix',
+                  'workspace_name': self.wsName,
+                  'input_file_path': os.path.join('data', 'test_import.xlsx'),
+                  'genome_ref': self.genome_ref}
+        returnVal = self.getImpl().import_matrix_from_excel(self.ctx, params)[0]
+        self.assertTrue('matrix_obj_ref' in returnVal)
+        print returnVal

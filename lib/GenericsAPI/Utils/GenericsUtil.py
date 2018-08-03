@@ -8,15 +8,18 @@ import errno
 import traceback
 import xlsxwriter
 from dotmap import DotMap
+from xlrd.biffh import XLRDError
 
 from DataFileUtil.DataFileUtilClient import DataFileUtil
 from Workspace.WorkspaceClient import Workspace as workspaceService
+from ConditionUtils.ConditionUtilsClient import ConditionUtils
 
 
 def log(message, prefix_newline=False):
     print(('\n' if prefix_newline else '') + str(time.time()) + ': ' + message)
 
 GENERICS_TYPE = ['FloatMatrix2D']  # add case in _convert_data for each additional type
+MATRIX_TYPE = ['ExpressionMatrix', 'FitnessMatrix', 'DifferentialExpressionMatrix']
 
 
 class GenericsUtil:
@@ -33,6 +36,44 @@ class GenericsUtil:
         for p in ['obj_ref']:
             if p not in params:
                 raise ValueError('"{}" parameter is required, but missing'.format(p))
+
+    def _validate_import_matrix_from_excel_params(self, params):
+        """
+        _validate_import_matrix_from_excel_params:
+            validates params passed to import_matrix_from_excel method
+        """
+        log('start validating import_matrix_from_excel params')
+
+        # check for required parameters
+        for p in ['obj_type', 'matrix_name', 'workspace_name']:
+            if p not in params:
+                raise ValueError('"{}" parameter is required, but missing'.format(p))
+
+        obj_type = params.get('obj_type')
+        if obj_type not in MATRIX_TYPE:
+            raise ValueError('Unknown matrix object type: {}'.format(obj_type))
+
+        if params.get('input_file_path'):
+            file_path = params.get('input_file_path')
+        elif params.get('input_shock_id'):
+            file_path = self.dfu.shock_to_file(
+                {'shock_id': params['input_shock_id'],
+                 'file_path': self.scratch}).get('file_path')
+        elif params.get('input_staging_file_path'):
+            file_path = self.dfu.download_staging_file(
+                        {'staging_file_subdir_path': params.get('input_staging_file_path')}
+                        ).get('copy_file_path')
+        else:
+            error_msg = "Must supply either a input_shock_id or input_file_path "
+            error_msg += "or input_staging_file_path"
+            raise ValueError(error_msg)
+
+        refs_key = ['col_conditionset_ref', 'row_conditionset_ref', 'genome_ref',
+                    'diff_expr_matrix_ref']
+        refs = {k: v for k, v in params.items() if k in refs_key}
+
+        return (obj_type, file_path, params.get('workspace_name'),
+                params.get('matrix_name'), refs)
 
     def _upload_to_shock(self, file_path):
         """
@@ -402,6 +443,92 @@ class GenericsUtil:
 
         return validated, failed_constraint
 
+    def _process_mapping_sheet(self, file_path, sheet_name):
+        """
+        _process_mapping: process mapping sheet
+        """
+
+        try:
+            df = pd.read_excel(file_path, sheet_name=sheet_name)
+        except XLRDError:
+            return dict()
+        else:
+            mapping = {value[0]: value[1] for value in df.values.tolist()}
+
+        return mapping
+
+    def _process_conditionset_sheet(self, file_path, sheet_name, matrix_name, workspace_id):
+        """
+        _process_conditionset_sheet: process condition set sheet
+        """
+
+        try:
+            df = pd.read_excel(file_path, sheet_name=sheet_name)
+        except XLRDError:
+            return ''
+        else:
+            obj_name = '{}_{}'.format(sheet_name, matrix_name)
+            result_directory = os.path.join(self.scratch, str(uuid.uuid4()))
+            self._mkdir_p(result_directory)
+            file_path = os.path.join(result_directory, '{}.xlsx'.format(obj_name))
+            df.to_excel(file_path)
+            import_condition_set_params = {
+                'output_obj_name': obj_name,
+                'output_ws_id': workspace_id,
+                'input_file_path': file_path
+            }
+
+            ref = self.cu.file_to_condition_set(import_condition_set_params)
+
+            return ref.get('condition_set_ref')
+
+    def _file_to_data(self, file_path, refs, matrix_name, workspace_id):
+        log('Start reading and converting excel file data')
+        data = refs
+
+        try:
+            pd.read_excel(file_path)
+        except XLRDError:
+            # TODO: convert csv file to excel
+            log('Found csv file')
+
+        # processing data sheet
+        try:
+            df = pd.read_excel(file_path, sheet_name='data')
+        except XLRDError:
+            raise ValueError('Cannot find <data> sheetss')
+        else:
+            matrix_data = {'row_ids': df.index.tolist(),
+                           'col_ids': df.columns.tolist(),
+                           'values': df.values.tolist()}
+            data.update({'data': matrix_data})
+
+        # processing col/row_mapping
+        col_mapping = self._process_mapping_sheet(file_path, 'col_mapping')
+        data.update({'col_mapping': col_mapping})
+
+        row_mapping = self._process_mapping_sheet(file_path, 'row_mapping')
+        data.update({'row_mapping': row_mapping})
+
+        # processing col/row_conditionset
+        col_conditionset_ref = self._process_conditionset_sheet(file_path,
+                                                                'col_conditionset',
+                                                                matrix_name,
+                                                                workspace_id)
+        data.update({'col_conditionset_ref': col_conditionset_ref})
+
+        row_conditionset_ref = self._process_conditionset_sheet(file_path,
+                                                                'row_conditionset',
+                                                                matrix_name,
+                                                                workspace_id)
+        data.update({'row_conditionset_ref': row_conditionset_ref})
+
+        # processing metadata
+        metadata = self._process_mapping_sheet(file_path, 'metadata')
+        data.update(metadata)
+
+        return data
+
     def __init__(self, config):
         self.ws_url = config["workspace-url"]
         self.callback_url = config['SDK_CALLBACK_URL']
@@ -411,6 +538,94 @@ class GenericsUtil:
         self.scratch = config['scratch']
         self.dfu = DataFileUtil(self.callback_url)
         self.wsClient = workspaceService(self.ws_url, token=self.token)
+        self.cu = ConditionUtils(self.callback_url, service_ver="dev")
+
+    def import_matrix_from_excel(self, params):
+        """
+        import_matrix_from_excel: import matrix object from excel
+
+        arguments:
+        obj_type: one of ExpressionMatrix, FitnessMatrix, DifferentialExpressionMatrix
+        matrix_name: matrix object name
+        workspace_name: workspace name matrix object to be saved to
+        input_shock_id: file shock id
+        or
+        input_file_path: absolute file path
+        or
+        input_staging_file_path: staging area file path
+        """
+
+        (obj_type, file_path, workspace_name,
+         matrix_name, refs) = self._validate_import_matrix_from_excel_params(params)
+
+        if not isinstance(workspace_name, int):
+            workspace_id = self.dfu.ws_name_to_id(workspace_name)
+        else:
+            workspace_id = workspace_name
+
+        data = self._file_to_data(file_path, refs, matrix_name, workspace_id)
+
+        matrix_obj_ref = self.save_object({'obj_type': 'KBaseMatrices.{}'.format(obj_type),
+                                           'obj_name': matrix_name,
+                                           'data': data,
+                                           'workspace_name': workspace_id})['obj_ref']
+
+        returnVal = {'matrix_obj_ref': matrix_obj_ref}
+
+        return returnVal
+
+    def save_object(self, params):
+        """
+        save_object: validate data constraints and save matrix object
+
+        arguments:
+        obj_type: saving object data type
+        obj_name: saving object name
+        data: data to be saved
+        workspace_name: workspace name matrix object to be saved to
+
+        return:
+        obj_ref: object reference
+        """
+        log('Starting saving object')
+
+        obj_type = params.get('obj_type')
+
+        module_name = obj_type.split('.')[0]
+        type_name = obj_type.split('.')[1]
+
+        types = self.wsClient.get_module_info({'mod': module_name}).get('types')
+
+        for module_type in types:
+            if self._find_between(module_type, '\.', '\-') == type_name:
+                obj_type = module_type
+                break
+
+        data = params.get('data')
+        validate = self.validate_data({'obj_type': obj_type,
+                                       'data': data})
+
+        if not validate.get('validated'):
+            log('Data is not validated')
+            print validate.get('failed_constraint')
+            raise ValueError('Data is not validated')
+
+        workspace_name = params.get('workspace_name')
+        if not isinstance(workspace_name, int):
+            ws_name_id = self.dfu.ws_name_to_id(workspace_name)
+        else:
+            ws_name_id = workspace_name
+
+        info = self.dfu.save_objects({
+            "id": ws_name_id,
+            "objects": [{
+                "type": obj_type,
+                "data": data,
+                "name": params.get('obj_name')
+            }]
+        })[0]
+
+        return {"obj_ref": "%s/%s/%s" % (info[6], info[0], info[4])}
 
     def validate_data(self, params):
         """
