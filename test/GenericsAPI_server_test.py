@@ -251,9 +251,10 @@ class GenericsAPITest(unittest.TestCase):
 
         shock_to_file_params = {
             'shock_id': returnVal.get('shock_id'),
-            'file_path': result_dir}
+            'file_path': result_dir,
+            'unpack': 'unpack'}
         shock_file = self.dfu.shock_to_file(shock_to_file_params)['file_path']
-        df = pd.read_excel(shock_file)
+        df = pd.read_excel(shock_file[:-4])
 
         return len(df.index.tolist()), len(df.columns.tolist())
 
