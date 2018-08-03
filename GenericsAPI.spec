@@ -12,6 +12,9 @@ module GenericsAPI {
   */
   typedef string obj_ref;
 
+  /* workspace name of the object */
+  typedef string workspace_name;
+
   /* Input of the fetch_data function
     obj_ref: generics object reference
 
@@ -100,4 +103,51 @@ module GenericsAPI {
 
   /* validate_data: validate data*/
   funcdef validate_data (ValidateParams params) returns (ValidateOutput returnVal) authentication required;
+
+
+  /* Input of the import_matrix_from_excel function
+    obj_type: one of ExpressionMatrix, FitnessMatrix, DifferentialExpressionMatrix
+    input_shock_id: file shock id
+    input_file_path: absolute file path
+    input_staging_file_path: staging area file path
+    matrix_name: matrix object name
+    workspace_name: workspace name matrix object to be saved to
+  */
+  typedef structure {
+      string obj_type;
+      string input_shock_id;
+      string input_file_path;
+      string input_staging_file_path;
+      string matrix_name;
+      workspace_name workspace_name;
+  } ImportMatrixParams;
+
+  typedef structure {
+      string report_name;
+      string report_ref;
+      obj_ref matrix_obj_ref;
+  } ImportMatrixOutput;
+
+  /* import_matrix_from_excel: import matrix object from excel*/
+  funcdef import_matrix_from_excel (ImportMatrixParams params) returns (ImportMatrixOutput returnVal) authentication required;
+
+  /* Input of the import_matrix_from_excel function
+    obj_type: saving object data type
+    obj_name: saving object name
+    data: data to be saved
+    workspace_name: workspace name matrix object to be saved to
+  */
+  typedef structure {
+      string obj_type;
+      string obj_name;
+      mapping<string, string> data;
+      workspace_name workspace_name;
+  } SaveObjectParams;
+
+  typedef structure {
+      obj_ref obj_ref;
+  } SaveObjectOutput;
+
+  /* save_object: validate data constraints and save matrix object*/
+  funcdef save_object (SaveObjectParams params) returns (SaveObjectOutput returnVal) authentication required;
 };

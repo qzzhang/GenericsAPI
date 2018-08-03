@@ -349,6 +349,14 @@ class Application(object):
                              name='GenericsAPI.validate_data',
                              types=[dict])
         self.method_authentication['GenericsAPI.validate_data'] = 'required'  # noqa
+        self.rpc_service.add(impl_GenericsAPI.import_matrix_from_excel,
+                             name='GenericsAPI.import_matrix_from_excel',
+                             types=[dict])
+        self.method_authentication['GenericsAPI.import_matrix_from_excel'] = 'required'  # noqa
+        self.rpc_service.add(impl_GenericsAPI.save_object,
+                             name='GenericsAPI.save_object',
+                             types=[dict])
+        self.method_authentication['GenericsAPI.save_object'] = 'required'  # noqa
         self.rpc_service.add(impl_GenericsAPI.status,
                              name='GenericsAPI.status',
                              types=[dict])
