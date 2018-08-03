@@ -631,7 +631,7 @@ class GenericsUtil:
                 obj_type = module_type
                 break
 
-        data = params.get('data')
+        data = dict((k, v) for k, v in params.get('data').iteritems() if v)
         validate = self.validate_data({'obj_type': obj_type,
                                        'data': data})
 
