@@ -1,0 +1,173 @@
+{
+  "ver" : "",
+  "authors" : ["tgu2"],
+  "contact" : "http://kbase.us/contact-us/",
+  "visible" : true,
+  "categories" : ["upload"],
+  "widgets": {
+    "input": "kbaseNarrativeMethodInput",
+    "output" : "no-display"
+  },
+  "parameters" : [
+    {
+      "id" : "obj_type",
+      "optional" : false,
+      "advanced" : false,
+      "allow_multiple" : false,
+      "default_values" : ["ExpressionMatrix"],
+      "field_type" : "dropdown",
+      "dropdown_options": 
+      {
+        "options": 
+        [
+          {
+              "display": "ExpressionMatrix",
+              "value": "ExpressionMatrix"
+          },
+          {
+              "display": "FitnessMatrix",
+              "value": "FitnessMatrix"
+          },
+          {
+              "display": "DifferentialExpressionMatrix",
+              "value": "DifferentialExpressionMatrix"
+          }
+        ]
+      }
+    },
+    {
+      "id" : "input_staging_file_path",
+      "optional" : false,
+      "advanced" : false,
+      "allow_multiple" : false,
+      "default_values" : [ "" ],
+      "field_type" : "dynamic_dropdown",
+      "text_options" : {}
+    },
+    {
+      "id" : "matrix_name",
+      "optional" : false,
+      "advanced" : false,
+      "allow_multiple" : false,
+      "default_values" : [ "" ],
+      "field_type" : "text",
+      "text_options" : {
+        "valid_ws_types" : ["KBaseMatrices.ExpressionMatrix", "KBaseMatrices.FitnessMatrix", "KBaseMatrices.DifferentialExpressionMatrix"],
+        "is_output_name" : true
+      }
+    },
+    {
+      "id" : "genome_ref",
+      "optional" : true,
+      "advanced" : true,
+      "allow_multiple" : false,
+      "default_values" : [ "" ],
+      "field_type" : "text",
+      "text_options" : {
+        "valid_ws_types" : ["KBaseGenomes.Genome"]
+      }
+    },
+    {
+      "id" : "col_conditionset_ref",
+      "optional" : true,
+      "advanced" : true,
+      "allow_multiple" : false,
+      "default_values" : [ "" ],
+      "field_type" : "text",
+      "text_options" : {
+        "valid_ws_types" : ["KBaseExperiments.ConditionSet"]
+      }
+    },
+    {
+      "id" : "row_conditionset_ref",
+      "optional" : true,
+      "advanced" : true,
+      "allow_multiple" : false,
+      "default_values" : [ "" ],
+      "field_type" : "text",
+      "text_options" : {
+        "valid_ws_types" : ["KBaseExperiments.ConditionSet"]
+      }
+    },
+    {
+      "id" : "diff_expr_matrix_ref",
+      "optional" : true,
+      "advanced" : true,
+      "allow_multiple" : false,
+      "default_values" : [ "" ],
+      "field_type" : "text",
+      "text_options" : {
+        "valid_ws_types" : ["KBaseMatrices.DifferentialExpressionMatrix"]
+      }
+    }
+  ],
+  "behavior" : {
+    "service-mapping" : {
+      "url" : "",
+      "name" : "GenericsAPI",
+      "method" : "import_matrix_from_excel",
+      "input_mapping" : [
+        {
+          "narrative_system_variable": "workspace",
+          "target_property": "workspace_name"
+        },
+        {
+          "input_parameter": "obj_type",
+          "target_property": "obj_type"
+        },
+        {
+          "input_parameter": "input_staging_file_path",
+          "target_property": "input_staging_file_path"
+        },
+        {
+          "input_parameter": "matrix_name",
+          "target_property": "matrix_name"
+        },
+        {
+          "input_parameter" : "genome_ref",
+          "target_property" : "genome_ref",
+          "target_type_transform": "resolved-ref"
+        },
+        {
+          "input_parameter" : "col_conditionset_ref",
+          "target_property" : "col_conditionset_ref",
+          "target_type_transform": "resolved-ref"
+        },
+        {
+          "input_parameter" : "row_conditionset_ref",
+          "target_property" : "row_conditionset_ref",
+          "target_type_transform": "resolved-ref"
+        },
+        {
+          "input_parameter" : "diff_expr_matrix_ref",
+          "target_property" : "diff_expr_matrix_ref",
+          "target_type_transform": "resolved-ref"
+        }
+      ],
+      "output_mapping" : [
+        {
+          "narrative_system_variable": "workspace",
+          "target_property": "wsName"
+        },
+        {
+          "service_method_output_path": [0,"matrix_obj_ref"],
+          "target_property": "matrix_obj_ref",
+          "target_type_transform": "resolved-ref"
+        },
+        {
+            "service_method_output_path": [0, "report_name"],
+            "target_property": "report_name"
+        },
+        {
+            "service_method_output_path": [0, "report_ref"],
+            "target_property": "report_ref"
+        },
+        {
+            "constant_value": "16",
+            "target_property": "report_window_line_height"
+        }
+      ]
+    }
+  },
+  "job_id_output_field": "docker"
+}

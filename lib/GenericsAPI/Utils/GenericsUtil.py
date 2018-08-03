@@ -13,6 +13,7 @@ from xlrd.biffh import XLRDError
 from DataFileUtil.DataFileUtilClient import DataFileUtil
 from Workspace.WorkspaceClient import Workspace as workspaceService
 from ConditionUtils.ConditionUtilsClient import ConditionUtils
+from KBaseReport.KBaseReportClient import KBaseReport
 
 
 def log(message, prefix_newline=False):
@@ -415,6 +416,24 @@ class GenericsUtil:
 
         return retrieve_data
 
+    def _generate_report(self, matrix_obj_ref, workspace_name):
+        """
+        _generate_report: generate summary report
+        """
+
+        report_params = {'message': '',
+                         'objects_created': [{'ref': matrix_obj_ref,
+                                              'description': 'Imported Matrix'}],
+                         'workspace_name': workspace_name,
+                         'report_object_name': 'import_matrix_from_excel_' + str(uuid.uuid4())}
+
+        kbase_report_client = KBaseReport(self.callback_url, token=self.token)
+        output = kbase_report_client.create_extended_report(report_params)
+
+        report_output = {'report_name': output['name'], 'report_ref': output['ref']}
+
+        return report_output
+
     def _validate(self, constraints, data):
         """
         _validate: validate data
@@ -491,6 +510,7 @@ class GenericsUtil:
         except XLRDError:
             # TODO: convert csv file to excel
             log('Found csv file')
+            raise ValueError('Please provide .xlsx file only')
 
         # processing data sheet
         try:
@@ -553,6 +573,12 @@ class GenericsUtil:
         input_file_path: absolute file path
         or
         input_staging_file_path: staging area file path
+
+        optional arguments:
+        col_conditionset_ref: column ConditionSet reference
+        row_conditionset_ref: row ConditionSet reference
+        genome_ref: genome reference
+        diff_expr_matrix_ref: DifferentialExpressionMatrix reference
         """
 
         (obj_type, file_path, workspace_name,
@@ -571,6 +597,10 @@ class GenericsUtil:
                                            'workspace_name': workspace_id})['obj_ref']
 
         returnVal = {'matrix_obj_ref': matrix_obj_ref}
+
+        report_output = self._generate_report(matrix_obj_ref, workspace_name)
+
+        returnVal.update(report_output)
 
         return returnVal
 
