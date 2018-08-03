@@ -112,6 +112,13 @@ module GenericsAPI {
     input_staging_file_path: staging area file path
     matrix_name: matrix object name
     workspace_name: workspace name matrix object to be saved to
+
+    optional:
+    col_conditionset_ref: column ConditionSet reference
+    row_conditionset_ref: row ConditionSet reference
+    genome_ref: genome reference
+    diff_expr_matrix_ref: DifferentialExpressionMatrix reference
+
   */
   typedef structure {
       string obj_type;
@@ -120,6 +127,11 @@ module GenericsAPI {
       string input_staging_file_path;
       string matrix_name;
       workspace_name workspace_name;
+
+      obj_ref genome_ref;
+      obj_ref col_conditionset_ref;
+      obj_ref row_conditionset_ref;
+      obj_ref diff_expr_matrix_ref;
   } ImportMatrixParams;
 
   typedef structure {

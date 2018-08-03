@@ -1,0 +1,81 @@
+name     : Import Excel File as Matrix from Staging Area
+subtitle : Import an Excel file from your staging area into your Narrative as an Matrix data object
+tooltip  : Import an Excel file from your staging area into your Narrative as an Matrix data object
+
+icon: data-blue.png
+
+screenshots :
+    []
+
+suggestions :
+    apps:
+        related :
+            []
+        next :
+            []
+    methods:
+        related :
+            []
+        next :
+            []
+
+parameters :
+    obj_type :
+        ui-name: |
+            Matrix Type
+        short-hint : |
+            One of ExpressionMatrix, FitnessMatrix, DifferentialExpressionMatrix
+        long-hint  : |
+            One of ExpressionMatrix, FitnessMatrix, DifferentialExpressionMatrix
+
+    input_staging_file_path :
+        ui-name : |
+            File Path
+        short-hint : |
+            Recognized extensions for the input file is .xlsx
+        long-hint  : |
+            Recognized extensions for the input file is .xlsx
+
+    matrix_name :
+        ui-name : |
+            Matrix Object Name
+        short-hint : |
+            Provide a name for the Matrix that will be created by this importer
+        long-hint : |
+            Provide a name for the Matrix that will be created by this importer
+
+    genome_ref :
+        ui-name : |
+            Genome Reference
+        short-hint : |
+            Provide a Genome associated with Matrix
+        long-hint : |
+            Provide a Genome associated with Matrix
+
+    col_conditionset_ref :
+        ui-name : |
+            Column ConditionSet Reference
+        short-hint : |
+            Provide a ConditionSet associated with column in data set
+        long-hint : |
+            Provide a ConditionSet associated with column in data set
+
+    row_conditionset_ref :
+        ui-name : |
+            Row ConditionSet Reference
+        short-hint : |
+            Provide a ConditionSet associated with row in data set
+        long-hint : |
+            Provide a ConditionSet associated with row in data set
+
+    diff_expr_matrix_ref :
+        ui-name : |
+            DifferentialExpressionMatrix Reference
+        short-hint : |
+            Provide a DifferentialExpressionMatrix associated with Matrix
+        long-hint : |
+            Provide a DifferentialExpressionMatrix associated with Matrix
+
+description : |
+    <p> Import an Excel file from your staging area into your Narrative as an Matrix data object.
+    Please see the <a href="http://kbase.us/data-upload-download-guide/">Data Upload/Download Guide</a> for more information. </p>

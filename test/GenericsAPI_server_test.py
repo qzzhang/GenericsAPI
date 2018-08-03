@@ -371,4 +371,6 @@ class GenericsAPITest(unittest.TestCase):
                   'genome_ref': self.genome_ref}
         returnVal = self.getImpl().import_matrix_from_excel(self.ctx, params)[0]
         self.assertTrue('matrix_obj_ref' in returnVal)
+        self.assertTrue('report_name' in returnVal)
+        self.assertTrue('report_ref' in returnVal)
         print returnVal
