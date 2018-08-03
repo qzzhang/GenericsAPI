@@ -41,11 +41,10 @@ class GenericsUtil:
         log('Start uploading file to shock: {}'.format(file_path))
 
         file_to_shock_params = {
-            'file_path': file_path
+            'file_path': file_path,
+            'pack': 'zip'
         }
-        shock_file = self.dfu.file_to_shock(file_to_shock_params)
-
-        shock_id = shock_file.get('shock_id')
+        shock_id = self.dfu.file_to_shock(file_to_shock_params).get('shock_id')
 
         return shock_id
 
