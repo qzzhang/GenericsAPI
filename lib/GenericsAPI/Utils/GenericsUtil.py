@@ -10,6 +10,7 @@ import xlsxwriter
 from dotmap import DotMap
 from xlrd.biffh import XLRDError
 from openpyxl import load_workbook
+import collections
 
 from DataFileUtil.DataFileUtilClient import DataFileUtil
 from Workspace.WorkspaceClient import Workspace as workspaceService
@@ -383,9 +384,10 @@ class GenericsUtil:
         """
         _write_mapping_sheet: write mapping to sheet
         """
+        df_dict = collections.OrderedDict()
 
-        df_dict = {index[0]: [],
-                   index[1]: []}
+        df_dict[index[0]] = []
+        df_dict[index[1]] = []
 
         for key, value in mapping.items():
             df_dict.get(index[0]).append(key)
