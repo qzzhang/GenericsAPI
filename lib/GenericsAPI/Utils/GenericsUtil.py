@@ -9,6 +9,7 @@ import traceback
 import xlsxwriter
 from dotmap import DotMap
 from xlrd.biffh import XLRDError
+from openpyxl import load_workbook
 
 from DataFileUtil.DataFileUtilClient import DataFileUtil
 from Workspace.WorkspaceClient import Workspace as workspaceService
@@ -357,6 +358,7 @@ class GenericsUtil:
         """
         _gen_excel: create excel
         """
+
         result_directory = os.path.join(self.scratch, str(uuid.uuid4()))
         self._mkdir_p(result_directory)
         file_path = os.path.join(result_directory, '{}.xlsx'.format(obj_name))
@@ -376,6 +378,24 @@ class GenericsUtil:
         workbook.close()
 
         return file_path
+
+    def _write_mapping_sheet(self, file_path, sheet_name, mapping, index):
+        """
+        _write_mapping_sheet: write mapping to sheet
+        """
+
+        df_dict = {index[0]: [],
+                   index[1]: []}
+
+        for key, value in mapping.items():
+            df_dict.get(index[0]).append(key)
+            df_dict.get(index[1]).append(value)
+
+        df = pd.DataFrame.from_dict(df_dict)
+
+        with pd.ExcelWriter(file_path, engine='openpyxl') as writer:
+            writer.book = load_workbook(file_path)
+            df.to_excel(writer, sheet_name=sheet_name)
 
     def _retrieve_value(self, data, value):
         log('Getting value for {}'.format(value))
@@ -766,36 +786,35 @@ class GenericsUtil:
         if 'input_ref' in params:
             params['obj_ref'] = params.pop('input_ref')
 
-        data_matrix = self.fetch_data(params).get('data_matrix')
-
-        df = pd.read_json(data_matrix)
-        cols = df.columns.tolist()
-        rows = df.index.tolist()
-
-        excel_list = []
-
         obj_source = self.dfu.get_objects(
             {"object_refs": [params.get('obj_ref')]})['data'][0]
         obj_data = obj_source.get('data')
 
-        col_cond_list = []
-        if obj_data.get('col_mapping') and obj_data.get('col_conditionset_ref'):
-            col_cond_list = self._get_col_cond_list(obj_data.get('col_mapping'),
-                                                    obj_data.get('col_conditionset_ref'),
-                                                    cols)
-            excel_list += col_cond_list
+        result_directory = os.path.join(self.scratch, str(uuid.uuid4()))
+        self._mkdir_p(result_directory)
+        file_path = os.path.join(result_directory, '{}.xlsx'.format(obj_source.get('info')[1]))
 
-        excel_list += self._get_data_list(cols, rows, df.values.tolist())
+        data_matrix = self.fetch_data(params).get('data_matrix')
+        df = pd.read_json(data_matrix)
 
-        row_cond_list = []
-        if obj_data.get('row_mapping') and obj_data.get('row_conditionset_ref'):
-            row_cond_list = self._get_row_cond_list(obj_data.get('row_mapping'),
-                                                    obj_data.get('row_conditionset_ref'),
-                                                    rows)
+        df.to_excel(file_path, sheet_name='data')
 
-        self._merge_cond_list(excel_list, col_cond_list, row_cond_list)
+        if obj_data.get('col_mapping'):
+            self._write_mapping_sheet(file_path, 'col_mapping',
+                                      obj_data.get('col_mapping'), ['col_name', 'condition_name'])
+            obj_data.pop('col_mapping')
 
-        file_path = self._gen_excel(excel_list, obj_source.get('info')[1])
+        if obj_data.get('row_mapping'):
+            self._write_mapping_sheet(file_path, 'row_mapping',
+                                      obj_data.get('row_mapping'), ['row_name', 'condition_name'])
+            obj_data.pop('row_mapping')
+
+        try:
+            obj_data.pop('data')
+        except KeyError:
+            log('Missing key [data]')
+
+        self._write_mapping_sheet(file_path, 'metadata', obj_data, ['name', 'value'])
 
         shock_id = self._upload_to_shock(file_path)
 
