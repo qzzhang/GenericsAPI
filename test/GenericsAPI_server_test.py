@@ -254,9 +254,9 @@ class GenericsAPITest(unittest.TestCase):
             'file_path': result_dir,
             'unpack': 'unpack'}
         shock_file = self.dfu.shock_to_file(shock_to_file_params)['file_path']
-        df = pd.read_excel(shock_file[:-4])
+        df = pd.read_excel(shock_file[:-4], None)
 
-        return len(df.index.tolist()), len(df.columns.tolist())
+        return df.keys()
 
     def test_bad_fetch_data_params(self):
         self.start_test()
@@ -301,27 +301,23 @@ class GenericsAPITest(unittest.TestCase):
         self.start_test()
         params = {'obj_ref': self.expression_matrix_nc_ref}
         returnVal = self.getImpl().export_matrix(self.ctx, params)[0]
-        row_len, col_len = self.check_export_matrix_output(returnVal)
-        self.assertEqual(row_len, 3)
-        self.assertEqual(col_len, 5)
+        sheet_names = self.check_export_matrix_output(returnVal)
+        self.assertItemsEqual(sheet_names, ['data', 'metadata'])
 
         params = {'obj_ref': self.expression_matrix_ref}
         returnVal = self.getImpl().export_matrix(self.ctx, params)[0]
-        row_len, col_len = self.check_export_matrix_output(returnVal)
-        self.assertEqual(row_len, 6)
-        self.assertEqual(col_len, 8)
+        sheet_names = self.check_export_matrix_output(returnVal)
+        self.assertItemsEqual(sheet_names, ['data', 'col_mapping', 'row_mapping', 'metadata'])
 
         params = {'obj_ref': self.fitness_matrix_ref}
         returnVal = self.getImpl().export_matrix(self.ctx, params)[0]
-        row_len, col_len = self.check_export_matrix_output(returnVal)
-        self.assertEqual(row_len, 3)
-        self.assertEqual(col_len, 8)
+        sheet_names = self.check_export_matrix_output(returnVal)
+        self.assertItemsEqual(sheet_names, ['data', 'row_mapping', 'metadata'])
 
         params = {'obj_ref': self.diff_expr_matrix_ref}
         returnVal = self.getImpl().export_matrix(self.ctx, params)[0]
-        row_len, col_len = self.check_export_matrix_output(returnVal)
-        self.assertEqual(row_len, 6)
-        self.assertEqual(col_len, 5)
+        sheet_names = self.check_export_matrix_output(returnVal)
+        self.assertItemsEqual(sheet_names, ['data', 'col_mapping', 'metadata'])
 
     def test_validate_data(self):
         self.start_test()
