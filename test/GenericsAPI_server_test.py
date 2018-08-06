@@ -333,7 +333,7 @@ class GenericsAPITest(unittest.TestCase):
         self.assertFalse(returnVal.get('validated'))
         expected_failed_constraints = ['data.row_ids', 'data.col_ids']
         self.assertItemsEqual(expected_failed_constraints,
-                              returnVal.get('failed_constraint').get('unique'))
+                              returnVal.get('failed_constraints').get('unique'))
 
         # testing contains
         data = {'data': {'row_ids': ['same_row_id', 'unknown_row_id'],
@@ -354,7 +354,7 @@ class GenericsAPITest(unittest.TestCase):
                                        'values(col_mapping) col_conditionset_ref:conditions',
                                        'data.row_ids genome_ref:features.[*].id genome_ref:mrnas.[*].id genome_ref:cdss.[*].id genome_ref:non_codeing_features.[*].id']
         self.assertItemsEqual(expected_failed_constraints,
-                              returnVal.get('failed_constraint').get('contains'))
+                              returnVal.get('failed_constraints').get('contains'))
 
     def test_import_matrix_from_excel(self):
         self.start_test()
