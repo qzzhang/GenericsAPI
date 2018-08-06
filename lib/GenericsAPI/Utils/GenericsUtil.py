@@ -658,7 +658,7 @@ class GenericsUtil:
                                        'data': data})
 
         if not validate.get('validated'):
-            # log('Data failed type checking')
+            log('Data failed type checking')
             failed_constraints = validate.get('failed_constraints')
             error_msg = 'Object {} failed type checking:\n'.format(params.get('obj_name'))
             if failed_constraints.get('unique'):
