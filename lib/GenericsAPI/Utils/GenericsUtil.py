@@ -462,14 +462,14 @@ class GenericsUtil:
         """
 
         validated = True
-        failed_constraint = {'contains': [], 'rowsum': [], 'unique': []}
+        failed_constraints = {'contains': [], 'rowsum': [], 'unique': []}
 
         unique_constraints = constraints.get('unique')
         for unique_constraint in unique_constraints:
             retrieved_value = self._retrieve_value(data, unique_constraint)
             if len(set(retrieved_value)) != len(retrieved_value):
                 validated = False
-                failed_constraint['unique'].append(unique_constraint)
+                failed_constraints['unique'].append(unique_constraint)
 
         contains_constraints = constraints.get('contains')
         for contains_constraint in contains_constraints:
@@ -480,9 +480,9 @@ class GenericsUtil:
                 retrieved_in_values += self._retrieve_value(data, in_value)
             if not (set(self._retrieve_value(data, value)) <= set(retrieved_in_values)):
                 validated = False
-                failed_constraint['contains'].append(contains_constraint)
+                failed_constraints['contains'].append(contains_constraint)
 
-        return validated, failed_constraint
+        return validated, failed_constraints
 
     def _process_mapping_sheet(self, file_path, sheet_name):
         """
@@ -658,9 +658,21 @@ class GenericsUtil:
                                        'data': data})
 
         if not validate.get('validated'):
-            log('Data is not validated')
-            print validate.get('failed_constraint')
-            raise ValueError('Data is not validated')
+            log('Data failed type checking')
+            failed_constraints = validate.get('failed_constraints')
+            error_msg = 'Object {} failed type checking:\n'.format(params.get('obj_name'))
+            if failed_constraints.get('unique'):
+                unique_values = failed_constraints.get('unique')
+                error_msg += 'Object should have unique field: {}\n'.format(unique_values)
+            if failed_constraints.get('contains'):
+                contained_values = failed_constraints.get('contains')
+                for contained_value in contained_values:
+                    subset_value = contained_value.split(' ')[0]
+                    super_value = ' '.join(contained_value.split(' ')[1:])
+                    error_msg += 'Object field [{}] should contain field [{}]\n'.format(
+                                                                                    super_value,
+                                                                                    subset_value)
+            raise ValueError(error_msg)
 
         workspace_name = params.get('workspace_name')
         if not isinstance(workspace_name, int):
@@ -694,10 +706,10 @@ class GenericsUtil:
         constraints = self._find_constraints(params.get('obj_type'))
         data = params.get('data')
 
-        validated, failed_constraint = self._validate(constraints, data)
+        validated, failed_constraints = self._validate(constraints, data)
 
         returnVal = {'validated': validated,
-                     'failed_constraint': failed_constraint}
+                     'failed_constraints': failed_constraints}
 
         return returnVal
 
