@@ -579,40 +579,34 @@ class GenericsUtil:
         header_str += '<tr class="header">'
         header_str += '<th style="width:40%;">Feature ID</th>'
 
+        width = 100.0/len(factor_names)
+
         for factor_name in factor_names:
-            header_str += '<th style="width:40%;">{}</th>'.format(factor_name)
+            header_str += '<th style="width:{0:.2f}%;">{}</th>'.format(width, factor_name)
         header_str += '</tr>'
 
         return header_str
 
-    def _build_html_str(self, row_mapping, conditions):
+    def _build_html_str(self, row_mapping, conditionset_data):
 
         log('Start building html replacement')
 
-        factor_names = [x.get('factor') for x in conditions[conditions.keys()[0]].values()[0]]
-
-        factor_names += [x[0].get('factor') for x in conditions[conditions.keys()[0]].values()]
-
-        factor_names = list(set(factor_names))
+        factor_names = [factor.get('factor') for factor in conditionset_data.get('factors')]
 
         header_str = self._build_header_str(factor_names)
 
         table_str = ''
 
-        for feature_id, factor_id in row_mapping.items():
-            condition = conditions.get(factor_id)
-            condition_values = [None] * len(factor_names)
+        conditions = conditionset_data.get('conditions')
 
-            for condition_info in condition.values():
-                factor_name = condition_info[0].get('factor')
-                idx = factor_names.index(factor_name)
-                condition_values[idx] = condition_info[0].get('value')
+        for feature_id, factor_id in row_mapping.items():
+            feature_conditions = conditions.get(factor_id)
 
             table_str += '<tr>'
             table_str += '<td>{}</td>'.format(feature_id)
 
-            for condition_value in condition_values:
-                table_str += '<td>{}</td>'.format(condition_value)
+            for feature_condition in feature_conditions:
+                table_str += '<td>{}</td>'.format(feature_condition)
             table_str += '</tr>'
 
         return header_str, table_str
@@ -638,10 +632,13 @@ class GenericsUtil:
                 report_template = report_template.replace('//TABLE_STR', table_str)
                 result_file.write(report_template)
 
-        html_report.append({'path': result_file_path,
+        report_shock_id = self.dfu.file_to_shock({'file_path': output_directory,
+                                                  'pack': 'zip'})['shock_id']
+
+        html_report.append({'shock_id': report_shock_id,
                             'name': os.path.basename(result_file_path),
                             'label': os.path.basename(result_file_path),
-                            'description': 'HTML summary report for StringTie App'})
+                            'description': 'HTML summary report for Search Matrix App'})
 
         return html_report
 
@@ -697,9 +694,12 @@ class GenericsUtil:
         if not (row_mapping and row_conditionset_ref):
             raise ValueError('Matrix obejct is missing either row_mapping or row_conditionset_ref')
 
-        conditions = self.cu.get_conditions({'condition_set_ref': row_conditionset_ref})
+        conditionset_data = self.dfu.get_objects(
+                                    {"object_refs": [row_conditionset_ref]})['data'][0]['data']
 
-        header_str, table_str = self._build_html_str(row_mapping, conditions.get('conditions'))
+        # conditions = self.cu.get_conditions({'condition_set_ref': row_conditionset_ref})
+
+        header_str, table_str = self._build_html_str(row_mapping, conditionset_data)
 
         returnVal = self._generate_search_report(header_str, table_str, workspace_name)
 
