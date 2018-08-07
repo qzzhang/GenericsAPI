@@ -571,6 +571,89 @@ class GenericsUtil:
 
         return data
 
+    def _build_header_str(self, factor_names):
+
+        header_str = ''
+
+        header_str += '<tr class="header">'
+        header_str += '<th style="width:40%;">Feature ID</th>'
+
+        for factor_name in factor_names:
+            header_str += '<th style="width:40%;">{}</th>'.format(factor_name)
+        header_str += '</tr>'
+
+        return header_str
+
+    def _build_html_str(self, row_mapping, conditions):
+
+        log('Start building html replacement')
+
+        factor_names = [x[0].get('factor') for x in conditions[conditions.keys()[0]].values()]
+
+        header_str = self._build_header_str(factor_names)
+
+        table_str = ''
+
+        for feature_id, factor_id in row_mapping.items():
+            condition = conditions.get(factor_id)
+            condition_values = [None] * len(factor_names)
+
+            for condition_info in condition.values():
+                factor_name = condition_info[0].get('factor')
+                idx = factor_names.index(factor_name)
+                condition_values[idx] = condition_info[0].get('value')
+
+            table_str += '<tr>'
+            table_str += '<td>{}</td>'.format(feature_id)
+
+            for condition_value in condition_values:
+                table_str += '<td>{}</td>'.format(condition_value)
+            table_str += '</tr>'
+
+        return header_str, table_str
+
+    def _generate_search_html_report(self, header_str, table_str):
+
+        html_report = list()
+
+        output_directory = os.path.join(self.scratch, str(uuid.uuid4()))
+        self._mkdir_p(output_directory)
+        result_file_path = os.path.join(output_directory, 'search.html')
+
+        with open(result_file_path, 'w') as result_file:
+            with open(os.path.join(os.path.dirname(__file__), 'search_template.html'),
+                      'r') as report_template_file:
+                report_template = report_template_file.read()
+                report_template = report_template.replace('//HEADER_STR', header_str)
+                report_template = report_template.replace('//TABLE_STR', table_str)
+                result_file.write(report_template)
+
+        html_report.append({'path': result_file_path,
+                            'name': os.path.basename(result_file_path),
+                            'label': os.path.basename(result_file_path),
+                            'description': 'HTML summary report for StringTie App'})
+
+        return html_report
+
+    def _generate_search_report(self, header_str, table_str, workspace_name):
+        log('Start creating report')
+
+        output_html_files = self._generate_search_html_report(header_str, table_str)
+
+        report_params = {'message': '',
+                         'workspace_name': workspace_name,
+                         'html_links': output_html_files,
+                         'direct_html_link_index': 0,
+                         'html_window_height': 366,
+                         'report_object_name': 'kb_matrix_filter_report_' + str(uuid.uuid4())}
+
+        kbase_report_client = KBaseReport(self.callback_url, token=self.token)
+        output = kbase_report_client.create_extended_report(report_params)
+
+        report_output = {'report_name': output['name'], 'report_ref': output['ref']}
+
+        return report_output
+
     def __init__(self, config):
         self.ws_url = config["workspace-url"]
         self.callback_url = config['SDK_CALLBACK_URL']
@@ -581,6 +664,36 @@ class GenericsUtil:
         self.dfu = DataFileUtil(self.callback_url)
         self.wsClient = workspaceService(self.ws_url, token=self.token)
         self.cu = ConditionUtils(self.callback_url, service_ver="dev")
+
+    def matrix_filter(self, params):
+        """
+        matrix_filter: generate a HTML report that allows users to fitler feature ids
+
+        arguments:
+        matrix_obj_ref: object reference of a matrix
+        workspace_name: workspace name
+        """
+
+        matrix_obj_ref = params.get('matrix_obj_ref')
+        workspace_name = params.get('workspace_name')
+
+        matrix_source = self.dfu.get_objects(
+            {"object_refs": [matrix_obj_ref]})['data'][0]
+        matrix_data = matrix_source.get('data')
+
+        row_mapping = matrix_data.get('row_mapping')
+        row_conditionset_ref = matrix_data.get('row_conditionset_ref')
+
+        if not (row_mapping and row_conditionset_ref):
+            raise ValueError('Matrix obejct is missing either row_mapping or row_conditionset_ref')
+
+        conditions = self.cu.get_conditions({'condition_set_ref': row_conditionset_ref})
+
+        header_str, table_str = self._build_html_str(row_mapping, conditions.get('conditions'))
+
+        returnVal = self._generate_search_report(header_str, table_str, workspace_name)
+
+        return returnVal
 
     def import_matrix_from_excel(self, params):
         """

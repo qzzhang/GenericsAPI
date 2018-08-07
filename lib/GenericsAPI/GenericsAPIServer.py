@@ -357,6 +357,10 @@ class Application(object):
                              name='GenericsAPI.save_object',
                              types=[dict])
         self.method_authentication['GenericsAPI.save_object'] = 'required'  # noqa
+        self.rpc_service.add(impl_GenericsAPI.matrix_filter,
+                             name='GenericsAPI.matrix_filter',
+                             types=[dict])
+        self.method_authentication['GenericsAPI.matrix_filter'] = 'required'  # noqa
         self.rpc_service.add(impl_GenericsAPI.status,
                              name='GenericsAPI.status',
                              types=[dict])

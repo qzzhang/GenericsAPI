@@ -502,12 +502,16 @@ ImportMatrixParams is a reference to a hash where the following keys are defined
 	input_staging_file_path has a value which is a string
 	matrix_name has a value which is a string
 	workspace_name has a value which is a GenericsAPI.workspace_name
+	genome_ref has a value which is a GenericsAPI.obj_ref
+	col_conditionset_ref has a value which is a GenericsAPI.obj_ref
+	row_conditionset_ref has a value which is a GenericsAPI.obj_ref
+	diff_expr_matrix_ref has a value which is a GenericsAPI.obj_ref
 workspace_name is a string
+obj_ref is a string
 ImportMatrixOutput is a reference to a hash where the following keys are defined:
 	report_name has a value which is a string
 	report_ref has a value which is a string
 	matrix_obj_ref has a value which is a GenericsAPI.obj_ref
-obj_ref is a string
 
 </pre>
 
@@ -524,12 +528,16 @@ ImportMatrixParams is a reference to a hash where the following keys are defined
 	input_staging_file_path has a value which is a string
 	matrix_name has a value which is a string
 	workspace_name has a value which is a GenericsAPI.workspace_name
+	genome_ref has a value which is a GenericsAPI.obj_ref
+	col_conditionset_ref has a value which is a GenericsAPI.obj_ref
+	row_conditionset_ref has a value which is a GenericsAPI.obj_ref
+	diff_expr_matrix_ref has a value which is a GenericsAPI.obj_ref
 workspace_name is a string
+obj_ref is a string
 ImportMatrixOutput is a reference to a hash where the following keys are defined:
 	report_name has a value which is a string
 	report_ref has a value which is a string
 	matrix_obj_ref has a value which is a GenericsAPI.obj_ref
-obj_ref is a string
 
 
 =end text
@@ -688,6 +696,100 @@ save_object: validate data constraints and save matrix object
     }
 }
  
+
+
+=head2 matrix_filter
+
+  $returnVal = $obj->matrix_filter($params)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$params is a GenericsAPI.MatrixFilterParams
+$returnVal is a GenericsAPI.MatrixFilterOutput
+MatrixFilterParams is a reference to a hash where the following keys are defined:
+	matrix_obj_ref has a value which is a GenericsAPI.obj_ref
+obj_ref is a string
+MatrixFilterOutput is a reference to a hash where the following keys are defined:
+	report_name has a value which is a string
+	report_ref has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$params is a GenericsAPI.MatrixFilterParams
+$returnVal is a GenericsAPI.MatrixFilterOutput
+MatrixFilterParams is a reference to a hash where the following keys are defined:
+	matrix_obj_ref has a value which is a GenericsAPI.obj_ref
+obj_ref is a string
+MatrixFilterOutput is a reference to a hash where the following keys are defined:
+	report_name has a value which is a string
+	report_ref has a value which is a string
+
+
+=end text
+
+=item Description
+
+matrix_filter: generate a HTML report that allows users to fitler feature ids
+
+=back
+
+=cut
+
+ sub matrix_filter
+{
+    my($self, @args) = @_;
+
+# Authentication: required
+
+    if ((my $n = @args) != 1)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function matrix_filter (received $n, expecting 1)");
+    }
+    {
+	my($params) = @args;
+
+	my @_bad_arguments;
+        (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument 1 \"params\" (value was \"$params\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to matrix_filter:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'matrix_filter');
+	}
+    }
+
+    my $url = $self->{url};
+    my $result = $self->{client}->call($url, $self->{headers}, {
+	    method => "GenericsAPI.matrix_filter",
+	    params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'matrix_filter',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method matrix_filter",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'matrix_filter',
+				       );
+    }
+}
+ 
   
 sub status
 {
@@ -731,16 +833,16 @@ sub version {
             Bio::KBase::Exceptions::JSONRPC->throw(
                 error => $result->error_message,
                 code => $result->content->{code},
-                method_name => 'save_object',
+                method_name => 'matrix_filter',
             );
         } else {
             return wantarray ? @{$result->result} : $result->result->[0];
         }
     } else {
         Bio::KBase::Exceptions::HTTP->throw(
-            error => "Error invoking method save_object",
+            error => "Error invoking method matrix_filter",
             status_line => $self->{client}->status_line,
-            method_name => 'save_object',
+            method_name => 'matrix_filter',
         );
     }
 }
@@ -1194,6 +1296,12 @@ input_staging_file_path: staging area file path
 matrix_name: matrix object name
 workspace_name: workspace name matrix object to be saved to
 
+optional:
+col_conditionset_ref: column ConditionSet reference
+row_conditionset_ref: row ConditionSet reference
+genome_ref: genome reference
+diff_expr_matrix_ref: DifferentialExpressionMatrix reference
+
 
 =item Definition
 
@@ -1207,6 +1315,10 @@ input_file_path has a value which is a string
 input_staging_file_path has a value which is a string
 matrix_name has a value which is a string
 workspace_name has a value which is a GenericsAPI.workspace_name
+genome_ref has a value which is a GenericsAPI.obj_ref
+col_conditionset_ref has a value which is a GenericsAPI.obj_ref
+row_conditionset_ref has a value which is a GenericsAPI.obj_ref
+diff_expr_matrix_ref has a value which is a GenericsAPI.obj_ref
 
 </pre>
 
@@ -1221,6 +1333,10 @@ input_file_path has a value which is a string
 input_staging_file_path has a value which is a string
 matrix_name has a value which is a string
 workspace_name has a value which is a GenericsAPI.workspace_name
+genome_ref has a value which is a GenericsAPI.obj_ref
+col_conditionset_ref has a value which is a GenericsAPI.obj_ref
+row_conditionset_ref has a value which is a GenericsAPI.obj_ref
+diff_expr_matrix_ref has a value which is a GenericsAPI.obj_ref
 
 
 =end text
@@ -1330,6 +1446,74 @@ obj_ref has a value which is a GenericsAPI.obj_ref
 
 a reference to a hash where the following keys are defined:
 obj_ref has a value which is a GenericsAPI.obj_ref
+
+
+=end text
+
+=back
+
+
+
+=head2 MatrixFilterParams
+
+=over 4
+
+
+
+=item Description
+
+Input of the matrix_filter function
+matrix_obj_ref: object reference of a matrix
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+matrix_obj_ref has a value which is a GenericsAPI.obj_ref
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+matrix_obj_ref has a value which is a GenericsAPI.obj_ref
+
+
+=end text
+
+=back
+
+
+
+=head2 MatrixFilterOutput
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+report_name has a value which is a string
+report_ref has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+report_name has a value which is a string
+report_ref has a value which is a string
 
 
 =end text

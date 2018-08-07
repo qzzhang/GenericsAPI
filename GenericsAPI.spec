@@ -162,4 +162,20 @@ module GenericsAPI {
 
   /* save_object: validate data constraints and save matrix object*/
   funcdef save_object (SaveObjectParams params) returns (SaveObjectOutput returnVal) authentication required;
+
+  /* Input of the matrix_filter function
+    matrix_obj_ref: object reference of a matrix
+  */
+  typedef structure {
+      obj_ref matrix_obj_ref;
+      workspace_name workspace_name;
+  } MatrixFilterParams;
+
+  typedef structure {
+      string report_name;
+      string report_ref;
+  } MatrixFilterOutput;
+
+  /* matrix_filter: generate a HTML report that allows users to fitler feature ids*/
+  funcdef matrix_filter (MatrixFilterParams params) returns (MatrixFilterOutput returnVal) authentication required;
 };

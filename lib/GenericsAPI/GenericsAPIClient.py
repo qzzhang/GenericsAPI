@@ -113,11 +113,20 @@ class GenericsAPI(object):
            input_shock_id: file shock id input_file_path: absolute file path
            input_staging_file_path: staging area file path matrix_name:
            matrix object name workspace_name: workspace name matrix object to
-           be saved to) -> structure: parameter "obj_type" of String,
-           parameter "input_shock_id" of String, parameter "input_file_path"
-           of String, parameter "input_staging_file_path" of String,
-           parameter "matrix_name" of String, parameter "workspace_name" of
-           type "workspace_name" (workspace name of the object)
+           be saved to optional: col_conditionset_ref: column ConditionSet
+           reference row_conditionset_ref: row ConditionSet reference
+           genome_ref: genome reference diff_expr_matrix_ref:
+           DifferentialExpressionMatrix reference) -> structure: parameter
+           "obj_type" of String, parameter "input_shock_id" of String,
+           parameter "input_file_path" of String, parameter
+           "input_staging_file_path" of String, parameter "matrix_name" of
+           String, parameter "workspace_name" of type "workspace_name"
+           (workspace name of the object), parameter "genome_ref" of type
+           "obj_ref" (An X/Y/Z style reference), parameter
+           "col_conditionset_ref" of type "obj_ref" (An X/Y/Z style
+           reference), parameter "row_conditionset_ref" of type "obj_ref" (An
+           X/Y/Z style reference), parameter "diff_expr_matrix_ref" of type
+           "obj_ref" (An X/Y/Z style reference)
         :returns: instance of type "ImportMatrixOutput" -> structure:
            parameter "report_name" of String, parameter "report_ref" of
            String, parameter "matrix_obj_ref" of type "obj_ref" (An X/Y/Z
@@ -143,6 +152,20 @@ class GenericsAPI(object):
         """
         return self._client.call_method(
             'GenericsAPI.save_object',
+            [params], self._service_ver, context)
+
+    def matrix_filter(self, params, context=None):
+        """
+        matrix_filter: generate a HTML report that allows users to fitler feature ids
+        :param params: instance of type "MatrixFilterParams" (Input of the
+           matrix_filter function matrix_obj_ref: object reference of a
+           matrix) -> structure: parameter "matrix_obj_ref" of type "obj_ref"
+           (An X/Y/Z style reference)
+        :returns: instance of type "MatrixFilterOutput" -> structure:
+           parameter "report_name" of String, parameter "report_ref" of String
+        """
+        return self._client.call_method(
+            'GenericsAPI.matrix_filter',
             [params], self._service_ver, context)
 
     def status(self, context=None):

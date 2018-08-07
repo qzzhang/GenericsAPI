@@ -23,7 +23,7 @@ class GenericsAPI:
     ######################################### noqa
     VERSION = "0.0.1"
     GIT_URL = "git@github.com:Tianhao-Gu/GenericsAPI.git"
-    GIT_COMMIT_HASH = "5ffad5b22b9c72822d3e0d8546091be0c723aac3"
+    GIT_COMMIT_HASH = "29dc7c7e7a319c939c074950b531285d720d1acc"
 
     #BEGIN_CLASS_HEADER
     #END_CLASS_HEADER
@@ -159,11 +159,20 @@ class GenericsAPI:
            input_shock_id: file shock id input_file_path: absolute file path
            input_staging_file_path: staging area file path matrix_name:
            matrix object name workspace_name: workspace name matrix object to
-           be saved to) -> structure: parameter "obj_type" of String,
-           parameter "input_shock_id" of String, parameter "input_file_path"
-           of String, parameter "input_staging_file_path" of String,
-           parameter "matrix_name" of String, parameter "workspace_name" of
-           type "workspace_name" (workspace name of the object)
+           be saved to optional: col_conditionset_ref: column ConditionSet
+           reference row_conditionset_ref: row ConditionSet reference
+           genome_ref: genome reference diff_expr_matrix_ref:
+           DifferentialExpressionMatrix reference) -> structure: parameter
+           "obj_type" of String, parameter "input_shock_id" of String,
+           parameter "input_file_path" of String, parameter
+           "input_staging_file_path" of String, parameter "matrix_name" of
+           String, parameter "workspace_name" of type "workspace_name"
+           (workspace name of the object), parameter "genome_ref" of type
+           "obj_ref" (An X/Y/Z style reference), parameter
+           "col_conditionset_ref" of type "obj_ref" (An X/Y/Z style
+           reference), parameter "row_conditionset_ref" of type "obj_ref" (An
+           X/Y/Z style reference), parameter "diff_expr_matrix_ref" of type
+           "obj_ref" (An X/Y/Z style reference)
         :returns: instance of type "ImportMatrixOutput" -> structure:
            parameter "report_name" of String, parameter "report_ref" of
            String, parameter "matrix_obj_ref" of type "obj_ref" (An X/Y/Z
@@ -207,6 +216,30 @@ class GenericsAPI:
         # At some point might do deeper type checking...
         if not isinstance(returnVal, dict):
             raise ValueError('Method save_object return value ' +
+                             'returnVal is not type dict as required.')
+        # return the results
+        return [returnVal]
+
+    def matrix_filter(self, ctx, params):
+        """
+        matrix_filter: generate a HTML report that allows users to fitler feature ids
+        :param params: instance of type "MatrixFilterParams" (Input of the
+           matrix_filter function matrix_obj_ref: object reference of a
+           matrix) -> structure: parameter "matrix_obj_ref" of type "obj_ref"
+           (An X/Y/Z style reference)
+        :returns: instance of type "MatrixFilterOutput" -> structure:
+           parameter "report_name" of String, parameter "report_ref" of String
+        """
+        # ctx is the context object
+        # return variables are: returnVal
+        #BEGIN matrix_filter
+        generics_api = GenericsUtil(self.config)
+        returnVal = generics_api.matrix_filter(params)
+        #END matrix_filter
+
+        # At some point might do deeper type checking...
+        if not isinstance(returnVal, dict):
+            raise ValueError('Method matrix_filter return value ' +
                              'returnVal is not type dict as required.')
         # return the results
         return [returnVal]
