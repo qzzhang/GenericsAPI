@@ -11,6 +11,7 @@ from dotmap import DotMap
 from xlrd.biffh import XLRDError
 from openpyxl import load_workbook
 import collections
+import shutil
 
 from DataFileUtil.DataFileUtilClient import DataFileUtil
 from Workspace.WorkspaceClient import Workspace as workspaceService
@@ -588,7 +589,11 @@ class GenericsUtil:
 
         log('Start building html replacement')
 
-        factor_names = [x[0].get('factor') for x in conditions[conditions.keys()[0]].values()]
+        factor_names = [x.get('factor') for x in conditions[conditions.keys()[0]].values()[0]]
+
+        factor_names += [x[0].get('factor') for x in conditions[conditions.keys()[0]].values()]
+
+        factor_names = list(set(factor_names))
 
         header_str = self._build_header_str(factor_names)
 
@@ -619,6 +624,11 @@ class GenericsUtil:
         output_directory = os.path.join(self.scratch, str(uuid.uuid4()))
         self._mkdir_p(output_directory)
         result_file_path = os.path.join(output_directory, 'search.html')
+
+        shutil.copy2(os.path.join(os.path.dirname(__file__), 'kbase_icon.png'),
+                     output_directory)
+        shutil.copy2(os.path.join(os.path.dirname(__file__), 'search_icon.png'),
+                     output_directory)
 
         with open(result_file_path, 'w') as result_file:
             with open(os.path.join(os.path.dirname(__file__), 'search_template.html'),
