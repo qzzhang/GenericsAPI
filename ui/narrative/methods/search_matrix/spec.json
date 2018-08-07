@@ -25,7 +25,7 @@
     "service-mapping" : {
       "url" : "",
       "name" : "GenericsAPI",
-      "method" : "import_matrix_from_excel",
+      "method" : "matrix_filter",
       "input_mapping" : [
         {
           "narrative_system_variable": "workspace",
