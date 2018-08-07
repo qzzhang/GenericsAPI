@@ -21,6 +21,11 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
  * input_staging_file_path: staging area file path
  * matrix_name: matrix object name
  * workspace_name: workspace name matrix object to be saved to
+ * optional:
+ * col_conditionset_ref: column ConditionSet reference
+ * row_conditionset_ref: row ConditionSet reference
+ * genome_ref: genome reference
+ * diff_expr_matrix_ref: DifferentialExpressionMatrix reference
  * </pre>
  * 
  */
@@ -32,7 +37,11 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
     "input_file_path",
     "input_staging_file_path",
     "matrix_name",
-    "workspace_name"
+    "workspace_name",
+    "genome_ref",
+    "col_conditionset_ref",
+    "row_conditionset_ref",
+    "diff_expr_matrix_ref"
 })
 public class ImportMatrixParams {
 
@@ -48,6 +57,14 @@ public class ImportMatrixParams {
     private String matrixName;
     @JsonProperty("workspace_name")
     private String workspaceName;
+    @JsonProperty("genome_ref")
+    private String genomeRef;
+    @JsonProperty("col_conditionset_ref")
+    private String colConditionsetRef;
+    @JsonProperty("row_conditionset_ref")
+    private String rowConditionsetRef;
+    @JsonProperty("diff_expr_matrix_ref")
+    private String diffExprMatrixRef;
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     @JsonProperty("obj_type")
@@ -140,6 +157,66 @@ public class ImportMatrixParams {
         return this;
     }
 
+    @JsonProperty("genome_ref")
+    public String getGenomeRef() {
+        return genomeRef;
+    }
+
+    @JsonProperty("genome_ref")
+    public void setGenomeRef(String genomeRef) {
+        this.genomeRef = genomeRef;
+    }
+
+    public ImportMatrixParams withGenomeRef(String genomeRef) {
+        this.genomeRef = genomeRef;
+        return this;
+    }
+
+    @JsonProperty("col_conditionset_ref")
+    public String getColConditionsetRef() {
+        return colConditionsetRef;
+    }
+
+    @JsonProperty("col_conditionset_ref")
+    public void setColConditionsetRef(String colConditionsetRef) {
+        this.colConditionsetRef = colConditionsetRef;
+    }
+
+    public ImportMatrixParams withColConditionsetRef(String colConditionsetRef) {
+        this.colConditionsetRef = colConditionsetRef;
+        return this;
+    }
+
+    @JsonProperty("row_conditionset_ref")
+    public String getRowConditionsetRef() {
+        return rowConditionsetRef;
+    }
+
+    @JsonProperty("row_conditionset_ref")
+    public void setRowConditionsetRef(String rowConditionsetRef) {
+        this.rowConditionsetRef = rowConditionsetRef;
+    }
+
+    public ImportMatrixParams withRowConditionsetRef(String rowConditionsetRef) {
+        this.rowConditionsetRef = rowConditionsetRef;
+        return this;
+    }
+
+    @JsonProperty("diff_expr_matrix_ref")
+    public String getDiffExprMatrixRef() {
+        return diffExprMatrixRef;
+    }
+
+    @JsonProperty("diff_expr_matrix_ref")
+    public void setDiffExprMatrixRef(String diffExprMatrixRef) {
+        this.diffExprMatrixRef = diffExprMatrixRef;
+    }
+
+    public ImportMatrixParams withDiffExprMatrixRef(String diffExprMatrixRef) {
+        this.diffExprMatrixRef = diffExprMatrixRef;
+        return this;
+    }
+
     @JsonAnyGetter
     public Map<String, Object> getAdditionalProperties() {
         return this.additionalProperties;
@@ -152,7 +229,7 @@ public class ImportMatrixParams {
 
     @Override
     public String toString() {
-        return ((((((((((((((("ImportMatrixParams"+" [objType=")+ objType)+", inputShockId=")+ inputShockId)+", inputFilePath=")+ inputFilePath)+", inputStagingFilePath=")+ inputStagingFilePath)+", matrixName=")+ matrixName)+", workspaceName=")+ workspaceName)+", additionalProperties=")+ additionalProperties)+"]");
+        return ((((((((((((((((((((((("ImportMatrixParams"+" [objType=")+ objType)+", inputShockId=")+ inputShockId)+", inputFilePath=")+ inputFilePath)+", inputStagingFilePath=")+ inputStagingFilePath)+", matrixName=")+ matrixName)+", workspaceName=")+ workspaceName)+", genomeRef=")+ genomeRef)+", colConditionsetRef=")+ colConditionsetRef)+", rowConditionsetRef=")+ rowConditionsetRef)+", diffExprMatrixRef=")+ diffExprMatrixRef)+", additionalProperties=")+ additionalProperties)+"]");
     }
 
 }

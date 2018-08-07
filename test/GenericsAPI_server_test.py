@@ -370,3 +370,12 @@ class GenericsAPITest(unittest.TestCase):
         self.assertTrue('report_name' in returnVal)
         self.assertTrue('report_ref' in returnVal)
         print returnVal
+
+    def test_matrix_filter(self):
+        self.start_test()
+
+        params = {'matrix_obj_ref': self.expression_matrix_ref,
+                  'workspace_name': self.wsName}
+        returnVal = self.getImpl().matrix_filter(self.ctx, params)[0]
+        self.assertTrue('report_name' in returnVal)
+        self.assertTrue('report_ref' in returnVal)

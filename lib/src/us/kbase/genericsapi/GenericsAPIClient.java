@@ -269,6 +269,24 @@ public class GenericsAPIClient {
         return res.get(0);
     }
 
+    /**
+     * <p>Original spec-file function name: matrix_filter</p>
+     * <pre>
+     * matrix_filter: generate a HTML report that allows users to fitler feature ids
+     * </pre>
+     * @param   params   instance of type {@link us.kbase.genericsapi.MatrixFilterParams MatrixFilterParams}
+     * @return   parameter "returnVal" of type {@link us.kbase.genericsapi.MatrixFilterOutput MatrixFilterOutput}
+     * @throws IOException if an IO exception occurs
+     * @throws JsonClientException if a JSON RPC exception occurs
+     */
+    public MatrixFilterOutput matrixFilter(MatrixFilterParams params, RpcContext... jsonRpcContext) throws IOException, JsonClientException {
+        List<Object> args = new ArrayList<Object>();
+        args.add(params);
+        TypeReference<List<MatrixFilterOutput>> retType = new TypeReference<List<MatrixFilterOutput>>() {};
+        List<MatrixFilterOutput> res = caller.jsonrpcCall("GenericsAPI.matrix_filter", args, retType, true, true, jsonRpcContext, this.serviceVersion);
+        return res.get(0);
+    }
+
     public Map<String, Object> status(RpcContext... jsonRpcContext) throws IOException, JsonClientException {
         List<Object> args = new ArrayList<Object>();
         TypeReference<List<Map<String, Object>>> retType = new TypeReference<List<Map<String, Object>>>() {};
