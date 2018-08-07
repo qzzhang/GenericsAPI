@@ -575,14 +575,14 @@ class GenericsUtil:
     def _build_header_str(self, factor_names):
 
         header_str = ''
-
-        header_str += '<tr class="header">'
-        header_str += '<th style="width:40%;">Feature ID</th>'
-
         width = 100.0/len(factor_names)
 
+        header_str += '<tr class="header">'
+        header_str += '<th style="width:{0:.2f}%;">Feature ID</th>'.format(width)
+
         for factor_name in factor_names:
-            header_str += '<th style="width:{0:.2f}%;">{}</th>'.format(width, factor_name)
+            header_str += '<th style="width:{0:.2f}%;"'.format(width)
+            header_str += '>{}</th>'.format(factor_name)
         header_str += '</tr>'
 
         return header_str
