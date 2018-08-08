@@ -163,19 +163,41 @@ module GenericsAPI {
   /* save_object: validate data constraints and save matrix object*/
   funcdef save_object (SaveObjectParams params) returns (SaveObjectOutput returnVal) authentication required;
 
-  /* Input of the matrix_filter function
+  /* Input of the search_matrix function
     matrix_obj_ref: object reference of a matrix
+    workspace_name: workspace name objects to be saved to
   */
   typedef structure {
       obj_ref matrix_obj_ref;
       workspace_name workspace_name;
+  } MatrixSelectorParams;
+
+  typedef structure {
+      string report_name;
+      string report_ref;
+  } MatrixSelectorOutput;
+
+  /* search_matrix: generate a HTML report that allows users to select feature ids*/
+  funcdef search_matrix (MatrixSelectorParams params) returns (MatrixSelectorOutput returnVal) authentication required;
+
+  /* Input of the filter_matrix function
+    matrix_obj_ref: object reference of a matrix
+    workspace_name: workspace name objects to be saved to
+    feature_ids: string of feature ids that result matrix contains
+  */
+  typedef structure {
+      obj_ref matrix_obj_ref;
+      workspace_name workspace_name;
+      string feature_ids;
   } MatrixFilterParams;
 
   typedef structure {
       string report_name;
       string report_ref;
+      list<obj_ref> matrix_obj_refs;
   } MatrixFilterOutput;
 
-  /* matrix_filter: generate a HTML report that allows users to fitler feature ids*/
-  funcdef matrix_filter (MatrixFilterParams params) returns (MatrixFilterOutput returnVal) authentication required;
+  /* filter_matrix: create sub-matrix based on input feature_ids or group by factor name*/
+  funcdef filter_matrix (MatrixFilterParams params) returns (MatrixFilterOutput returnVal) authentication required;
+
 };

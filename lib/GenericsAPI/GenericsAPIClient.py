@@ -154,18 +154,40 @@ class GenericsAPI(object):
             'GenericsAPI.save_object',
             [params], self._service_ver, context)
 
-    def matrix_filter(self, params, context=None):
+    def search_matrix(self, params, context=None):
         """
-        matrix_filter: generate a HTML report that allows users to fitler feature ids
-        :param params: instance of type "MatrixFilterParams" (Input of the
-           matrix_filter function matrix_obj_ref: object reference of a
-           matrix) -> structure: parameter "matrix_obj_ref" of type "obj_ref"
-           (An X/Y/Z style reference)
-        :returns: instance of type "MatrixFilterOutput" -> structure:
+        search_matrix: generate a HTML report that allows users to select feature ids
+        :param params: instance of type "MatrixSelectorParams" (Input of the
+           search_matrix function matrix_obj_ref: object reference of a
+           matrix workspace_name: workspace name objects to be saved to) ->
+           structure: parameter "matrix_obj_ref" of type "obj_ref" (An X/Y/Z
+           style reference), parameter "workspace_name" of type
+           "workspace_name" (workspace name of the object)
+        :returns: instance of type "MatrixSelectorOutput" -> structure:
            parameter "report_name" of String, parameter "report_ref" of String
         """
         return self._client.call_method(
-            'GenericsAPI.matrix_filter',
+            'GenericsAPI.search_matrix',
+            [params], self._service_ver, context)
+
+    def filter_matrix(self, params, context=None):
+        """
+        filter_matrix: create sub-matrix based on input feature_ids or group by factor name
+        :param params: instance of type "MatrixFilterParams" (Input of the
+           filter_matrix function matrix_obj_ref: object reference of a
+           matrix workspace_name: workspace name objects to be saved to
+           feature_ids: string of feature ids that result matrix contains) ->
+           structure: parameter "matrix_obj_ref" of type "obj_ref" (An X/Y/Z
+           style reference), parameter "workspace_name" of type
+           "workspace_name" (workspace name of the object), parameter
+           "feature_ids" of String
+        :returns: instance of type "MatrixFilterOutput" -> structure:
+           parameter "report_name" of String, parameter "report_ref" of
+           String, parameter "matrix_obj_refs" of list of type "obj_ref" (An
+           X/Y/Z style reference)
+        """
+        return self._client.call_method(
+            'GenericsAPI.filter_matrix',
             [params], self._service_ver, context)
 
     def status(self, context=None):
