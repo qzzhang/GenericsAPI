@@ -587,7 +587,7 @@ class GenericsUtil:
 
         return header_str
 
-    def _build_html_str(self, row_mapping, conditionset_data):
+    def _build_html_str(self, row_mapping, conditionset_data, row_ids):
 
         log('Start building html replacement')
 
@@ -600,14 +600,15 @@ class GenericsUtil:
         conditions = conditionset_data.get('conditions')
 
         for feature_id, factor_id in row_mapping.items():
-            feature_conditions = conditions.get(factor_id)
+            if feature_id in row_ids:
+                feature_conditions = conditions.get(factor_id)
 
-            table_str += '<tr>'
-            table_str += '<td>{}</td>'.format(feature_id)
+                table_str += '<tr>'
+                table_str += '<td>{}</td>'.format(feature_id)
 
-            for feature_condition in feature_conditions:
-                table_str += '<td>{}</td>'.format(feature_condition)
-            table_str += '</tr>'
+                for feature_condition in feature_conditions:
+                    table_str += '<td>{}</td>'.format(feature_condition)
+                table_str += '</tr>'
 
         return header_str, table_str
 
@@ -753,15 +754,15 @@ class GenericsUtil:
         row_mapping = matrix_data.get('row_mapping')
         row_conditionset_ref = matrix_data.get('row_conditionset_ref')
 
+        row_ids = matrix_data['data']['row_ids']
+
         if not (row_mapping and row_conditionset_ref):
             raise ValueError('Matrix obejct is missing either row_mapping or row_conditionset_ref')
 
         conditionset_data = self.dfu.get_objects(
                                     {"object_refs": [row_conditionset_ref]})['data'][0]['data']
 
-        # conditions = self.cu.get_conditions({'condition_set_ref': row_conditionset_ref})
-
-        header_str, table_str = self._build_html_str(row_mapping, conditionset_data)
+        header_str, table_str = self._build_html_str(row_mapping, conditionset_data, row_ids)
 
         returnVal = self._generate_search_report(header_str, table_str, workspace_name)
 
