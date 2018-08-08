@@ -661,6 +661,24 @@ class GenericsUtil:
 
         return report_output
 
+    def _filter_value_data(self, value_data, feature_ids):
+
+        filtered_value_data = dict()
+        filtered_value_data['col_ids'] = value_data['col_ids']
+
+        feature_ids = feature_ids.split(',')
+
+        filtered_value_data['row_ids'] = feature_ids
+        filtered_value_data['values'] = list()
+
+        values = value_data['values']
+        row_ids = value_data['row_ids']
+        for feature_id in feature_ids:
+            idx = row_ids.index(feature_id)
+            filtered_value_data['values'].append(values[idx])
+
+        return filtered_value_data
+
     def __init__(self, config):
         self.ws_url = config["workspace-url"]
         self.callback_url = config['SDK_CALLBACK_URL']
@@ -672,9 +690,53 @@ class GenericsUtil:
         self.wsClient = workspaceService(self.ws_url, token=self.token)
         self.cu = ConditionUtils(self.callback_url, service_ver="dev")
 
-    def matrix_filter(self, params):
+    def filter_matrix(self, params):
         """
-        matrix_filter: generate a HTML report that allows users to fitler feature ids
+        filter_matrix: create sub-matrix based on input feature_ids or group by factor name
+
+        arguments:
+        matrix_obj_ref: object reference of a matrix
+        workspace_name: workspace name
+        feature_ids: string of feature ids that result matrix contains
+        """
+
+        matrix_obj_ref = params.get('matrix_obj_ref')
+        workspace_name = params.get('workspace_name')
+        feature_ids = params.get('feature_ids')
+
+        matrix_source = self.dfu.get_objects(
+            {"object_refs": [matrix_obj_ref]})['data'][0]
+        matrix_info = matrix_source.get('info')
+        matrix_data = matrix_source.get('data')
+
+        matrix_name = matrix_info[1]
+        matrix_type = self._find_between(matrix_info[2], '\.', '\-')
+
+        value_data = matrix_data.get('data')
+        filtered_value_data = self._filter_value_data(value_data, feature_ids)
+        matrix_data['data'] = filtered_value_data
+
+        if not isinstance(workspace_name, int):
+            workspace_id = self.dfu.ws_name_to_id(workspace_name)
+        else:
+            workspace_id = workspace_name
+
+        filtered_matrix_obj_ref = self.save_object({'obj_type': 'KBaseMatrices.{}'.format(matrix_type),
+                                                    'obj_name': matrix_name + '_filtered',
+                                                    'data': matrix_data,
+                                                    'workspace_name': workspace_id})['obj_ref']
+
+        returnVal = {'matrix_obj_refs': [filtered_matrix_obj_ref]}
+
+        report_output = self._generate_report(filtered_matrix_obj_ref, workspace_name)
+
+        returnVal.update(report_output)
+
+        return returnVal
+
+    def search_matrix(self, params):
+        """
+        search_matrix: generate a HTML report that allows users to select feature ids
 
         arguments:
         matrix_obj_ref: object reference of a matrix

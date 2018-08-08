@@ -23,7 +23,7 @@ class GenericsAPI:
     ######################################### noqa
     VERSION = "0.0.1"
     GIT_URL = "git@github.com:Tianhao-Gu/GenericsAPI.git"
-    GIT_COMMIT_HASH = "29dc7c7e7a319c939c074950b531285d720d1acc"
+    GIT_COMMIT_HASH = "e272bc5c3f9d0014c1d6b07fa020343af7f8e765"
 
     #BEGIN_CLASS_HEADER
     #END_CLASS_HEADER
@@ -220,26 +220,58 @@ class GenericsAPI:
         # return the results
         return [returnVal]
 
-    def matrix_filter(self, ctx, params):
+    def search_matrix(self, ctx, params):
         """
-        matrix_filter: generate a HTML report that allows users to fitler feature ids
-        :param params: instance of type "MatrixFilterParams" (Input of the
-           matrix_filter function matrix_obj_ref: object reference of a
-           matrix) -> structure: parameter "matrix_obj_ref" of type "obj_ref"
-           (An X/Y/Z style reference)
-        :returns: instance of type "MatrixFilterOutput" -> structure:
+        search_matrix: generate a HTML report that allows users to select feature ids
+        :param params: instance of type "MatrixSelectorParams" (Input of the
+           search_matrix function matrix_obj_ref: object reference of a
+           matrix workspace_name: workspace name objects to be saved to) ->
+           structure: parameter "matrix_obj_ref" of type "obj_ref" (An X/Y/Z
+           style reference), parameter "workspace_name" of type
+           "workspace_name" (workspace name of the object)
+        :returns: instance of type "MatrixSelectorOutput" -> structure:
            parameter "report_name" of String, parameter "report_ref" of String
         """
         # ctx is the context object
         # return variables are: returnVal
-        #BEGIN matrix_filter
+        #BEGIN search_matrix
         generics_api = GenericsUtil(self.config)
-        returnVal = generics_api.matrix_filter(params)
-        #END matrix_filter
+        returnVal = generics_api.search_matrix(params)
+        #END search_matrix
 
         # At some point might do deeper type checking...
         if not isinstance(returnVal, dict):
-            raise ValueError('Method matrix_filter return value ' +
+            raise ValueError('Method search_matrix return value ' +
+                             'returnVal is not type dict as required.')
+        # return the results
+        return [returnVal]
+
+    def filter_matrix(self, ctx, params):
+        """
+        filter_matrix: create sub-matrix based on input feature_ids or group by factor name
+        :param params: instance of type "MatrixFilterParams" (Input of the
+           filter_matrix function matrix_obj_ref: object reference of a
+           matrix workspace_name: workspace name objects to be saved to
+           feature_ids: string of feature ids that result matrix contains) ->
+           structure: parameter "matrix_obj_ref" of type "obj_ref" (An X/Y/Z
+           style reference), parameter "workspace_name" of type
+           "workspace_name" (workspace name of the object), parameter
+           "feature_ids" of String
+        :returns: instance of type "MatrixFilterOutput" -> structure:
+           parameter "report_name" of String, parameter "report_ref" of
+           String, parameter "matrix_obj_refs" of list of type "obj_ref" (An
+           X/Y/Z style reference)
+        """
+        # ctx is the context object
+        # return variables are: returnVal
+        #BEGIN filter_matrix
+        generics_api = GenericsUtil(self.config)
+        returnVal = generics_api.filter_matrix(params)
+        #END filter_matrix
+
+        # At some point might do deeper type checking...
+        if not isinstance(returnVal, dict):
+            raise ValueError('Method filter_matrix return value ' +
                              'returnVal is not type dict as required.')
         # return the results
         return [returnVal]
