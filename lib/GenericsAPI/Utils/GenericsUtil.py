@@ -400,6 +400,39 @@ class GenericsUtil:
             writer.book = load_workbook(file_path)
             df.to_excel(writer, sheet_name=sheet_name)
 
+    def _filter_constraints(self, constraints, data):
+
+        contains_constraints = constraints.get('contains')
+
+        filtered_constraints = []
+        for contains_constraint in contains_constraints:
+            value = contains_constraint.split(' ')[0]
+            in_values = contains_constraint.split(' ')[1:]
+
+            missing_key = True
+            for in_value in in_values:
+                if value.startswith('values'):
+                    search_value = re.search('{}(.*){}'.format('\(', '\)'), value).group(1)
+                    unique_list = search_value.split('.')
+                    key = unique_list[0]
+                elif ':' in value:
+                    key = value.split(':')[0]
+                else:
+                    unique_list = value.split('.')
+                    key = unique_list[0]
+
+                if key in data:
+                    missing_key = False
+                    break
+
+            if missing_key:
+                filtered_constraints.append(contains_constraint)
+
+        for x in filtered_constraints:
+            contains_constraints.remove(x)
+
+        return constraints
+
     def _retrieve_value(self, data, value):
         log('Getting value for {}'.format(value))
         retrieve_data = []
@@ -891,6 +924,8 @@ class GenericsUtil:
 
         constraints = self._find_constraints(params.get('obj_type'))
         data = params.get('data')
+
+        constraints = self._filter_constraints(constraints, data)
 
         validated, failed_constraints = self._validate(constraints, data)
 
