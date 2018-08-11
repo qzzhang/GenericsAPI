@@ -406,19 +406,17 @@ class GenericsUtil:
 
         filtered_constraints = []
         for contains_constraint in contains_constraints:
-            value = contains_constraint.split(' ')[0]
             in_values = contains_constraint.split(' ')[1:]
-
             missing_key = True
             for in_value in in_values:
-                if value.startswith('values'):
-                    search_value = re.search('{}(.*){}'.format('\(', '\)'), value).group(1)
+                if in_value.startswith('values'):
+                    search_value = re.search('{}(.*){}'.format('\(', '\)'), in_value).group(1)
                     unique_list = search_value.split('.')
                     key = unique_list[0]
-                elif ':' in value:
-                    key = value.split(':')[0]
+                elif ':' in in_value:
+                    key = in_value.split(':')[0]
                 else:
-                    unique_list = value.split('.')
+                    unique_list = in_value.split('.')
                     key = unique_list[0]
 
                 if key in data:
