@@ -572,9 +572,11 @@ class GenericsUtil:
         except XLRDError:
             raise ValueError('Cannot find <data> sheetss')
         else:
+            df.fillna(0, inplace=True)
             matrix_data = {'row_ids': df.index.tolist(),
                            'col_ids': df.columns.tolist(),
                            'values': df.values.tolist()}
+
             data.update({'data': matrix_data})
 
         # processing col/row_mapping
