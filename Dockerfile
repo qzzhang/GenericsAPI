@@ -21,6 +21,9 @@ RUN pip install cffi --upgrade \
     && pip install requests --upgrade \
     && pip install 'requests[security]' --upgrade
 
+RUN pip uninstall numpy -y \
+    && pip install numpy==1.14.5
+
 RUN pip install pandas \
     && pip install xlrd \
     && pip install openpyxl \
