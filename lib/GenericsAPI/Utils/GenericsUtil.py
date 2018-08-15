@@ -218,7 +218,7 @@ class GenericsUtil:
         generics_module = dict()
         for generics_type in generics_types:
             for item in obj_type_spec.split(generics_type)[1:]:
-                generics_type_name = item.split(';')[0].strip()
+                generics_type_name = item.split(';')[0].strip().split(' ')[-1].strip()
                 generics_module.update({generics_type_name: generics_type})
 
         log('Found generics type:\n{}\n'.format(generics_module))
