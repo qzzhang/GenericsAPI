@@ -30,6 +30,18 @@
       "text_options" : {
          "n_rows" : 2
       }
+    },
+    {
+      "id" : "filtered_matrix_name",
+      "optional" : false,
+      "advanced" : false,
+      "allow_multiple" : false,
+      "default_values" : [ "" ],
+      "field_type" : "text",
+      "text_options" : {
+          "valid_ws_types" : ["KBaseMatrices.ExpressionMatrix", "KBaseMatrices.FitnessMatrix", "KBaseMatrices.DifferentialExpressionMatrix"],
+          "is_output_name" : true
+        }
     }
   ],
   "behavior" : {

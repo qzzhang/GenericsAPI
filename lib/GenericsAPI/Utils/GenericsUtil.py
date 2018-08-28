@@ -732,18 +732,19 @@ class GenericsUtil:
         matrix_obj_ref: object reference of a matrix
         workspace_name: workspace name
         feature_ids: string of feature ids that result matrix contains
+        filtered_matrix_name: name of newly created filtered matrix object
         """
 
         matrix_obj_ref = params.get('matrix_obj_ref')
         workspace_name = params.get('workspace_name')
         feature_ids = params.get('feature_ids')
+        filtered_matrix_name = params.get('filtered_matrix_name')
 
         matrix_source = self.dfu.get_objects(
             {"object_refs": [matrix_obj_ref]})['data'][0]
         matrix_info = matrix_source.get('info')
         matrix_data = matrix_source.get('data')
 
-        matrix_name = matrix_info[1]
         matrix_type = self._find_between(matrix_info[2], '\.', '\-')
 
         value_data = matrix_data.get('data')
@@ -755,10 +756,11 @@ class GenericsUtil:
         else:
             workspace_id = workspace_name
 
-        filtered_matrix_obj_ref = self.save_object({'obj_type': 'KBaseMatrices.{}'.format(matrix_type),
-                                                    'obj_name': matrix_name + '_filtered',
-                                                    'data': matrix_data,
-                                                    'workspace_name': workspace_id})['obj_ref']
+        filtered_matrix_obj_ref = self.save_object({
+                                                'obj_type': 'KBaseMatrices.{}'.format(matrix_type),
+                                                'obj_name': filtered_matrix_name,
+                                                'data': matrix_data,
+                                                'workspace_name': workspace_id})['obj_ref']
 
         returnVal = {'matrix_obj_refs': [filtered_matrix_obj_ref]}
 
@@ -819,7 +821,7 @@ class GenericsUtil:
         col_conditionset_ref: column ConditionSet reference
         row_conditionset_ref: row ConditionSet reference
         genome_ref: genome reference
-        diff_expr_matrix_ref: DifferentialExpressionMatrix reference
+        matrix_obj_ref: Matrix reference
         """
 
         (obj_type, file_path, workspace_name,

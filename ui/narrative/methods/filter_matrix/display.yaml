@@ -36,5 +36,13 @@ parameters :
         long-hint  : |
             Feature IDs used to create sub-matrix object
 
+    filtered_matrix_name:
+        ui-name: |
+            Filtered Matrix Name
+        short-hint : |
+            Filtered Matrix Name
+        long-hint  : |
+            Filtered Matrix Name
+
 description : |
     <p> Create a sub-matrix with given feature ids. </p>
