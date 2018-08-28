@@ -386,7 +386,8 @@ class GenericsAPITest(unittest.TestCase):
 
         params = {'matrix_obj_ref': self.expression_matrix_ref,
                   'workspace_name': self.wsName,
-                  'feature_ids': 'WRI_RS00065_CDS_1,WRI_RS00070_CDS_1'}
+                  'feature_ids': 'WRI_RS00065_CDS_1,WRI_RS00070_CDS_1',
+                  'filtered_matrix_name': 'filtered_test_matrix'}
         returnVal = self.getImpl().filter_matrix(self.ctx, params)[0]
         self.assertTrue('report_name' in returnVal)
         self.assertTrue('report_ref' in returnVal)

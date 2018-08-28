@@ -62,6 +62,10 @@
         {
           "input_parameter" : "feature_ids",
           "target_property" : "feature_ids"
+        },
+        {
+          "input_parameter" : "filtered_matrix_name",
+          "target_property" : "filtered_matrix_name"
         }
       ],
       "output_mapping" : [
