@@ -184,11 +184,13 @@ module GenericsAPI {
     matrix_obj_ref: object reference of a matrix
     workspace_name: workspace name objects to be saved to
     feature_ids: string of feature ids that result matrix contains
+    filtered_matrix_name: name of newly created filtered matrix object
   */
   typedef structure {
       obj_ref matrix_obj_ref;
       workspace_name workspace_name;
       string feature_ids;
+      string filtered_matrix_name;
   } MatrixFilterParams;
 
   typedef structure {
