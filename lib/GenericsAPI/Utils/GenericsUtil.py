@@ -695,21 +695,35 @@ class GenericsUtil:
 
         return report_output
 
-    def _filter_value_data(self, value_data, feature_ids):
+    @staticmethod
+    def _filter_value_data(value_data, filter_ids):
+        """Filters a value matrix based on column or row ids"""
+        def _norm_id(_id):
+            return _id.replace(" ", "_")
 
-        filtered_value_data = dict()
-        filtered_value_data['col_ids'] = value_data['col_ids']
+        val_df = pd.DataFrame(value_data['values'], index=value_data['row_ids'],
+                              columns=value_data['col_ids'], dtype='object')
 
-        feature_ids = feature_ids.split(',')
+        if filter_ids[0] in val_df.index:
+            filtered_df = val_df.filter(filter_ids, axis=0)
 
-        filtered_value_data['row_ids'] = feature_ids
-        filtered_value_data['values'] = list()
+        elif _norm_id(filter_ids[0]) in val_df.index:
+            filtered_df = val_df.filter([_norm_id(x) for x in filter_ids], axis=0)
 
-        values = value_data['values']
-        row_ids = value_data['row_ids']
-        for feature_id in feature_ids:
-            idx = row_ids.index(feature_id)
-            filtered_value_data['values'].append(values[idx])
+        elif filter_ids[0] in val_df.columns:
+            filtered_df = val_df.filter(filter_ids)
+
+        elif _norm_id(filter_ids[0]) in val_df.columns:
+            filtered_df = val_df.filter([_norm_id(x) for x in filter_ids])
+
+        else:
+            raise ValueError("Unable to match {} to a row or column ID in this matrix"
+                             .format(filter_ids[0]))
+        filtered_value_data = {
+            "values": filtered_df.values.tolist(),
+            "col_ids": list(filtered_df.columns),
+            "row_ids": list(filtered_df.index),
+        }
 
         return filtered_value_data
 
@@ -748,7 +762,22 @@ class GenericsUtil:
         matrix_type = self._find_between(matrix_info[2], '\.', '\-')
 
         value_data = matrix_data.get('data')
-        filtered_value_data = self._filter_value_data(value_data, feature_ids)
+        filter_ids = [x.strip() for x in feature_ids.split(',')]
+        filtered_value_data = self._filter_value_data(value_data, filter_ids)
+
+        # if the matrix has changed shape, update the mappings
+        if len(filtered_value_data['row_ids']) < len(matrix_data['data']['row_ids']):
+            if matrix_data.get('row_mapping'):
+                matrix_data['row_mapping'] = {k: matrix_data['row_mapping'][k]
+                                              for k in filtered_value_data['row_ids']}
+            if matrix_data.get('feature_mapping'):
+                matrix_data['feature_mapping'] = {k: matrix_data['feature_mapping'][k]
+                                                  for k in filtered_value_data['row_ids']}
+
+        if len(filtered_value_data['col_ids']) < len(matrix_data['data']['col_ids']):
+            if matrix_data.get('col_mapping'):
+                matrix_data['col_mapping'] = {k: matrix_data['col_mapping'][k]
+                                              for k in filtered_value_data['col_ids']}
         matrix_data['data'] = filtered_value_data
 
         if not isinstance(workspace_name, int):
