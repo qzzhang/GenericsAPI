@@ -17,7 +17,8 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
  * Input of the filter_matrix function
  * matrix_obj_ref: object reference of a matrix
  * workspace_name: workspace name objects to be saved to
- * feature_ids: string of feature ids that result matrix contains
+ * filter_ids: string of column or row ids that result matrix contains
+ * filtered_matrix_name: name of newly created filtered matrix object
  * </pre>
  * 
  */
@@ -26,7 +27,8 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 @JsonPropertyOrder({
     "matrix_obj_ref",
     "workspace_name",
-    "feature_ids"
+    "filter_ids",
+    "filtered_matrix_name"
 })
 public class MatrixFilterParams {
 
@@ -34,8 +36,10 @@ public class MatrixFilterParams {
     private String matrixObjRef;
     @JsonProperty("workspace_name")
     private String workspaceName;
-    @JsonProperty("feature_ids")
-    private String featureIds;
+    @JsonProperty("filter_ids")
+    private String filterIds;
+    @JsonProperty("filtered_matrix_name")
+    private String filteredMatrixName;
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     @JsonProperty("matrix_obj_ref")
@@ -68,18 +72,33 @@ public class MatrixFilterParams {
         return this;
     }
 
-    @JsonProperty("feature_ids")
-    public String getFeatureIds() {
-        return featureIds;
+    @JsonProperty("filter_ids")
+    public String getFilterIds() {
+        return filterIds;
     }
 
-    @JsonProperty("feature_ids")
-    public void setFeatureIds(String featureIds) {
-        this.featureIds = featureIds;
+    @JsonProperty("filter_ids")
+    public void setFilterIds(String filterIds) {
+        this.filterIds = filterIds;
     }
 
-    public MatrixFilterParams withFeatureIds(String featureIds) {
-        this.featureIds = featureIds;
+    public MatrixFilterParams withFilterIds(String filterIds) {
+        this.filterIds = filterIds;
+        return this;
+    }
+
+    @JsonProperty("filtered_matrix_name")
+    public String getFilteredMatrixName() {
+        return filteredMatrixName;
+    }
+
+    @JsonProperty("filtered_matrix_name")
+    public void setFilteredMatrixName(String filteredMatrixName) {
+        this.filteredMatrixName = filteredMatrixName;
+    }
+
+    public MatrixFilterParams withFilteredMatrixName(String filteredMatrixName) {
+        this.filteredMatrixName = filteredMatrixName;
         return this;
     }
 
@@ -95,7 +114,7 @@ public class MatrixFilterParams {
 
     @Override
     public String toString() {
-        return ((((((((("MatrixFilterParams"+" [matrixObjRef=")+ matrixObjRef)+", workspaceName=")+ workspaceName)+", featureIds=")+ featureIds)+", additionalProperties=")+ additionalProperties)+"]");
+        return ((((((((((("MatrixFilterParams"+" [matrixObjRef=")+ matrixObjRef)+", workspaceName=")+ workspaceName)+", filterIds=")+ filterIds)+", filteredMatrixName=")+ filteredMatrixName)+", additionalProperties=")+ additionalProperties)+"]");
     }
 
 }

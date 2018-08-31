@@ -751,7 +751,7 @@ class GenericsUtil:
 
         matrix_obj_ref = params.get('matrix_obj_ref')
         workspace_name = params.get('workspace_name')
-        feature_ids = params.get('feature_ids')
+        filter_ids = params.get('filter_ids')
         filtered_matrix_name = params.get('filtered_matrix_name')
 
         matrix_source = self.dfu.get_objects(
@@ -762,7 +762,7 @@ class GenericsUtil:
         matrix_type = self._find_between(matrix_info[2], '\.', '\-')
 
         value_data = matrix_data.get('data')
-        filter_ids = [x.strip() for x in feature_ids.split(',')]
+        filter_ids = [x.strip() for x in filter_ids.split(',')]
         filtered_value_data = self._filter_value_data(value_data, filter_ids)
 
         # if the matrix has changed shape, update the mappings

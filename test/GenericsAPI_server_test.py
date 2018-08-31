@@ -390,7 +390,7 @@ class GenericsAPITest(unittest.TestCase):
 
         params = {'matrix_obj_ref': self.expression_matrix_ref,
                   'workspace_name': self.wsName,
-                  'feature_ids': 'WRI_RS00065_CDS_1,WRI_RS00070_CDS_1',
+                  'filter_ids': 'WRI_RS00065_CDS_1,WRI_RS00070_CDS_1',
                   'filtered_matrix_name': 'filtered_test_matrix_rows'}
         returnVal = self.getImpl().filter_matrix(self.ctx, params)[0]
         self.assertTrue('report_name' in returnVal)
@@ -413,7 +413,7 @@ class GenericsAPITest(unittest.TestCase):
 
         params = {'matrix_obj_ref': self.expression_matrix_ref,
                   'workspace_name': self.wsName,
-                  'feature_ids': 'condition 1, condition 3',
+                  'filter_ids': 'condition 1, condition 3',
                   'filtered_matrix_name': 'filtered_test_matrix_cols'}
         returnVal = self.getImpl().filter_matrix(self.ctx, params)[0]
         self.assertTrue('report_name' in returnVal)

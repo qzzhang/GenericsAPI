@@ -23,7 +23,7 @@ class GenericsAPI(object):
             self, url=None, timeout=30 * 60, user_id=None,
             password=None, token=None, ignore_authrc=False,
             trust_all_ssl_certificates=False,
-            auth_svc='https://kbase.us/services/authorization/Sessions/Login'):
+            auth_svc='https://ci.kbase.us/services/auth/api/legacy/KBase/Sessions/Login'):
         if url is None:
             raise ValueError('A url is required')
         self._service_ver = None
@@ -172,15 +172,16 @@ class GenericsAPI(object):
 
     def filter_matrix(self, params, context=None):
         """
-        filter_matrix: create sub-matrix based on input feature_ids or group by factor name
+        filter_matrix: create sub-matrix based on input filter_ids
         :param params: instance of type "MatrixFilterParams" (Input of the
            filter_matrix function matrix_obj_ref: object reference of a
            matrix workspace_name: workspace name objects to be saved to
-           feature_ids: string of feature ids that result matrix contains) ->
-           structure: parameter "matrix_obj_ref" of type "obj_ref" (An X/Y/Z
-           style reference), parameter "workspace_name" of type
-           "workspace_name" (workspace name of the object), parameter
-           "feature_ids" of String
+           filter_ids: string of column or row ids that result matrix
+           contains filtered_matrix_name: name of newly created filtered
+           matrix object) -> structure: parameter "matrix_obj_ref" of type
+           "obj_ref" (An X/Y/Z style reference), parameter "workspace_name"
+           of type "workspace_name" (workspace name of the object), parameter
+           "filter_ids" of String, parameter "filtered_matrix_name" of String
         :returns: instance of type "MatrixFilterOutput" -> structure:
            parameter "report_name" of String, parameter "report_ref" of
            String, parameter "matrix_obj_refs" of list of type "obj_ref" (An

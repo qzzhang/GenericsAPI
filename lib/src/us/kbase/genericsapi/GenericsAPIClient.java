@@ -290,7 +290,7 @@ public class GenericsAPIClient {
     /**
      * <p>Original spec-file function name: filter_matrix</p>
      * <pre>
-     * filter_matrix: create sub-matrix based on input feature_ids or group by factor name
+     * filter_matrix: create sub-matrix based on input filter_ids
      * </pre>
      * @param   params   instance of type {@link us.kbase.genericsapi.MatrixFilterParams MatrixFilterParams}
      * @return   parameter "returnVal" of type {@link us.kbase.genericsapi.MatrixFilterOutput MatrixFilterOutput}

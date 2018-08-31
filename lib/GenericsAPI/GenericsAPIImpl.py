@@ -22,8 +22,8 @@ class GenericsAPI:
     # the latter method is running.
     ######################################### noqa
     VERSION = "0.0.1"
-    GIT_URL = "git@github.com:Tianhao-Gu/GenericsAPI.git"
-    GIT_COMMIT_HASH = "e272bc5c3f9d0014c1d6b07fa020343af7f8e765"
+    GIT_URL = "https://github.com/kbaseapps/GenericsAPI.git"
+    GIT_COMMIT_HASH = "401785cb177fe46ae0e52681a4db2466ddb6bf03"
 
     #BEGIN_CLASS_HEADER
     #END_CLASS_HEADER
@@ -248,15 +248,16 @@ class GenericsAPI:
 
     def filter_matrix(self, ctx, params):
         """
-        filter_matrix: create sub-matrix based on input feature_ids or group by factor name
+        filter_matrix: create sub-matrix based on input filter_ids
         :param params: instance of type "MatrixFilterParams" (Input of the
            filter_matrix function matrix_obj_ref: object reference of a
            matrix workspace_name: workspace name objects to be saved to
-           feature_ids: string of feature ids that result matrix contains) ->
-           structure: parameter "matrix_obj_ref" of type "obj_ref" (An X/Y/Z
-           style reference), parameter "workspace_name" of type
-           "workspace_name" (workspace name of the object), parameter
-           "feature_ids" of String
+           filter_ids: string of column or row ids that result matrix
+           contains filtered_matrix_name: name of newly created filtered
+           matrix object) -> structure: parameter "matrix_obj_ref" of type
+           "obj_ref" (An X/Y/Z style reference), parameter "workspace_name"
+           of type "workspace_name" (workspace name of the object), parameter
+           "filter_ids" of String, parameter "filtered_matrix_name" of String
         :returns: instance of type "MatrixFilterOutput" -> structure:
            parameter "report_name" of String, parameter "report_ref" of
            String, parameter "matrix_obj_refs" of list of type "obj_ref" (An
