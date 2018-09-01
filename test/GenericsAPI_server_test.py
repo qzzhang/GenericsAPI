@@ -125,6 +125,9 @@ class GenericsAPITest(unittest.TestCase):
                            'condition_2': 'test_condition_2',
                            'condition_3': 'test_condition_3',
                            'condition_4': 'test_condition_3'}
+        cls.feature_mapping = {'WRI_RS00050_CDS_1': 'WRI_RS00050_CDS_1',
+                               'WRI_RS00065_CDS_1': 'WRI_RS00065_CDS_1',
+                               'WRI_RS00070_CDS_1': 'WRI_RS00070_CDS_1'}
 
         # upload ExpressionMatrix object
         object_type = 'KBaseMatrices.ExpressionMatrix'
@@ -135,6 +138,7 @@ class GenericsAPITest(unittest.TestCase):
                                   'col_mapping': cls.col_mapping,
                                   'row_conditionset_ref': cls.condition_set_ref,
                                   'row_mapping': cls.row_mapping,
+                                  'feature_mapping': cls.feature_mapping,
                                   'data': {'row_ids': cls.row_ids,
                                            'col_ids': cls.col_ids,
                                            'values': cls.values
@@ -381,13 +385,13 @@ class GenericsAPITest(unittest.TestCase):
         self.assertTrue('report_name' in returnVal)
         self.assertTrue('report_ref' in returnVal)
 
-    def test_filter_matrix(self):
+    def test_filter_matrix_rows(self):
         self.start_test()
 
         params = {'matrix_obj_ref': self.expression_matrix_ref,
                   'workspace_name': self.wsName,
-                  'feature_ids': 'WRI_RS00065_CDS_1,WRI_RS00070_CDS_1',
-                  'filtered_matrix_name': 'filtered_test_matrix'}
+                  'filter_ids': 'WRI_RS00065_CDS_1,WRI_RS00070_CDS_1',
+                  'filtered_matrix_name': 'filtered_test_matrix_rows'}
         returnVal = self.getImpl().filter_matrix(self.ctx, params)[0]
         self.assertTrue('report_name' in returnVal)
         self.assertTrue('report_ref' in returnVal)
@@ -398,5 +402,30 @@ class GenericsAPITest(unittest.TestCase):
             {"object_refs": [matrix_obj_ref]})['data'][0]
         matrix_data = matrix_source.get('data')
 
-        feature_ids = matrix_data['data']['row_ids']
-        self.assertItemsEqual(feature_ids, ['WRI_RS00065_CDS_1', 'WRI_RS00070_CDS_1'])
+        expected_ids = ['WRI_RS00065_CDS_1', 'WRI_RS00070_CDS_1']
+        self.assertItemsEqual(matrix_data['data']['row_ids'], expected_ids)
+        self.assertItemsEqual(matrix_data['row_mapping'].keys(), expected_ids)
+        self.assertItemsEqual(matrix_data['feature_mapping'].keys(), expected_ids)
+        self.assertEqual(len(matrix_data['data']['values']), len(expected_ids))
+
+    def test_filter_matrix_cols(self):
+        self.start_test()
+
+        params = {'matrix_obj_ref': self.expression_matrix_ref,
+                  'workspace_name': self.wsName,
+                  'filter_ids': 'condition 1, condition 3',
+                  'filtered_matrix_name': 'filtered_test_matrix_cols'}
+        returnVal = self.getImpl().filter_matrix(self.ctx, params)[0]
+        self.assertTrue('report_name' in returnVal)
+        self.assertTrue('report_ref' in returnVal)
+        self.assertTrue('matrix_obj_refs' in returnVal)
+
+        matrix_obj_ref = returnVal.get('matrix_obj_refs')[0]
+        matrix_source = self.dfu.get_objects(
+            {"object_refs": [matrix_obj_ref]})['data'][0]
+        matrix_data = matrix_source.get('data')
+
+        expected_ids = ['condition_1', 'condition_3']
+        self.assertItemsEqual(matrix_data['data']['col_ids'], expected_ids)
+        self.assertItemsEqual(matrix_data['col_mapping'].keys(), expected_ids)
+        self.assertEqual(len(matrix_data['data']['values'][0]), len(expected_ids))

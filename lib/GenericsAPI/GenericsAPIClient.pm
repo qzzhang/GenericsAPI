@@ -812,7 +812,8 @@ $returnVal is a GenericsAPI.MatrixFilterOutput
 MatrixFilterParams is a reference to a hash where the following keys are defined:
 	matrix_obj_ref has a value which is a GenericsAPI.obj_ref
 	workspace_name has a value which is a GenericsAPI.workspace_name
-	feature_ids has a value which is a string
+	filter_ids has a value which is a string
+	filtered_matrix_name has a value which is a string
 obj_ref is a string
 workspace_name is a string
 MatrixFilterOutput is a reference to a hash where the following keys are defined:
@@ -831,7 +832,8 @@ $returnVal is a GenericsAPI.MatrixFilterOutput
 MatrixFilterParams is a reference to a hash where the following keys are defined:
 	matrix_obj_ref has a value which is a GenericsAPI.obj_ref
 	workspace_name has a value which is a GenericsAPI.workspace_name
-	feature_ids has a value which is a string
+	filter_ids has a value which is a string
+	filtered_matrix_name has a value which is a string
 obj_ref is a string
 workspace_name is a string
 MatrixFilterOutput is a reference to a hash where the following keys are defined:
@@ -844,7 +846,7 @@ MatrixFilterOutput is a reference to a hash where the following keys are defined
 
 =item Description
 
-filter_matrix: create sub-matrix based on input feature_ids or group by factor name
+filter_matrix: create sub-matrix based on input filter_ids
 
 =back
 
@@ -1642,7 +1644,8 @@ report_ref has a value which is a string
 Input of the filter_matrix function
 matrix_obj_ref: object reference of a matrix
 workspace_name: workspace name objects to be saved to
-feature_ids: string of feature ids that result matrix contains
+filter_ids: string of column or row ids that result matrix contains
+filtered_matrix_name: name of newly created filtered matrix object
 
 
 =item Definition
@@ -1653,7 +1656,8 @@ feature_ids: string of feature ids that result matrix contains
 a reference to a hash where the following keys are defined:
 matrix_obj_ref has a value which is a GenericsAPI.obj_ref
 workspace_name has a value which is a GenericsAPI.workspace_name
-feature_ids has a value which is a string
+filter_ids has a value which is a string
+filtered_matrix_name has a value which is a string
 
 </pre>
 
@@ -1664,7 +1668,8 @@ feature_ids has a value which is a string
 a reference to a hash where the following keys are defined:
 matrix_obj_ref has a value which is a GenericsAPI.obj_ref
 workspace_name has a value which is a GenericsAPI.workspace_name
-feature_ids has a value which is a string
+filter_ids has a value which is a string
+filtered_matrix_name has a value which is a string
 
 
 =end text

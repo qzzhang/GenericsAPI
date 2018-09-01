@@ -183,13 +183,13 @@ module GenericsAPI {
   /* Input of the filter_matrix function
     matrix_obj_ref: object reference of a matrix
     workspace_name: workspace name objects to be saved to
-    feature_ids: string of feature ids that result matrix contains
+    filter_ids: string of column or row ids that result matrix contains
     filtered_matrix_name: name of newly created filtered matrix object
   */
   typedef structure {
       obj_ref matrix_obj_ref;
       workspace_name workspace_name;
-      string feature_ids;
+      string filter_ids;
       string filtered_matrix_name;
   } MatrixFilterParams;
 
@@ -199,7 +199,7 @@ module GenericsAPI {
       list<obj_ref> matrix_obj_refs;
   } MatrixFilterOutput;
 
-  /* filter_matrix: create sub-matrix based on input feature_ids or group by factor name*/
+  /* filter_matrix: create sub-matrix based on input filter_ids*/
   funcdef filter_matrix (MatrixFilterParams params) returns (MatrixFilterOutput returnVal) authentication required;
 
 };

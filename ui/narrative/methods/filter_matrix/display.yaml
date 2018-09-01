@@ -1,6 +1,6 @@
 name     : Filter Matrix
-subtitle : Create a sub-matrix with given feature ids
-tooltip  : Create a sub-matrix with given feature ids
+subtitle : Create a sub-matrix with given ids
+tooltip  : Create a sub-matrix with given ids
 
 icon: data-blue.png
 
@@ -28,13 +28,13 @@ parameters :
         long-hint  : |
             One of ExpressionMatrix, FitnessMatrix, DifferentialExpressionMatrix Object
 
-    feature_ids:
+    filter_ids:
         ui-name: |
-            Feature IDs
+            Filtering IDs
         short-hint : |
-            Feature IDs used to create sub-matrix object
+            Column or Row IDs used to create sub-matrix object
         long-hint  : |
-            Feature IDs used to create sub-matrix object
+            Column or Row IDs used to create sub-matrix object
 
     filtered_matrix_name:
         ui-name: |
@@ -45,4 +45,4 @@ parameters :
             Filtered Matrix Name
 
 description : |
-    <p> Create a sub-matrix with given feature ids. </p>
+    <p> Create a sub-matrix with given ids. </p>

@@ -17,11 +17,11 @@
       "default_values" : [ "" ],
       "field_type" : "text",
       "text_options" : {
-        "valid_ws_types" : ["KBaseMatrices.ExpressionMatrix", "KBaseMatrices.FitnessMatrix", "KBaseMatrices.DifferentialExpressionMatrix"]
+        "valid_ws_types" : ["KBaseMatrices"]
       }
     },
     {
-      "id" : "feature_ids",
+      "id" : "filter_ids",
       "optional" : false,
       "advanced" : false,
       "allow_multiple" : false,
@@ -39,7 +39,6 @@
       "default_values" : [ "" ],
       "field_type" : "text",
       "text_options" : {
-          "valid_ws_types" : ["KBaseMatrices.ExpressionMatrix", "KBaseMatrices.FitnessMatrix", "KBaseMatrices.DifferentialExpressionMatrix"],
           "is_output_name" : true
         }
     }
@@ -60,8 +59,8 @@
           "target_type_transform": "resolved-ref"
         },
         {
-          "input_parameter" : "feature_ids",
-          "target_property" : "feature_ids"
+          "input_parameter" : "filter_ids",
+          "target_property" : "filter_ids"
         },
         {
           "input_parameter" : "filtered_matrix_name",
