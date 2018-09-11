@@ -371,6 +371,26 @@ class Application(object):
                              name='GenericsAPI.filter_matrix',
                              types=[dict])
         self.method_authentication['GenericsAPI.filter_matrix'] = 'required'  # noqa
+        self.rpc_service.add(impl_GenericsAPI.file_to_attribute_mapping,
+                             name='GenericsAPI.file_to_attribute_mapping',
+                             types=[dict])
+        self.method_authentication['GenericsAPI.file_to_attribute_mapping'] = 'required'  # noqa
+        self.rpc_service.add(impl_GenericsAPI.attribute_mapping_to_tsv_file,
+                             name='GenericsAPI.attribute_mapping_to_tsv_file',
+                             types=[dict])
+        self.method_authentication['GenericsAPI.attribute_mapping_to_tsv_file'] = 'required'  # noqa
+        self.rpc_service.add(impl_GenericsAPI.export_attribute_mapping_tsv,
+                             name='GenericsAPI.export_attribute_mapping_tsv',
+                             types=[dict])
+        self.method_authentication['GenericsAPI.export_attribute_mapping_tsv'] = 'required'  # noqa
+        self.rpc_service.add(impl_GenericsAPI.export_attribute_mapping_excel,
+                             name='GenericsAPI.export_attribute_mapping_excel',
+                             types=[dict])
+        self.method_authentication['GenericsAPI.export_attribute_mapping_excel'] = 'required'  # noqa
+        self.rpc_service.add(impl_GenericsAPI.export_cluster_set_excel,
+                             name='GenericsAPI.export_cluster_set_excel',
+                             types=[dict])
+        self.method_authentication['GenericsAPI.export_cluster_set_excel'] = 'required'  # noqa
         self.rpc_service.add(impl_GenericsAPI.status,
                              name='GenericsAPI.status',
                              types=[dict])

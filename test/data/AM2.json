@@ -1,0 +1,443 @@
+{
+  "ontology_mapping_method": "User Curation",
+  "instances": {
+    "35S.ABF3-57_2h_1": [
+      "5",
+      "PO_0007131",
+      "Col-0",
+      "ABF3 overexpression",
+      "NCBITaxon_3702",
+      "EFO_0001461",
+      "2",
+      "1"
+    ],
+    "35S.ABF3-57_2h_2": [
+      "5",
+      "PO_0007131",
+      "Col-0",
+      "ABF3 overexpression",
+      "NCBITaxon_3702",
+      "EFO_0001461",
+      "2",
+      "1"
+    ],
+    "35S.ABF3-57_2h_3": [
+      "5",
+      "PO_0007131",
+      "Col-0",
+      "ABF3 overexpression",
+      "NCBITaxon_3702",
+      "EFO_0001461",
+      "2",
+      "1"
+    ],
+    "35S.ABF3-48_2h_DR_1": [
+      "4",
+      "PO_0007131",
+      "Col-0",
+      "ABF3 overexpression",
+      "NCBITaxon_3702",
+      "EO_0007404",
+      "2",
+      "1"
+    ],
+    "35S.ABF3-48_2h_DR_2": [
+      "4",
+      "PO_0007131",
+      "Col-0",
+      "ABF3 overexpression",
+      "NCBITaxon_3702",
+      "EO_0007404",
+      "2",
+      "1"
+    ],
+    "35S.ABF3-48_2h_DR_3": [
+      "4",
+      "PO_0007131",
+      "Col-0",
+      "ABF3 overexpression",
+      "NCBITaxon_3702",
+      "EO_0007404",
+      "2",
+      "1"
+    ],
+    "Control-48_24h_2": [
+      "7",
+      "PO_0007131",
+      "Col-0",
+      "control",
+      "NCBITaxon_3702",
+      "EFO_0001461",
+      "24",
+      "1"
+    ],
+    "Control-48_24h_3": [
+      "7",
+      "PO_0007131",
+      "Col-0",
+      "control",
+      "NCBITaxon_3702",
+      "EFO_0001461",
+      "24",
+      "1"
+    ],
+    "Control-48_24h_1": [
+      "7",
+      "PO_0007131",
+      "Col-0",
+      "control",
+      "NCBITaxon_3702",
+      "EFO_0001461",
+      "24",
+      "1"
+    ],
+    "Control-48_2h_DR_1": [
+      "10",
+      "PO_0007131",
+      "Col-0",
+      "control",
+      "NCBITaxon_3702",
+      "EO_0007404",
+      "2",
+      "1"
+    ],
+    "Control-48_2h_DR_3": [
+      "10",
+      "PO_0007131",
+      "Col-0",
+      "control",
+      "NCBITaxon_3702",
+      "EO_0007404",
+      "2",
+      "1"
+    ],
+    "Control-48_2h_DR_2": [
+      "10",
+      "PO_0007131",
+      "Col-0",
+      "control",
+      "NCBITaxon_3702",
+      "EO_0007404",
+      "2",
+      "1"
+    ],
+    "35S.ABF3-48_2h_1": [
+      "3",
+      "PO_0007131",
+      "Col-0",
+      "ABF3 overexpression",
+      "NCBITaxon_3702",
+      "EFO_0001461",
+      "2",
+      "1"
+    ],
+    "35S.ABF3-48_2h_2": [
+      "3",
+      "PO_0007131",
+      "Col-0",
+      "ABF3 overexpression",
+      "NCBITaxon_3702",
+      "EFO_0001461",
+      "2",
+      "1"
+    ],
+    "35S.ABF3-48_2h_3": [
+      "3",
+      "PO_0007131",
+      "Col-0",
+      "ABF3 overexpression",
+      "NCBITaxon_3702",
+      "EFO_0001461",
+      "2",
+      "1"
+    ],
+    "Control-48_24h_DR_3": [
+      "8",
+      "PO_0007131",
+      "Col-0",
+      "control",
+      "NCBITaxon_3702",
+      "EO_0007404",
+      "24",
+      "1"
+    ],
+    "35S.ABF3-48_24h_DR_1": [
+      "2",
+      "PO_0007131",
+      "Col-0",
+      "ABF3 overexpression",
+      "NCBITaxon_3702",
+      "EO_0007404",
+      "24",
+      "1"
+    ],
+    "35S.ABF3-48_24h_DR_3": [
+      "2",
+      "PO_0007131",
+      "Col-0",
+      "ABF3 overexpression",
+      "NCBITaxon_3702",
+      "EO_0007404",
+      "24",
+      "1"
+    ],
+    "35S.ABF3-48_24h_DR_2": [
+      "2",
+      "PO_0007131",
+      "Col-0",
+      "ABF3 overexpression",
+      "NCBITaxon_3702",
+      "EO_0007404",
+      "24",
+      "1"
+    ],
+    "Control-48_2h_1": [
+      "9",
+      "PO_0007131",
+      "Col-0",
+      "control",
+      "NCBITaxon_3702",
+      "EFO_0001461",
+      "2",
+      "1"
+    ],
+    "35S.ABF3-48_24h_3": [
+      "1",
+      "PO_0007131:seedling",
+      "Col-0",
+      "ABF3 overexpression",
+      "NCBITaxon_3702",
+      "EFO_0001461",
+      "24",
+      "1"
+    ],
+    "Control-48_24h_DR_1": [
+      "8",
+      "PO_0007131",
+      "Col-0",
+      "control",
+      "NCBITaxon_3702",
+      "EO_0007404",
+      "24",
+      "1"
+    ],
+    "35S.ABF3-48_24h_2": [
+      "1",
+      "PO_0007131:seedling",
+      "Col-0",
+      "ABF3 overexpression",
+      "NCBITaxon_3702",
+      "EFO_0001461",
+      "24",
+      "1"
+    ],
+    "Control-59_2h_1": [
+      "12",
+      "PO_0007131",
+      "Col-0",
+      "control",
+      "NCBITaxon_3702",
+      "EFO_0001461",
+      "2",
+      "1"
+    ],
+    "Control-48_2h_2": [
+      "9",
+      "PO_0007131",
+      "Col-0",
+      "control",
+      "NCBITaxon_3702",
+      "EFO_0001461",
+      "2",
+      "1"
+    ],
+    "Control-59_2h_3": [
+      "12",
+      "PO_0007131",
+      "Col-0",
+      "control",
+      "NCBITaxon_3702",
+      "EFO_0001461",
+      "2",
+      "1"
+    ],
+    "Control-59_2h_2": [
+      "12",
+      "PO_0007131",
+      "Col-0",
+      "control",
+      "NCBITaxon_3702",
+      "EFO_0001461",
+      "2",
+      "1"
+    ],
+    "Control-48_2h_3": [
+      "9",
+      "PO_0007131",
+      "Col-0",
+      "control",
+      "NCBITaxon_3702",
+      "EFO_0001461",
+      "2",
+      "1"
+    ],
+    "35S.ABF3-59_2h_2": [
+      "6",
+      "PO_0007131",
+      "Col-0",
+      "ABF3 overexpression",
+      "NCBITaxon_3702",
+      "EFO_0001461",
+      "2",
+      "1"
+    ],
+    "35S.ABF3-59_2h_3": [
+      "6",
+      "PO_0007131",
+      "Col-0",
+      "ABF3 overexpression",
+      "NCBITaxon_3702",
+      "EFO_0001461",
+      "2",
+      "1"
+    ],
+    "35S.ABF3-48_24h_1": [
+      "1",
+      "PO_0007131:seedling",
+      "Col-0",
+      "ABF3 overexpression",
+      "NCBITaxon_3702",
+      "EFO_0001461",
+      "24",
+      "1"
+    ],
+    "35S.ABF3-59_2h_1": [
+      "6",
+      "PO_0007131",
+      "Col-0",
+      "ABF3 overexpression",
+      "NCBITaxon_3702",
+      "EFO_0001461",
+      "2",
+      "1"
+    ],
+    "Control-57_2h_3": [
+      "11",
+      "PO_0007131",
+      "Col-0",
+      "control",
+      "NCBITaxon_3702",
+      "EFO_0001461",
+      "2",
+      "1"
+    ],
+    "Control-57_2h_2": [
+      "11",
+      "PO_0007131",
+      "Col-0",
+      "control",
+      "NCBITaxon_3702",
+      "EFO_0001461",
+      "2",
+      "1"
+    ],
+    "Control-57_2h_1": [
+      "11",
+      "PO_0007131",
+      "Col-0",
+      "control",
+      "NCBITaxon_3702",
+      "EFO_0001461",
+      "2",
+      "1"
+    ],
+    "Control-48_24h_DR_2": [
+      "8",
+      "PO_0007131",
+      "Col-0",
+      "control",
+      "NCBITaxon_3702",
+      "EO_0007404",
+      "24",
+      "1"
+    ],
+    "WT_2h_1": [
+      "13",
+      "PO_0007131",
+      "Col-0",
+      "wild type",
+      "NCBITaxon_3702",
+      "EFO_0001461",
+      "2",
+      "1"
+    ],
+    "WT_2h_2": [
+      "13",
+      "PO_0007131",
+      "Col-0",
+      "wild type",
+      "NCBITaxon_3702",
+      "EFO_0001461",
+      "2",
+      "1"
+    ],
+    "WT_2h_3": [
+      "13",
+      "PO_0007131",
+      "Col-0",
+      "wild type",
+      "NCBITaxon_3702",
+      "EFO_0001461",
+      "2",
+      "1"
+    ]
+  },
+  "attributes": [
+    {
+      "attribute_ont_ref": "6308/19/1",
+      "attribute_ont_id": "EFO:0002091",
+      "attribute": "biological replicate"
+    },
+    {
+      "attribute_ont_ref": "6308/2/3",
+      "attribute_ont_id": "PO:0009012",
+      "attribute": "developmental stage"
+    },
+    {
+      "attribute_ont_ref": "6308/19/1",
+      "attribute_ont_id": "EFO:0005148",
+      "attribute": "Accession"
+    },
+    {
+      "attribute_ont_ref": "KbaseOntologies/Custom",
+      "attribute_ont_id": "Custom:Term",
+      "attribute": "genotype"
+    },
+    {
+      "attribute_ont_ref": "KbaseOntologies/Custom",
+      "attribute_ont_id": "Custom:Term",
+      "attribute": "organism"
+    },
+    {
+      "attribute_ont_ref": "6308/19/1",
+      "attribute_ont_id": "EFO:0000470",
+      "attribute": "environmental stress"
+    },
+    {
+      "unit_ont_id": "UO:0000032",
+      "attribute_ont_ref": "6308/19/1",
+      "attribute_ont_id": "EFO:0001779",
+      "attribute": "time series design",
+      "unit_ont_ref": "6308/15/6",
+      "unit": "hour"
+    },
+    {
+      "unit_ont_id": "UO:0000034",
+      "attribute_ont_ref": "6308/11/2",
+      "attribute_ont_id": "PATO:0000011",
+      "attribute": "age",
+      "unit_ont_ref": "6308/15/6",
+      "unit": "week"
+    }
+  ]
+}

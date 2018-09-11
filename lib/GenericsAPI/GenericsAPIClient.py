@@ -113,20 +113,20 @@ class GenericsAPI(object):
            input_shock_id: file shock id input_file_path: absolute file path
            input_staging_file_path: staging area file path matrix_name:
            matrix object name workspace_name: workspace name matrix object to
-           be saved to optional: col_conditionset_ref: column ConditionSet
-           reference row_conditionset_ref: row ConditionSet reference
-           genome_ref: genome reference diff_expr_matrix_ref:
-           DifferentialExpressionMatrix reference) -> structure: parameter
-           "obj_type" of String, parameter "input_shock_id" of String,
-           parameter "input_file_path" of String, parameter
-           "input_staging_file_path" of String, parameter "matrix_name" of
-           String, parameter "workspace_name" of type "workspace_name"
-           (workspace name of the object), parameter "genome_ref" of type
+           be saved to optional: col_attributemapping_ref: column
+           AttributeMapping reference row_attributemapping_ref: row
+           AttributeMapping reference genome_ref: genome reference
+           diff_expr_matrix_ref: DifferentialExpressionMatrix reference) ->
+           structure: parameter "obj_type" of String, parameter
+           "input_shock_id" of String, parameter "input_file_path" of String,
+           parameter "input_staging_file_path" of String, parameter
+           "matrix_name" of String, parameter "workspace_name" of type
+           "workspace_name" (workspace name of the object), parameter
+           "genome_ref" of type "obj_ref" (An X/Y/Z style reference),
+           parameter "col_attributemapping_ref" of type "obj_ref" (An X/Y/Z
+           style reference), parameter "row_attributemapping_ref" of type
            "obj_ref" (An X/Y/Z style reference), parameter
-           "col_conditionset_ref" of type "obj_ref" (An X/Y/Z style
-           reference), parameter "row_conditionset_ref" of type "obj_ref" (An
-           X/Y/Z style reference), parameter "diff_expr_matrix_ref" of type
-           "obj_ref" (An X/Y/Z style reference)
+           "diff_expr_matrix_ref" of type "obj_ref" (An X/Y/Z style reference)
         :returns: instance of type "ImportMatrixOutput" -> structure:
            parameter "report_name" of String, parameter "report_ref" of
            String, parameter "matrix_obj_ref" of type "obj_ref" (An X/Y/Z
@@ -189,6 +189,69 @@ class GenericsAPI(object):
         """
         return self._client.call_method(
             'GenericsAPI.filter_matrix',
+            [params], self._service_ver, context)
+
+    def file_to_attribute_mapping(self, params, context=None):
+        """
+        :param params: instance of type "FileToAttributeMappingParams"
+           (input_shock_id and input_file_path - alternative input params,)
+           -> structure: parameter "input_shock_id" of String, parameter
+           "input_file_path" of String, parameter "output_ws_id" of String,
+           parameter "output_obj_name" of String
+        :returns: instance of type "FileToAttributeMappingOutput" ->
+           structure: parameter "attribute_mapping_ref" of type "obj_ref" (An
+           X/Y/Z style reference)
+        """
+        return self._client.call_method(
+            'GenericsAPI.file_to_attribute_mapping',
+            [params], self._service_ver, context)
+
+    def attribute_mapping_to_tsv_file(self, params, context=None):
+        """
+        :param params: instance of type "AttributeMappingToTsvFileParams" ->
+           structure: parameter "input_ref" of type "obj_ref" (An X/Y/Z style
+           reference), parameter "destination_dir" of String
+        :returns: instance of type "AttributeMappingToTsvFileOutput" ->
+           structure: parameter "file_path" of String
+        """
+        return self._client.call_method(
+            'GenericsAPI.attribute_mapping_to_tsv_file',
+            [params], self._service_ver, context)
+
+    def export_attribute_mapping_tsv(self, params, context=None):
+        """
+        :param params: instance of type "ExportAttributeMappingParams" ->
+           structure: parameter "input_ref" of type "obj_ref" (An X/Y/Z style
+           reference)
+        :returns: instance of type "ExportOutput" -> structure: parameter
+           "shock_id" of String
+        """
+        return self._client.call_method(
+            'GenericsAPI.export_attribute_mapping_tsv',
+            [params], self._service_ver, context)
+
+    def export_attribute_mapping_excel(self, params, context=None):
+        """
+        :param params: instance of type "ExportAttributeMappingParams" ->
+           structure: parameter "input_ref" of type "obj_ref" (An X/Y/Z style
+           reference)
+        :returns: instance of type "ExportOutput" -> structure: parameter
+           "shock_id" of String
+        """
+        return self._client.call_method(
+            'GenericsAPI.export_attribute_mapping_excel',
+            [params], self._service_ver, context)
+
+    def export_cluster_set_excel(self, params, context=None):
+        """
+        :param params: instance of type "ExportClusterSetParams" ->
+           structure: parameter "input_ref" of type "obj_ref" (An X/Y/Z style
+           reference)
+        :returns: instance of type "ExportOutput" -> structure: parameter
+           "shock_id" of String
+        """
+        return self._client.call_method(
+            'GenericsAPI.export_cluster_set_excel',
             [params], self._service_ver, context)
 
     def status(self, context=None):
