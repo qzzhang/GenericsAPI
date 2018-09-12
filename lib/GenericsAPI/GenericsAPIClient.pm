@@ -26,7 +26,7 @@ GenericsAPI::GenericsAPIClient
 =head1 DESCRIPTION
 
 
-A KBase module: GenericsAPI
+
 
 
 =cut
@@ -503,8 +503,8 @@ ImportMatrixParams is a reference to a hash where the following keys are defined
 	matrix_name has a value which is a string
 	workspace_name has a value which is a GenericsAPI.workspace_name
 	genome_ref has a value which is a GenericsAPI.obj_ref
-	col_conditionset_ref has a value which is a GenericsAPI.obj_ref
-	row_conditionset_ref has a value which is a GenericsAPI.obj_ref
+	col_attributemapping_ref has a value which is a GenericsAPI.obj_ref
+	row_attributemapping_ref has a value which is a GenericsAPI.obj_ref
 	diff_expr_matrix_ref has a value which is a GenericsAPI.obj_ref
 workspace_name is a string
 obj_ref is a string
@@ -529,8 +529,8 @@ ImportMatrixParams is a reference to a hash where the following keys are defined
 	matrix_name has a value which is a string
 	workspace_name has a value which is a GenericsAPI.workspace_name
 	genome_ref has a value which is a GenericsAPI.obj_ref
-	col_conditionset_ref has a value which is a GenericsAPI.obj_ref
-	row_conditionset_ref has a value which is a GenericsAPI.obj_ref
+	col_attributemapping_ref has a value which is a GenericsAPI.obj_ref
+	row_attributemapping_ref has a value which is a GenericsAPI.obj_ref
 	diff_expr_matrix_ref has a value which is a GenericsAPI.obj_ref
 workspace_name is a string
 obj_ref is a string
@@ -898,6 +898,474 @@ filter_matrix: create sub-matrix based on input filter_ids
     }
 }
  
+
+
+=head2 file_to_attribute_mapping
+
+  $result = $obj->file_to_attribute_mapping($params)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$params is a GenericsAPI.FileToAttributeMappingParams
+$result is a GenericsAPI.FileToAttributeMappingOutput
+FileToAttributeMappingParams is a reference to a hash where the following keys are defined:
+	input_shock_id has a value which is a string
+	input_file_path has a value which is a string
+	output_ws_id has a value which is a string
+	output_obj_name has a value which is a string
+FileToAttributeMappingOutput is a reference to a hash where the following keys are defined:
+	attribute_mapping_ref has a value which is a GenericsAPI.obj_ref
+obj_ref is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$params is a GenericsAPI.FileToAttributeMappingParams
+$result is a GenericsAPI.FileToAttributeMappingOutput
+FileToAttributeMappingParams is a reference to a hash where the following keys are defined:
+	input_shock_id has a value which is a string
+	input_file_path has a value which is a string
+	output_ws_id has a value which is a string
+	output_obj_name has a value which is a string
+FileToAttributeMappingOutput is a reference to a hash where the following keys are defined:
+	attribute_mapping_ref has a value which is a GenericsAPI.obj_ref
+obj_ref is a string
+
+
+=end text
+
+=item Description
+
+
+
+=back
+
+=cut
+
+ sub file_to_attribute_mapping
+{
+    my($self, @args) = @_;
+
+# Authentication: required
+
+    if ((my $n = @args) != 1)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function file_to_attribute_mapping (received $n, expecting 1)");
+    }
+    {
+	my($params) = @args;
+
+	my @_bad_arguments;
+        (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument 1 \"params\" (value was \"$params\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to file_to_attribute_mapping:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'file_to_attribute_mapping');
+	}
+    }
+
+    my $url = $self->{url};
+    my $result = $self->{client}->call($url, $self->{headers}, {
+	    method => "GenericsAPI.file_to_attribute_mapping",
+	    params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'file_to_attribute_mapping',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method file_to_attribute_mapping",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'file_to_attribute_mapping',
+				       );
+    }
+}
+ 
+
+
+=head2 attribute_mapping_to_tsv_file
+
+  $result = $obj->attribute_mapping_to_tsv_file($params)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$params is a GenericsAPI.AttributeMappingToTsvFileParams
+$result is a GenericsAPI.AttributeMappingToTsvFileOutput
+AttributeMappingToTsvFileParams is a reference to a hash where the following keys are defined:
+	input_ref has a value which is a GenericsAPI.obj_ref
+	destination_dir has a value which is a string
+obj_ref is a string
+AttributeMappingToTsvFileOutput is a reference to a hash where the following keys are defined:
+	file_path has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$params is a GenericsAPI.AttributeMappingToTsvFileParams
+$result is a GenericsAPI.AttributeMappingToTsvFileOutput
+AttributeMappingToTsvFileParams is a reference to a hash where the following keys are defined:
+	input_ref has a value which is a GenericsAPI.obj_ref
+	destination_dir has a value which is a string
+obj_ref is a string
+AttributeMappingToTsvFileOutput is a reference to a hash where the following keys are defined:
+	file_path has a value which is a string
+
+
+=end text
+
+=item Description
+
+
+
+=back
+
+=cut
+
+ sub attribute_mapping_to_tsv_file
+{
+    my($self, @args) = @_;
+
+# Authentication: required
+
+    if ((my $n = @args) != 1)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function attribute_mapping_to_tsv_file (received $n, expecting 1)");
+    }
+    {
+	my($params) = @args;
+
+	my @_bad_arguments;
+        (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument 1 \"params\" (value was \"$params\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to attribute_mapping_to_tsv_file:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'attribute_mapping_to_tsv_file');
+	}
+    }
+
+    my $url = $self->{url};
+    my $result = $self->{client}->call($url, $self->{headers}, {
+	    method => "GenericsAPI.attribute_mapping_to_tsv_file",
+	    params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'attribute_mapping_to_tsv_file',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method attribute_mapping_to_tsv_file",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'attribute_mapping_to_tsv_file',
+				       );
+    }
+}
+ 
+
+
+=head2 export_attribute_mapping_tsv
+
+  $result = $obj->export_attribute_mapping_tsv($params)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$params is a GenericsAPI.ExportAttributeMappingParams
+$result is a GenericsAPI.ExportOutput
+ExportAttributeMappingParams is a reference to a hash where the following keys are defined:
+	input_ref has a value which is a GenericsAPI.obj_ref
+obj_ref is a string
+ExportOutput is a reference to a hash where the following keys are defined:
+	shock_id has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$params is a GenericsAPI.ExportAttributeMappingParams
+$result is a GenericsAPI.ExportOutput
+ExportAttributeMappingParams is a reference to a hash where the following keys are defined:
+	input_ref has a value which is a GenericsAPI.obj_ref
+obj_ref is a string
+ExportOutput is a reference to a hash where the following keys are defined:
+	shock_id has a value which is a string
+
+
+=end text
+
+=item Description
+
+
+
+=back
+
+=cut
+
+ sub export_attribute_mapping_tsv
+{
+    my($self, @args) = @_;
+
+# Authentication: required
+
+    if ((my $n = @args) != 1)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function export_attribute_mapping_tsv (received $n, expecting 1)");
+    }
+    {
+	my($params) = @args;
+
+	my @_bad_arguments;
+        (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument 1 \"params\" (value was \"$params\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to export_attribute_mapping_tsv:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'export_attribute_mapping_tsv');
+	}
+    }
+
+    my $url = $self->{url};
+    my $result = $self->{client}->call($url, $self->{headers}, {
+	    method => "GenericsAPI.export_attribute_mapping_tsv",
+	    params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'export_attribute_mapping_tsv',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method export_attribute_mapping_tsv",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'export_attribute_mapping_tsv',
+				       );
+    }
+}
+ 
+
+
+=head2 export_attribute_mapping_excel
+
+  $result = $obj->export_attribute_mapping_excel($params)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$params is a GenericsAPI.ExportAttributeMappingParams
+$result is a GenericsAPI.ExportOutput
+ExportAttributeMappingParams is a reference to a hash where the following keys are defined:
+	input_ref has a value which is a GenericsAPI.obj_ref
+obj_ref is a string
+ExportOutput is a reference to a hash where the following keys are defined:
+	shock_id has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$params is a GenericsAPI.ExportAttributeMappingParams
+$result is a GenericsAPI.ExportOutput
+ExportAttributeMappingParams is a reference to a hash where the following keys are defined:
+	input_ref has a value which is a GenericsAPI.obj_ref
+obj_ref is a string
+ExportOutput is a reference to a hash where the following keys are defined:
+	shock_id has a value which is a string
+
+
+=end text
+
+=item Description
+
+
+
+=back
+
+=cut
+
+ sub export_attribute_mapping_excel
+{
+    my($self, @args) = @_;
+
+# Authentication: required
+
+    if ((my $n = @args) != 1)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function export_attribute_mapping_excel (received $n, expecting 1)");
+    }
+    {
+	my($params) = @args;
+
+	my @_bad_arguments;
+        (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument 1 \"params\" (value was \"$params\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to export_attribute_mapping_excel:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'export_attribute_mapping_excel');
+	}
+    }
+
+    my $url = $self->{url};
+    my $result = $self->{client}->call($url, $self->{headers}, {
+	    method => "GenericsAPI.export_attribute_mapping_excel",
+	    params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'export_attribute_mapping_excel',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method export_attribute_mapping_excel",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'export_attribute_mapping_excel',
+				       );
+    }
+}
+ 
+
+
+=head2 export_cluster_set_excel
+
+  $result = $obj->export_cluster_set_excel($params)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$params is a GenericsAPI.ExportClusterSetParams
+$result is a GenericsAPI.ExportOutput
+ExportClusterSetParams is a reference to a hash where the following keys are defined:
+	input_ref has a value which is a GenericsAPI.obj_ref
+obj_ref is a string
+ExportOutput is a reference to a hash where the following keys are defined:
+	shock_id has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$params is a GenericsAPI.ExportClusterSetParams
+$result is a GenericsAPI.ExportOutput
+ExportClusterSetParams is a reference to a hash where the following keys are defined:
+	input_ref has a value which is a GenericsAPI.obj_ref
+obj_ref is a string
+ExportOutput is a reference to a hash where the following keys are defined:
+	shock_id has a value which is a string
+
+
+=end text
+
+=item Description
+
+
+
+=back
+
+=cut
+
+ sub export_cluster_set_excel
+{
+    my($self, @args) = @_;
+
+# Authentication: required
+
+    if ((my $n = @args) != 1)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function export_cluster_set_excel (received $n, expecting 1)");
+    }
+    {
+	my($params) = @args;
+
+	my @_bad_arguments;
+        (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument 1 \"params\" (value was \"$params\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to export_cluster_set_excel:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'export_cluster_set_excel');
+	}
+    }
+
+    my $url = $self->{url};
+    my $result = $self->{client}->call($url, $self->{headers}, {
+	    method => "GenericsAPI.export_cluster_set_excel",
+	    params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'export_cluster_set_excel',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method export_cluster_set_excel",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'export_cluster_set_excel',
+				       );
+    }
+}
+ 
   
 sub status
 {
@@ -941,16 +1409,16 @@ sub version {
             Bio::KBase::Exceptions::JSONRPC->throw(
                 error => $result->error_message,
                 code => $result->content->{code},
-                method_name => 'filter_matrix',
+                method_name => 'export_cluster_set_excel',
             );
         } else {
             return wantarray ? @{$result->result} : $result->result->[0];
         }
     } else {
         Bio::KBase::Exceptions::HTTP->throw(
-            error => "Error invoking method filter_matrix",
+            error => "Error invoking method export_cluster_set_excel",
             status_line => $self->{client}->status_line,
-            method_name => 'filter_matrix',
+            method_name => 'export_cluster_set_excel',
         );
     }
 }
@@ -1405,8 +1873,8 @@ matrix_name: matrix object name
 workspace_name: workspace name matrix object to be saved to
 
 optional:
-col_conditionset_ref: column ConditionSet reference
-row_conditionset_ref: row ConditionSet reference
+col_attributemapping_ref: column AttributeMapping reference
+row_attributemapping_ref: row AttributeMapping reference
 genome_ref: genome reference
 diff_expr_matrix_ref: DifferentialExpressionMatrix reference
 
@@ -1424,8 +1892,8 @@ input_staging_file_path has a value which is a string
 matrix_name has a value which is a string
 workspace_name has a value which is a GenericsAPI.workspace_name
 genome_ref has a value which is a GenericsAPI.obj_ref
-col_conditionset_ref has a value which is a GenericsAPI.obj_ref
-row_conditionset_ref has a value which is a GenericsAPI.obj_ref
+col_attributemapping_ref has a value which is a GenericsAPI.obj_ref
+row_attributemapping_ref has a value which is a GenericsAPI.obj_ref
 diff_expr_matrix_ref has a value which is a GenericsAPI.obj_ref
 
 </pre>
@@ -1442,8 +1910,8 @@ input_staging_file_path has a value which is a string
 matrix_name has a value which is a string
 workspace_name has a value which is a GenericsAPI.workspace_name
 genome_ref has a value which is a GenericsAPI.obj_ref
-col_conditionset_ref has a value which is a GenericsAPI.obj_ref
-row_conditionset_ref has a value which is a GenericsAPI.obj_ref
+col_attributemapping_ref has a value which is a GenericsAPI.obj_ref
+row_attributemapping_ref has a value which is a GenericsAPI.obj_ref
 diff_expr_matrix_ref has a value which is a GenericsAPI.obj_ref
 
 
@@ -1704,6 +2172,199 @@ a reference to a hash where the following keys are defined:
 report_name has a value which is a string
 report_ref has a value which is a string
 matrix_obj_refs has a value which is a reference to a list where each element is a GenericsAPI.obj_ref
+
+
+=end text
+
+=back
+
+
+
+=head2 FileToAttributeMappingParams
+
+=over 4
+
+
+
+=item Description
+
+input_shock_id and input_file_path - alternative input params,
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+input_shock_id has a value which is a string
+input_file_path has a value which is a string
+output_ws_id has a value which is a string
+output_obj_name has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+input_shock_id has a value which is a string
+input_file_path has a value which is a string
+output_ws_id has a value which is a string
+output_obj_name has a value which is a string
+
+
+=end text
+
+=back
+
+
+
+=head2 FileToAttributeMappingOutput
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+attribute_mapping_ref has a value which is a GenericsAPI.obj_ref
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+attribute_mapping_ref has a value which is a GenericsAPI.obj_ref
+
+
+=end text
+
+=back
+
+
+
+=head2 AttributeMappingToTsvFileParams
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+input_ref has a value which is a GenericsAPI.obj_ref
+destination_dir has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+input_ref has a value which is a GenericsAPI.obj_ref
+destination_dir has a value which is a string
+
+
+=end text
+
+=back
+
+
+
+=head2 AttributeMappingToTsvFileOutput
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+file_path has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+file_path has a value which is a string
+
+
+=end text
+
+=back
+
+
+
+=head2 ExportAttributeMappingParams
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+input_ref has a value which is a GenericsAPI.obj_ref
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+input_ref has a value which is a GenericsAPI.obj_ref
+
+
+=end text
+
+=back
+
+
+
+=head2 ExportClusterSetParams
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+input_ref has a value which is a GenericsAPI.obj_ref
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+input_ref has a value which is a GenericsAPI.obj_ref
 
 
 =end text

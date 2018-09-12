@@ -68,7 +68,7 @@
       }
     },
     {
-      "id" : "col_conditionset_ref",
+      "id" : "col_attributemapping_ref",
       "optional" : true,
       "advanced" : true,
       "allow_multiple" : false,
@@ -79,7 +79,7 @@
       }
     },
     {
-      "id" : "row_conditionset_ref",
+      "id" : "row_attributemapping_ref",
       "optional" : true,
       "advanced" : true,
       "allow_multiple" : false,
@@ -129,13 +129,13 @@
           "target_type_transform": "resolved-ref"
         },
         {
-          "input_parameter" : "col_conditionset_ref",
-          "target_property" : "col_conditionset_ref",
+          "input_parameter" : "col_attributemapping_ref",
+          "target_property" : "col_attributemapping_ref",
           "target_type_transform": "resolved-ref"
         },
         {
-          "input_parameter" : "row_conditionset_ref",
-          "target_property" : "row_conditionset_ref",
+          "input_parameter" : "row_attributemapping_ref",
+          "target_property" : "row_attributemapping_ref",
           "target_type_transform": "resolved-ref"
         },
         {

@@ -1,6 +1,7 @@
 /*
 A KBase module: GenericsAPI
 */
+#include <KBaseExperiments.spec>
 
 module GenericsAPI {
   /* A boolean - 0 for false, 1 for true.
@@ -114,8 +115,8 @@ module GenericsAPI {
     workspace_name: workspace name matrix object to be saved to
 
     optional:
-    col_conditionset_ref: column ConditionSet reference
-    row_conditionset_ref: row ConditionSet reference
+    col_attributemapping_ref: column AttributeMapping reference
+    row_attributemapping_ref: row AttributeMapping reference
     genome_ref: genome reference
     diff_expr_matrix_ref: DifferentialExpressionMatrix reference
 
@@ -129,8 +130,8 @@ module GenericsAPI {
       workspace_name workspace_name;
 
       obj_ref genome_ref;
-      obj_ref col_conditionset_ref;
-      obj_ref row_conditionset_ref;
+      obj_ref col_attributemapping_ref;
+      obj_ref row_attributemapping_ref;
       obj_ref diff_expr_matrix_ref;
   } ImportMatrixParams;
 
@@ -201,5 +202,53 @@ module GenericsAPI {
 
   /* filter_matrix: create sub-matrix based on input filter_ids*/
   funcdef filter_matrix (MatrixFilterParams params) returns (MatrixFilterOutput returnVal) authentication required;
+
+  /* ATTRIBUTE MAPPING */
+
+    /*
+        input_shock_id and input_file_path - alternative input params,
+    */
+    typedef structure {
+        string input_shock_id;
+        string input_file_path;
+        string output_ws_id;
+        string output_obj_name;
+    } FileToAttributeMappingParams;
+
+    typedef structure {
+        obj_ref attribute_mapping_ref;
+    } FileToAttributeMappingOutput;
+
+    funcdef file_to_attribute_mapping(FileToAttributeMappingParams params)
+        returns (FileToAttributeMappingOutput result) authentication required;
+
+    typedef structure {
+        obj_ref input_ref;
+        string destination_dir;
+    } AttributeMappingToTsvFileParams;
+
+    typedef structure {
+        string file_path;
+    } AttributeMappingToTsvFileOutput;
+
+    funcdef attribute_mapping_to_tsv_file(AttributeMappingToTsvFileParams params)
+        returns (AttributeMappingToTsvFileOutput result) authentication required;
+
+    typedef structure {
+        obj_ref input_ref;
+    } ExportAttributeMappingParams;
+
+    typedef structure {
+        obj_ref input_ref;
+    } ExportClusterSetParams;
+
+    funcdef export_attribute_mapping_tsv(ExportAttributeMappingParams params)
+        returns (ExportOutput result) authentication required;
+
+    funcdef export_attribute_mapping_excel(ExportAttributeMappingParams params)
+        returns (ExportOutput result) authentication required;
+
+    funcdef export_cluster_set_excel(ExportClusterSetParams params)
+        returns (ExportOutput result) authentication required;
 
 };

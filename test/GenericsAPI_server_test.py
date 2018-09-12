@@ -1,28 +1,25 @@
 # -*- coding: utf-8 -*-
-import unittest
-import os  # noqa: F401
-import json  # noqa: F401
-import time
-import requests  # noqa: F401
 import inspect
-import pandas as pd
+import json  # noqa: F401
+import os  # noqa: F401
 import shutil
-
-
+import time
+import unittest
 from os import environ
+
+import pandas as pd
+
 try:
     from ConfigParser import ConfigParser  # py2
 except:
     from configparser import ConfigParser  # py3
 
-from pprint import pprint  # noqa: F401
-
-from biokbase.workspace.client import Workspace as workspaceService
 from GenericsAPI.GenericsAPIImpl import GenericsAPI
 from GenericsAPI.GenericsAPIServer import MethodContext
 from GenericsAPI.authclient import KBaseAuth as _KBaseAuth
 from DataFileUtil.DataFileUtilClient import DataFileUtil
 from GenomeFileUtil.GenomeFileUtilClient import GenomeFileUtil
+from Workspace.WorkspaceClient import Workspace as workspaceService
 
 
 class GenericsAPITest(unittest.TestCase):

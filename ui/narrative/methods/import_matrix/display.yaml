@@ -52,21 +52,21 @@ parameters :
         long-hint : |
             Provide a Genome associated with Matrix
 
-    col_conditionset_ref :
+    col_attributemapping_ref :
         ui-name : |
-            Column ConditionSet Reference
+            Column AttributeMapping Reference
         short-hint : |
-            Provide a ConditionSet associated with column in data set
+            Provide a AttributeMapping associated with column in data set
         long-hint : |
-            Provide a ConditionSet associated with column in data set
+            Provide a AttributeMapping associated with column in data set
 
-    row_conditionset_ref :
+    row_attributemapping_ref :
         ui-name : |
-            Row ConditionSet Reference
+            Row AttributeMapping Reference
         short-hint : |
-            Provide a ConditionSet associated with row in data set
+            Provide a AttributeMapping associated with row in data set
         long-hint : |
-            Provide a ConditionSet associated with row in data set
+            Provide a AttributeMapping associated with row in data set
 
     diff_expr_matrix_ref :
         ui-name : |

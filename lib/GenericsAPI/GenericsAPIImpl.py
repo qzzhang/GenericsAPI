@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 #BEGIN_HEADER
 import os
+import logging
 
 from GenericsAPI.Utils.GenericsUtil import GenericsUtil
+from GenericsAPI.Utils.AttributeUtils import AttributesUtil
 #END_HEADER
 
 
@@ -12,7 +14,7 @@ class GenericsAPI:
     GenericsAPI
 
     Module Description:
-    A KBase module: GenericsAPI
+    
     '''
 
     ######## WARNING FOR GEVENT USERS ####### noqa
@@ -23,7 +25,7 @@ class GenericsAPI:
     ######################################### noqa
     VERSION = "0.0.1"
     GIT_URL = "https://github.com/kbaseapps/GenericsAPI.git"
-    GIT_COMMIT_HASH = "401785cb177fe46ae0e52681a4db2466ddb6bf03"
+    GIT_COMMIT_HASH = "466b195ac36b6c92ffde76d34d2a3fbda0b589ee"
 
     #BEGIN_CLASS_HEADER
     #END_CLASS_HEADER
@@ -35,6 +37,9 @@ class GenericsAPI:
         self.config = config
         self.config['SDK_CALLBACK_URL'] = os.environ['SDK_CALLBACK_URL']
         self.config['KB_AUTH_TOKEN'] = os.environ['KB_AUTH_TOKEN']
+        self.scratch = config['scratch']
+        self.attr_util = AttributesUtil(self.config)
+        logging.basicConfig(level=logging.INFO)
         #END_CONSTRUCTOR
         pass
 
@@ -159,20 +164,20 @@ class GenericsAPI:
            input_shock_id: file shock id input_file_path: absolute file path
            input_staging_file_path: staging area file path matrix_name:
            matrix object name workspace_name: workspace name matrix object to
-           be saved to optional: col_conditionset_ref: column ConditionSet
-           reference row_conditionset_ref: row ConditionSet reference
-           genome_ref: genome reference diff_expr_matrix_ref:
-           DifferentialExpressionMatrix reference) -> structure: parameter
-           "obj_type" of String, parameter "input_shock_id" of String,
-           parameter "input_file_path" of String, parameter
-           "input_staging_file_path" of String, parameter "matrix_name" of
-           String, parameter "workspace_name" of type "workspace_name"
-           (workspace name of the object), parameter "genome_ref" of type
+           be saved to optional: col_attributemapping_ref: column
+           AttributeMapping reference row_attributemapping_ref: row
+           AttributeMapping reference genome_ref: genome reference
+           diff_expr_matrix_ref: DifferentialExpressionMatrix reference) ->
+           structure: parameter "obj_type" of String, parameter
+           "input_shock_id" of String, parameter "input_file_path" of String,
+           parameter "input_staging_file_path" of String, parameter
+           "matrix_name" of String, parameter "workspace_name" of type
+           "workspace_name" (workspace name of the object), parameter
+           "genome_ref" of type "obj_ref" (An X/Y/Z style reference),
+           parameter "col_attributemapping_ref" of type "obj_ref" (An X/Y/Z
+           style reference), parameter "row_attributemapping_ref" of type
            "obj_ref" (An X/Y/Z style reference), parameter
-           "col_conditionset_ref" of type "obj_ref" (An X/Y/Z style
-           reference), parameter "row_conditionset_ref" of type "obj_ref" (An
-           X/Y/Z style reference), parameter "diff_expr_matrix_ref" of type
-           "obj_ref" (An X/Y/Z style reference)
+           "diff_expr_matrix_ref" of type "obj_ref" (An X/Y/Z style reference)
         :returns: instance of type "ImportMatrixOutput" -> structure:
            parameter "report_name" of String, parameter "report_ref" of
            String, parameter "matrix_obj_ref" of type "obj_ref" (An X/Y/Z
@@ -276,6 +281,131 @@ class GenericsAPI:
                              'returnVal is not type dict as required.')
         # return the results
         return [returnVal]
+
+    def file_to_attribute_mapping(self, ctx, params):
+        """
+        :param params: instance of type "FileToAttributeMappingParams"
+           (input_shock_id and input_file_path - alternative input params,)
+           -> structure: parameter "input_shock_id" of String, parameter
+           "input_file_path" of String, parameter "output_ws_id" of String,
+           parameter "output_obj_name" of String
+        :returns: instance of type "FileToAttributeMappingOutput" ->
+           structure: parameter "attribute_mapping_ref" of type "obj_ref" (An
+           X/Y/Z style reference)
+        """
+        # ctx is the context object
+        # return variables are: result
+        #BEGIN file_to_attribute_mapping
+        logging.info("Starting 'file_to_attribute_mapping' with params:{}".format(params))
+        self.attr_util.validate_params(params, ("output_ws_id", "output_obj_name"),
+                                   ('input_shock_id', 'input_file_path'))
+        result = self.attr_util.file_to_attribute_mapping(params)
+        #END file_to_attribute_mapping
+
+        # At some point might do deeper type checking...
+        if not isinstance(result, dict):
+            raise ValueError('Method file_to_attribute_mapping return value ' +
+                             'result is not type dict as required.')
+        # return the results
+        return [result]
+
+    def attribute_mapping_to_tsv_file(self, ctx, params):
+        """
+        :param params: instance of type "AttributeMappingToTsvFileParams" ->
+           structure: parameter "input_ref" of type "obj_ref" (An X/Y/Z style
+           reference), parameter "destination_dir" of String
+        :returns: instance of type "AttributeMappingToTsvFileOutput" ->
+           structure: parameter "file_path" of String
+        """
+        # ctx is the context object
+        # return variables are: result
+        #BEGIN attribute_mapping_to_tsv_file
+        logging.info("Starting 'attribute_mapping_to_tsv_file' with params:{}".format(params))
+        self.attr_util.validate_params(params, ("destination_dir", "input_ref"))
+        am_id, result = self.attr_util.to_tsv(params)
+        #END attribute_mapping_to_tsv_file
+
+        # At some point might do deeper type checking...
+        if not isinstance(result, dict):
+            raise ValueError('Method attribute_mapping_to_tsv_file return value ' +
+                             'result is not type dict as required.')
+        # return the results
+        return [result]
+
+    def export_attribute_mapping_tsv(self, ctx, params):
+        """
+        :param params: instance of type "ExportAttributeMappingParams" ->
+           structure: parameter "input_ref" of type "obj_ref" (An X/Y/Z style
+           reference)
+        :returns: instance of type "ExportOutput" -> structure: parameter
+           "shock_id" of String
+        """
+        # ctx is the context object
+        # return variables are: result
+        #BEGIN export_attribute_mapping_tsv
+        logging.info("Starting 'export_attribute_mapping_tsv' with params:{}".format(params))
+        self.attr_util.validate_params(params, ("input_ref",))
+        params['destination_dir'] = self.scratch
+        am_id, files = self.attr_util.to_tsv(params)
+        result = self.attr_util.export(files['file_path'], am_id, params['input_ref'])
+        #END export_attribute_mapping_tsv
+
+        # At some point might do deeper type checking...
+        if not isinstance(result, dict):
+            raise ValueError('Method export_attribute_mapping_tsv return value ' +
+                             'result is not type dict as required.')
+        # return the results
+        return [result]
+
+    def export_attribute_mapping_excel(self, ctx, params):
+        """
+        :param params: instance of type "ExportAttributeMappingParams" ->
+           structure: parameter "input_ref" of type "obj_ref" (An X/Y/Z style
+           reference)
+        :returns: instance of type "ExportOutput" -> structure: parameter
+           "shock_id" of String
+        """
+        # ctx is the context object
+        # return variables are: result
+        #BEGIN export_attribute_mapping_excel
+        logging.info("Starting 'export_attribute_mapping_excel' with params:{}".format(params))
+        self.attr_util.validate_params(params, ("input_ref",))
+        params['destination_dir'] = self.scratch
+        am_id, files = self.attr_util.to_excel(params)
+        result = self.attr_util.export(files['file_path'], am_id, params['input_ref'])
+        #END export_attribute_mapping_excel
+
+        # At some point might do deeper type checking...
+        if not isinstance(result, dict):
+            raise ValueError('Method export_attribute_mapping_excel return value ' +
+                             'result is not type dict as required.')
+        # return the results
+        return [result]
+
+    def export_cluster_set_excel(self, ctx, params):
+        """
+        :param params: instance of type "ExportClusterSetParams" ->
+           structure: parameter "input_ref" of type "obj_ref" (An X/Y/Z style
+           reference)
+        :returns: instance of type "ExportOutput" -> structure: parameter
+           "shock_id" of String
+        """
+        # ctx is the context object
+        # return variables are: result
+        #BEGIN export_cluster_set_excel
+        logging.info("Starting 'export_cluster_set_excel' with params:{}".format(params))
+        self.attr_util.validate_params(params, ("input_ref",))
+        params['destination_dir'] = self.scratch
+        cs_id, files = self.attr_util.to_excel(params)
+        result = self.attr_util.export(files['file_path'], cs_id, params['input_ref'])
+        #END export_cluster_set_excel
+
+        # At some point might do deeper type checking...
+        if not isinstance(result, dict):
+            raise ValueError('Method export_cluster_set_excel return value ' +
+                             'result is not type dict as required.')
+        # return the results
+        return [result]
     def status(self, ctx):
         #BEGIN_STATUS
         returnVal = {'state': "OK",

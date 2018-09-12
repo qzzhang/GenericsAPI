@@ -16,7 +16,6 @@ import us.kbase.common.service.UnauthorizedException;
 /**
  * <p>Original spec-file module name: GenericsAPI</p>
  * <pre>
- * A KBase module: GenericsAPI
  * </pre>
  */
 public class GenericsAPIClient {
@@ -302,6 +301,91 @@ public class GenericsAPIClient {
         args.add(params);
         TypeReference<List<MatrixFilterOutput>> retType = new TypeReference<List<MatrixFilterOutput>>() {};
         List<MatrixFilterOutput> res = caller.jsonrpcCall("GenericsAPI.filter_matrix", args, retType, true, true, jsonRpcContext, this.serviceVersion);
+        return res.get(0);
+    }
+
+    /**
+     * <p>Original spec-file function name: file_to_attribute_mapping</p>
+     * <pre>
+     * </pre>
+     * @param   params   instance of type {@link us.kbase.genericsapi.FileToAttributeMappingParams FileToAttributeMappingParams}
+     * @return   parameter "result" of type {@link us.kbase.genericsapi.FileToAttributeMappingOutput FileToAttributeMappingOutput}
+     * @throws IOException if an IO exception occurs
+     * @throws JsonClientException if a JSON RPC exception occurs
+     */
+    public FileToAttributeMappingOutput fileToAttributeMapping(FileToAttributeMappingParams params, RpcContext... jsonRpcContext) throws IOException, JsonClientException {
+        List<Object> args = new ArrayList<Object>();
+        args.add(params);
+        TypeReference<List<FileToAttributeMappingOutput>> retType = new TypeReference<List<FileToAttributeMappingOutput>>() {};
+        List<FileToAttributeMappingOutput> res = caller.jsonrpcCall("GenericsAPI.file_to_attribute_mapping", args, retType, true, true, jsonRpcContext, this.serviceVersion);
+        return res.get(0);
+    }
+
+    /**
+     * <p>Original spec-file function name: attribute_mapping_to_tsv_file</p>
+     * <pre>
+     * </pre>
+     * @param   params   instance of type {@link us.kbase.genericsapi.AttributeMappingToTsvFileParams AttributeMappingToTsvFileParams}
+     * @return   parameter "result" of type {@link us.kbase.genericsapi.AttributeMappingToTsvFileOutput AttributeMappingToTsvFileOutput}
+     * @throws IOException if an IO exception occurs
+     * @throws JsonClientException if a JSON RPC exception occurs
+     */
+    public AttributeMappingToTsvFileOutput attributeMappingToTsvFile(AttributeMappingToTsvFileParams params, RpcContext... jsonRpcContext) throws IOException, JsonClientException {
+        List<Object> args = new ArrayList<Object>();
+        args.add(params);
+        TypeReference<List<AttributeMappingToTsvFileOutput>> retType = new TypeReference<List<AttributeMappingToTsvFileOutput>>() {};
+        List<AttributeMappingToTsvFileOutput> res = caller.jsonrpcCall("GenericsAPI.attribute_mapping_to_tsv_file", args, retType, true, true, jsonRpcContext, this.serviceVersion);
+        return res.get(0);
+    }
+
+    /**
+     * <p>Original spec-file function name: export_attribute_mapping_tsv</p>
+     * <pre>
+     * </pre>
+     * @param   params   instance of type {@link us.kbase.genericsapi.ExportAttributeMappingParams ExportAttributeMappingParams}
+     * @return   parameter "result" of type {@link us.kbase.genericsapi.ExportOutput ExportOutput}
+     * @throws IOException if an IO exception occurs
+     * @throws JsonClientException if a JSON RPC exception occurs
+     */
+    public ExportOutput exportAttributeMappingTsv(ExportAttributeMappingParams params, RpcContext... jsonRpcContext) throws IOException, JsonClientException {
+        List<Object> args = new ArrayList<Object>();
+        args.add(params);
+        TypeReference<List<ExportOutput>> retType = new TypeReference<List<ExportOutput>>() {};
+        List<ExportOutput> res = caller.jsonrpcCall("GenericsAPI.export_attribute_mapping_tsv", args, retType, true, true, jsonRpcContext, this.serviceVersion);
+        return res.get(0);
+    }
+
+    /**
+     * <p>Original spec-file function name: export_attribute_mapping_excel</p>
+     * <pre>
+     * </pre>
+     * @param   params   instance of type {@link us.kbase.genericsapi.ExportAttributeMappingParams ExportAttributeMappingParams}
+     * @return   parameter "result" of type {@link us.kbase.genericsapi.ExportOutput ExportOutput}
+     * @throws IOException if an IO exception occurs
+     * @throws JsonClientException if a JSON RPC exception occurs
+     */
+    public ExportOutput exportAttributeMappingExcel(ExportAttributeMappingParams params, RpcContext... jsonRpcContext) throws IOException, JsonClientException {
+        List<Object> args = new ArrayList<Object>();
+        args.add(params);
+        TypeReference<List<ExportOutput>> retType = new TypeReference<List<ExportOutput>>() {};
+        List<ExportOutput> res = caller.jsonrpcCall("GenericsAPI.export_attribute_mapping_excel", args, retType, true, true, jsonRpcContext, this.serviceVersion);
+        return res.get(0);
+    }
+
+    /**
+     * <p>Original spec-file function name: export_cluster_set_excel</p>
+     * <pre>
+     * </pre>
+     * @param   params   instance of type {@link us.kbase.genericsapi.ExportClusterSetParams ExportClusterSetParams}
+     * @return   parameter "result" of type {@link us.kbase.genericsapi.ExportOutput ExportOutput}
+     * @throws IOException if an IO exception occurs
+     * @throws JsonClientException if a JSON RPC exception occurs
+     */
+    public ExportOutput exportClusterSetExcel(ExportClusterSetParams params, RpcContext... jsonRpcContext) throws IOException, JsonClientException {
+        List<Object> args = new ArrayList<Object>();
+        args.add(params);
+        TypeReference<List<ExportOutput>> retType = new TypeReference<List<ExportOutput>>() {};
+        List<ExportOutput> res = caller.jsonrpcCall("GenericsAPI.export_cluster_set_excel", args, retType, true, true, jsonRpcContext, this.serviceVersion);
         return res.get(0);
     }
 
