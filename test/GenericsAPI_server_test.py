@@ -83,45 +83,45 @@ class GenericsAPITest(unittest.TestCase):
                                                     'generate_ids_if_needed': 1
                                                     })['genome_ref']
 
-        # upload ConditionSet object
+        # upload AttributeMapping object
         workspace_id = cls.dfu.ws_name_to_id(cls.wsName)
-        object_type = 'KBaseExperiments.ConditionSet'
-        condition_set_object_name = 'test_condition_set'
-        condition_set_data = {'conditions': {'test_condition_1': ['1-1', '1-2', '1-3'],
-                                             'test_condition_2': ['2-1', '2-2', '2-3'],
-                                             'test_condition_3': ['3-1', '3-2', '3-3']},
-                              'factors': [{'factor': 'test_factor_1',
-                                           'factor_ont_ref': 'factor_ont_ref_1',
-                                           'factor_ont_id': 'factor_ont_id_1'},
-                                          {'factor': 'test_factor_2',
-                                           'factor_ont_ref': 'factor_ont_ref_2',
-                                           'factor_ont_id': 'factor_ont_id_2'},
-                                          {'factor': 'test_factor_3',
-                                           'factor_ont_ref': 'factor_ont_ref_3',
-                                           'factor_ont_id': 'factor_ont_id_3'}],
-                              'ontology_mapping_method': 'user curation'}
+        object_type = 'KBaseExperiments.AttributeMapping'
+        attribute_mapping_object_name = 'test_attribute_mapping'
+        attribute_mapping_data = {'instances': {'test_instance_1': ['1-1', '1-2', '1-3'],
+                                                'test_instance_2': ['2-1', '2-2', '2-3'],
+                                                'test_instance_3': ['3-1', '3-2', '3-3']},
+                                  'attributes': [{'attribute': 'test_attribute_1',
+                                                  'attribute_ont_ref': 'attribute_ont_ref_1',
+                                                  'attribute_ont_id': 'attribute_ont_id_1'},
+                                                 {'attribute': 'test_attribute_2',
+                                                  'attribute_ont_ref': 'attribute_ont_ref_2',
+                                                  'attribute_ont_id': 'attribute_ont_id_2'},
+                                                 {'attribute': 'test_attribute_3',
+                                                  'attribute_ont_ref': 'attribute_ont_ref_3',
+                                                  'attribute_ont_id': 'attribute_ont_id_3'}],
+                                  'ontology_mapping_method': 'user curation'}
         save_object_params = {
             'id': workspace_id,
             'objects': [{'type': object_type,
-                         'data': condition_set_data,
-                         'name': condition_set_object_name}]
+                         'data': attribute_mapping_data,
+                         'name': attribute_mapping_object_name}]
         }
 
         dfu_oi = cls.dfu.save_objects(save_object_params)[0]
-        cls.condition_set_ref = str(dfu_oi[6]) + '/' + str(dfu_oi[0]) + '/' + str(dfu_oi[4])
+        cls.attribute_mapping_ref = str(dfu_oi[6]) + '/' + str(dfu_oi[0]) + '/' + str(dfu_oi[4])
 
-        cls.col_ids = ['condition_1', 'condition_2', 'condition_3', 'condition_4']
+        cls.col_ids = ['instance_1', 'instance_2', 'instance_3', 'instance_4']
         cls.row_ids = ['WRI_RS00050_CDS_1', 'WRI_RS00065_CDS_1', 'WRI_RS00070_CDS_1']
         cls.values = [[0.1, 0.2, 0.3, 0.4],
                       [0.3, 0.4, 0.5, 0.6],
                       [None, None, None, None]]
-        cls.row_mapping = {'WRI_RS00050_CDS_1': 'test_condition_1',
-                           'WRI_RS00065_CDS_1': 'test_condition_2',
-                           'WRI_RS00070_CDS_1': 'test_condition_3'}
-        cls.col_mapping = {'condition_1': 'test_condition_1',
-                           'condition_2': 'test_condition_2',
-                           'condition_3': 'test_condition_3',
-                           'condition_4': 'test_condition_3'}
+        cls.row_mapping = {'WRI_RS00050_CDS_1': 'test_instance_1',
+                           'WRI_RS00065_CDS_1': 'test_instance_2',
+                           'WRI_RS00070_CDS_1': 'test_instance_3'}
+        cls.col_mapping = {'instance_1': 'test_instance_1',
+                           'instance_2': 'test_instance_2',
+                           'instance_3': 'test_instance_3',
+                           'instance_4': 'test_instance_3'}
         cls.feature_mapping = {'WRI_RS00050_CDS_1': 'WRI_RS00050_CDS_1',
                                'WRI_RS00065_CDS_1': 'WRI_RS00065_CDS_1',
                                'WRI_RS00070_CDS_1': 'WRI_RS00070_CDS_1'}
@@ -131,9 +131,9 @@ class GenericsAPITest(unittest.TestCase):
         expression_matrix_object_name = 'test_expression_matrix'
         expression_matrix_data = {'scale': 'log2',
                                   'type': 'level',
-                                  'col_conditionset_ref': cls.condition_set_ref,
+                                  'col_attributemapping_ref': cls.attribute_mapping_ref,
                                   'col_mapping': cls.col_mapping,
-                                  'row_conditionset_ref': cls.condition_set_ref,
+                                  'row_attributemapping_ref': cls.attribute_mapping_ref,
                                   'row_mapping': cls.row_mapping,
                                   'feature_mapping': cls.feature_mapping,
                                   'data': {'row_ids': cls.row_ids,
@@ -151,7 +151,7 @@ class GenericsAPITest(unittest.TestCase):
         dfu_oi = cls.dfu.save_objects(save_object_params)[0]
         cls.expression_matrix_ref = str(dfu_oi[6]) + '/' + str(dfu_oi[0]) + '/' + str(dfu_oi[4])
 
-        expression_matrix_object_name = 'test_expression_matrix_no_condition'
+        expression_matrix_object_name = 'test_expression_matrix_no_attribute_mapping'
         expression_matrix_data = {'scale': 'log2',
                                   'type': 'level',
                                   'data': {'row_ids': cls.row_ids,
@@ -173,7 +173,7 @@ class GenericsAPITest(unittest.TestCase):
         fitness_matrix_object_name = 'test_fitness_matrix'
         fitness_matrix_data = {'scale': 'log2',
                                'type': 'level',
-                               'row_conditionset_ref': cls.condition_set_ref,
+                               'row_attributemapping_ref': cls.attribute_mapping_ref,
                                'row_mapping': cls.row_mapping,
                                'data': {'row_ids': cls.row_ids,
                                         'col_ids': cls.col_ids,
@@ -194,7 +194,7 @@ class GenericsAPITest(unittest.TestCase):
         diff_expr_matrix_object_name = 'test_diff_expr_matrix'
         diff_expr_matrix_data = {'scale': 'log2',
                                  'type': 'level',
-                                 'col_conditionset_ref': cls.condition_set_ref,
+                                 'col_attributemapping_ref': cls.attribute_mapping_ref,
                                  'col_mapping': cls.col_mapping,
                                  'data': {'row_ids': cls.row_ids,
                                           'col_ids': cls.col_ids,
@@ -266,24 +266,10 @@ class GenericsAPITest(unittest.TestCase):
         error_msg = '"obj_ref" parameter is required, but missing'
         self.fail_fetch_data(invalidate_params, error_msg)
 
-    def test_generate_matrix_html(self):
-        self.start_test()
-
-        csv_file_name = 'metadata.csv'
-        df = pd.read_csv(os.path.join('data', csv_file_name))
-
-        returnVal = self.getImpl().generate_matrix_html(self.ctx, {'df': df})[0]
-
-        self.assertTrue('html_string' in returnVal)
-        self.assertTrue('ADD_COL' not in returnVal.get('html_string'))
-        self.assertTrue('ADD_DATA' not in returnVal.get('html_string'))
-        self.assertTrue('ADD_FORMATTER' not in returnVal.get('html_string'))
-
     def test_fetch_data(self):
         self.start_test()
         params = {'obj_ref': self.expression_matrix_ref}
         returnVal = self.getImpl().fetch_data(self.ctx, params)[0]
-        print returnVal
         self.check_fetch_data_output(returnVal)
 
         params = {'obj_ref': self.fitness_matrix_ref}
@@ -327,7 +313,7 @@ class GenericsAPITest(unittest.TestCase):
         # testing unique
         data = {'data': {'row_ids': ['same_row_id', 'same_row_id'],
                          'col_ids': ['same_col_id', 'same_col_id']}}
-        obj_type = 'KBaseMatrices.ExpressionMatrix-1.1'
+        obj_type = 'KBaseMatrices.ExpressionMatrix-3.0'
 
         params = {'obj_type': obj_type,
                   'data': data}
@@ -340,20 +326,21 @@ class GenericsAPITest(unittest.TestCase):
         # testing contains
         data = {'data': {'row_ids': ['same_row_id', 'unknown_row_id'],
                          'col_ids': ['same_col_id', 'unknown_col_id']},
-                'row_mapping': {'same_row_id': 'condition_1'},
-                'col_mapping': {'same_col_id': 'condition_1'},
-                'row_conditionset_ref': self.condition_set_ref,
-                'col_conditionset_ref': self.condition_set_ref,
+                'row_mapping': {'same_row_id': 'instance_1'},
+                'col_mapping': {'same_col_id': 'instance_1'},
+                'row_attributemapping_ref': self.attribute_mapping_ref,
+                'col_attributemapping_ref': self.attribute_mapping_ref,
                 'genome_ref': self.genome_ref}
-        obj_type = 'KBaseMatrices.ExpressionMatrix-1.1'
+        obj_type = 'KBaseMatrices.ExpressionMatrix-3.0'
         params = {'obj_type': obj_type,
                   'data': data}
         returnVal = self.getImpl().validate_data(self.ctx, params)[0]
         self.assertFalse(returnVal.get('validated'))
+
         expected_failed_constraints = ['data.row_ids row_mapping',
                                        'data.col_ids col_mapping',
-                                       'values(row_mapping) row_conditionset_ref:conditions',
-                                       'values(col_mapping) col_conditionset_ref:conditions',
+                                       'values(row_mapping) row_attributemapping_ref:instances',
+                                       'values(col_mapping) col_attributemapping_ref:instances',
                                        'data.row_ids genome_ref:features.[*].id genome_ref:mrnas.[*].id genome_ref:cdss.[*].id genome_ref:non_codeing_features.[*].id']
         self.assertItemsEqual(expected_failed_constraints,
                               returnVal.get('failed_constraints').get('contains'))
@@ -371,7 +358,6 @@ class GenericsAPITest(unittest.TestCase):
         self.assertTrue('matrix_obj_ref' in returnVal)
         self.assertTrue('report_name' in returnVal)
         self.assertTrue('report_ref' in returnVal)
-        print returnVal
 
     def test_search_matrix(self):
         self.start_test()
@@ -410,7 +396,7 @@ class GenericsAPITest(unittest.TestCase):
 
         params = {'matrix_obj_ref': self.expression_matrix_ref,
                   'workspace_name': self.wsName,
-                  'filter_ids': 'condition 1, condition 3',
+                  'filter_ids': 'instance 1, instance 3',
                   'filtered_matrix_name': 'filtered_test_matrix_cols'}
         returnVal = self.getImpl().filter_matrix(self.ctx, params)[0]
         self.assertTrue('report_name' in returnVal)
@@ -422,7 +408,7 @@ class GenericsAPITest(unittest.TestCase):
             {"object_refs": [matrix_obj_ref]})['data'][0]
         matrix_data = matrix_source.get('data')
 
-        expected_ids = ['condition_1', 'condition_3']
+        expected_ids = ['instance_1', 'instance_3']
         self.assertItemsEqual(matrix_data['data']['col_ids'], expected_ids)
         self.assertItemsEqual(matrix_data['col_mapping'].keys(), expected_ids)
         self.assertEqual(len(matrix_data['data']['values'][0]), len(expected_ids))

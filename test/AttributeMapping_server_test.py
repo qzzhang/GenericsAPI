@@ -142,11 +142,11 @@ class AttributeUtilsTest(unittest.TestCase):
         cluster_set_data = {'clustering_parameters': {'dist_metric': 'cityblock',
                                                       'k_num': '2'},
                             'clusters': [{'id_to_data_position': {
-                                            'condition_2': 1,
-                                            'condition_3': 2}},
+                                            'instance_2': 1,
+                                            'instance_3': 2}},
                                          {'id_to_data_position': {
-                                            'condition_1': 0,
-                                            'condition_4': 3}}],
+                                            'instance_1': 0,
+                                            'instance_4': 3}}],
                             'original_data': expr_matrix_ref}
 
         save_object_params = {
@@ -261,7 +261,7 @@ class AttributeUtilsTest(unittest.TestCase):
 
         df = xl.parse("ClusterSet")
         expected_index = ['WRI_RS00010_CDS_1', 'WRI_RS00015_CDS_1', 'WRI_RS00025_CDS_1']
-        expected_col = ['condition_1', 'condition_2', 'condition_3', 'condition_4', 'cluster']
+        expected_col = ['instance_1', 'instance_2', 'instance_3', 'instance_4', 'cluster']
         self.assertItemsEqual(df.index.tolist(), expected_index)
         self.assertItemsEqual(df.columns.tolist(), expected_col)
 
@@ -287,7 +287,7 @@ class AttributeUtilsTest(unittest.TestCase):
         self.assertItemsEqual(xl.sheet_names, expected_sheet_names)
 
         df = xl.parse("ClusterSet")
-        expected_index = ['condition_1', 'condition_2', 'condition_3', 'condition_4']
+        expected_index = ['instance_1', 'instance_2', 'instance_3', 'instance_4']
         expected_col = ['WRI_RS00010_CDS_1', 'WRI_RS00015_CDS_1', 'WRI_RS00025_CDS_1', 'cluster']
         self.assertItemsEqual(df.index.tolist(), expected_index)
         self.assertItemsEqual(df.columns.tolist(), expected_col)
