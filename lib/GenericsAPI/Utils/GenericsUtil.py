@@ -1,12 +1,9 @@
 import time
-import json
 import os
 import re
 import pandas as pd
 import uuid
 import errno
-import traceback
-import xlsxwriter
 from dotmap import DotMap
 from xlrd.biffh import XLRDError
 from openpyxl import load_workbook
@@ -15,8 +12,9 @@ import shutil
 
 from DataFileUtil.DataFileUtilClient import DataFileUtil
 from Workspace.WorkspaceClient import Workspace as workspaceService
-from ConditionUtils.ConditionUtilsClient import ConditionUtils
 from KBaseReport.KBaseReportClient import KBaseReport
+from GenericsAPI.Utils.DataUtil import DataUtil
+from GenericsAPI.Utils.AttributeUtils import AttributesUtil
 
 
 def log(message, prefix_newline=False):
@@ -27,19 +25,6 @@ MATRIX_TYPE = ['ExpressionMatrix', 'FitnessMatrix', 'DifferentialExpressionMatri
 
 
 class GenericsUtil:
-
-    def _validate_fetch_data_params(self, params):
-        """
-        _validate_fetch_data_params:
-            validates params passed to fetch_data method
-        """
-
-        log('start validating fetch_data params')
-
-        # check for required parameters
-        for p in ['obj_ref']:
-            if p not in params:
-                raise ValueError('"{}" parameter is required, but missing'.format(p))
 
     def _validate_import_matrix_from_excel_params(self, params):
         """
@@ -72,7 +57,7 @@ class GenericsUtil:
             error_msg += "or input_staging_file_path"
             raise ValueError(error_msg)
 
-        refs_key = ['col_conditionset_ref', 'row_conditionset_ref', 'genome_ref',
+        refs_key = ['col_attributemapping_ref', 'row_attributemapping_ref', 'genome_ref',
                     'diff_expr_matrix_ref']
         refs = {k: v for k, v in params.items() if k in refs_key}
 
@@ -93,22 +78,6 @@ class GenericsUtil:
 
         return shock_id
 
-    def _upload_dir_to_shock(self, directory):
-        """
-        _upload_dir_to_shock: upload target dir to shock using DataFileUtil
-        """
-        log('Start uploading directory to shock: {}'.format(directory))
-
-        file_to_shock_params = {
-            'file_path': directory,
-            'pack': 'zip'
-        }
-        shock_file = self.dfu.file_to_shock(file_to_shock_params)
-
-        shock_id = shock_file.get('shock_id')
-
-        return shock_id
-
     def _mkdir_p(self, path):
         """
         _mkdir_p: make directory for given path
@@ -123,60 +92,12 @@ class GenericsUtil:
             else:
                 raise
 
-    def _generate_html_string(self, df):
-        """
-        _generate_html_string: generating a html string from df
-        template used: https://developers.google.com/chart/interactive/docs/gallery/table
-                       https://developers.google.com/chart/interactive/docs/reference#formatters
-        """
-        dtypes = df.dtypes
-        columns = df.columns
-
-        column_str = ''
-        number_columns = []
-        for idx, column in enumerate(columns):
-            dtype = dtypes[idx].name
-            if 'int' in dtype or 'float' in dtype:
-                column_str += "data.addColumn('number', '{}')\n".format(column)
-                number_columns.append(column)
-            else:
-                column_str += "data.addColumn('string', '{}')\n".format(column)
-
-        data_str = "data.addRows({})".format(df.values.tolist())
-
-        formatter_str = ''
-        for number_column in number_columns:
-            mean = round(df[number_column].mean(), 2)
-            column_n = columns.tolist().index(number_column)
-            formatter_str += "var formatter_{} = ".format(column_n)
-            formatter_str += "new google.visualization.BarFormat({base: "
-            formatter_str += str(mean)
-            formatter_str += ", width: 120});\n"
-            formatter_str += "formatter_{}.format(data, {});\n".format(column_n, column_n)
-
-        return column_str, data_str, formatter_str
-
     def _find_between(self, s, start, end):
         """
         _find_between: find string in between start and end
         """
 
         return re.search('{}(.*){}'.format(start, end), s).group(1)
-
-    def _find_type_spec(self, obj_type):
-        """
-        _find_type_spec: find body spec of type
-        """
-        obj_type_name = self._find_between(obj_type, '\.', '\-')
-
-        type_info = self.wsClient.get_type_info(obj_type)
-        type_spec = type_info.get('spec_def')
-
-        type_spec_list = type_spec.split(obj_type_name + ';')
-        obj_type_spec = type_spec_list[0].split('structure')[-1]
-        log('Found spec for {}\n{}\n'.format(obj_type, obj_type_spec))
-
-        return obj_type_spec
 
     def _find_constraints(self, obj_type):
         """
@@ -195,191 +116,6 @@ class GenericsUtil:
         constraints['contains'] = contains
 
         return constraints
-
-    def _find_generics_type(self, obj_type):
-        """
-        _find_generics_type: try to find generics type in an object
-        """
-
-        log('Start finding generics type and name')
-
-        obj_type_spec = self._find_type_spec(obj_type)
-
-        if not obj_type_spec:
-            raise ValueError('Cannot retrieve spec for: {}'.format(obj_type))
-
-        generics_types = [generics_type for generics_type in GENERICS_TYPE
-                          if generics_type in obj_type_spec]
-
-        if not generics_types:
-            error_msg = 'Cannot find generics type in spec:\n{}\n'.format(obj_type_spec)
-            raise ValueError(error_msg)
-
-        generics_module = dict()
-        for generics_type in generics_types:
-            for item in obj_type_spec.split(generics_type)[1:]:
-                generics_type_name = item.split(';')[0].strip().split(' ')[-1].strip()
-                generics_module.update({generics_type_name: generics_type})
-
-        log('Found generics type:\n{}\n'.format(generics_module))
-
-        return generics_module
-
-    def _convert_data(self, data, generics_module):
-        """
-        _convert_data: convert data to df based on data_type
-        """
-
-        data_types = generics_module.values()
-
-        if not set(GENERICS_TYPE) >= set(data_types):
-            raise ValueError('Found unknown generics data type in:\n{}\n'.format(data_types))
-
-        if data_types == ['FloatMatrix2D']:
-            key = generics_module.keys()[generics_module.values().index('FloatMatrix2D')]
-            values = data[key]['values']
-            index = data[key]['row_ids']
-            columns = data[key]['col_ids']
-            df = pd.DataFrame(values, index=index, columns=columns)
-        # elif 'FloatMatrix2D' in data_types:  # default case
-        #     key = generics_module.keys()[generics_module.values().index('FloatMatrix2D')]
-        #     values = data[key]['values']
-        #     index = data[key]['row_ids']
-        #     columns = data[key]['col_ids']
-        #     df = pd.DataFrame(values, index=index, columns=columns)
-        else:
-            raise ValueError('Unexpected Error')
-
-        return df.to_json()
-
-    def _retrieve_data(self, obj_ref, generics_module=None):
-        """
-        _retrieve_data: retrieve object data and return a dataframe in json format
-        """
-        log('Start retrieving data')
-        obj_source = self.dfu.get_objects(
-            {"object_refs": [obj_ref]})['data'][0]
-
-        obj_info = obj_source.get('info')
-        obj_data = obj_source.get('data')
-
-        if not generics_module:
-            generics_module = self._find_generics_type(obj_info[2])
-
-        try:
-            data = {k: v for k, v in obj_data.items() if k in generics_module.keys()}
-        except KeyError:
-            raise ValueError('Retrieved wrong generics type name')
-
-        data_matrix = self._convert_data(data, generics_module)
-
-        return data_matrix
-
-    def _get_col_cond_list(self, col_mapping, col_conditionset_ref, cols):
-        """
-        _get_col_cond_list: generate col condition list for excel
-        """
-        col_cond_list = []
-
-        conditionset_data = self.dfu.get_objects(
-                        {"object_refs": [col_conditionset_ref]})['data'][0]['data']
-        col_condition_names = [factor.get('factor') for factor in conditionset_data.get('factors')]
-        for col in cols:
-            condition_id = col_mapping.get(col)
-            if condition_id:
-                col_cond_list.append(conditionset_data.get('conditions').get(condition_id))
-            else:
-                col_cond_list.append(['']*len(col_condition_names))
-
-        col_cond_list = map(list, zip(*col_cond_list))
-        for idx, col_array in enumerate(col_cond_list):
-            col_array.insert(0, col_condition_names[idx])
-
-        return col_cond_list
-
-    def _get_row_cond_list(self, row_mapping, row_conditionset_ref, rows):
-        """
-        _get_row_cond_list: generate row condition list for excel
-        """
-        row_cond_list = []
-
-        conditionset_data = self.dfu.get_objects(
-                        {"object_refs": [row_conditionset_ref]})['data'][0]['data']
-        row_condition_names = [factor.get('factor') for factor in conditionset_data.get('factors')]
-
-        row_cond_list.append(row_condition_names)
-
-        for row in rows:
-            condition_id = row_mapping.get(row)
-            if condition_id:
-                row_cond_list.append(conditionset_data.get('conditions').get(condition_id))
-            else:
-                row_cond_list.append(['']*len(row_condition_names))
-
-        return row_cond_list
-
-    def _get_data_list(self, cols, rows, values):
-        """
-        _get_data_list: generate data value list for excel
-        """
-        data_arrays = []
-        cols.insert(0, '')
-        data_arrays.append(cols)
-        for idx, row in enumerate(rows):
-            values[idx].insert(0, row)
-        data_arrays += values
-
-        return data_arrays
-
-    def _merge_cond_list(self, excel_list, col_cond_list, row_cond_list):
-        """
-        _merge_cond_list: merge lists for excel
-        """
-        col_cond_len = len(col_cond_list)
-        for item in excel_list[:col_cond_len]:
-            row_len = len(row_cond_list[0]) if row_cond_list else 0
-            item[0:0] = [''] * row_len
-
-        if row_cond_list:
-            for idx, item in enumerate(excel_list[col_cond_len:]):
-                item[0:0] = row_cond_list[idx]
-
-    def _is_number(s):
-        """
-        _is_number: string is a numeric
-        """
-        try:
-            float(s)
-            return True
-        except ValueError:
-            pass
-
-        return False
-
-    def _gen_excel(self, excel_list, obj_name):
-        """
-        _gen_excel: create excel
-        """
-
-        result_directory = os.path.join(self.scratch, str(uuid.uuid4()))
-        self._mkdir_p(result_directory)
-        file_path = os.path.join(result_directory, '{}.xlsx'.format(obj_name))
-
-        log('Start writing to file: {}'.format(file_path))
-
-        workbook = xlsxwriter.Workbook(file_path, {'nan_inf_to_errors': True})
-        worksheet = workbook.add_worksheet()
-
-        row = 1
-        for data_entry in excel_list:
-            for idx, cell_data in enumerate(data_entry):
-                worksheet.write(row, idx, cell_data)
-
-            row += 1
-
-        workbook.close()
-
-        return file_path
 
     def _write_mapping_sheet(self, file_path, sheet_name, mapping, index):
         """
@@ -530,9 +266,9 @@ class GenericsUtil:
 
         return mapping
 
-    def _process_conditionset_sheet(self, file_path, sheet_name, matrix_name, workspace_id):
+    def _process_attribute_mapping_sheet(self, file_path, sheet_name, matrix_name, workspace_id):
         """
-        _process_conditionset_sheet: process condition set sheet
+        _process_attribute_mapping_sheet: process attribute_mapping sheet
         """
 
         try:
@@ -545,15 +281,15 @@ class GenericsUtil:
             self._mkdir_p(result_directory)
             file_path = os.path.join(result_directory, '{}.xlsx'.format(obj_name))
             df.to_excel(file_path)
-            import_condition_set_params = {
+            import_attribute_mapping_params = {
                 'output_obj_name': obj_name,
                 'output_ws_id': workspace_id,
                 'input_file_path': file_path
             }
 
-            ref = self.cu.file_to_condition_set(import_condition_set_params)
+            ref = self.attr_util.file_to_attribute_mapping(import_attribute_mapping_params)
 
-            return ref.get('condition_set_ref')
+            return ref.get('attribute_mapping_ref')
 
     def _file_to_data(self, file_path, refs, matrix_name, workspace_id):
         log('Start reading and converting excel file data')
@@ -586,18 +322,18 @@ class GenericsUtil:
         row_mapping = self._process_mapping_sheet(file_path, 'row_mapping')
         data.update({'row_mapping': row_mapping})
 
-        # processing col/row_conditionset
-        col_conditionset_ref = self._process_conditionset_sheet(file_path,
-                                                                'col_conditionset',
-                                                                matrix_name,
-                                                                workspace_id)
-        data.update({'col_conditionset_ref': col_conditionset_ref})
+        # processing col/row_attributemapping
+        col_attributemapping_ref = self._process_attribute_mapping_sheet(file_path,
+                                                                         'col_attribute_mapping',
+                                                                         matrix_name,
+                                                                         workspace_id)
+        data.update({'col_attributemapping_ref': col_attributemapping_ref})
 
-        row_conditionset_ref = self._process_conditionset_sheet(file_path,
-                                                                'row_conditionset',
-                                                                matrix_name,
-                                                                workspace_id)
-        data.update({'row_conditionset_ref': row_conditionset_ref})
+        row_attributemapping_ref = self._process_attribute_mapping_sheet(file_path,
+                                                                         'row_attribute_mapping',
+                                                                         matrix_name,
+                                                                         workspace_id)
+        data.update({'row_attributemapping_ref': row_attributemapping_ref})
 
         # processing metadata
         metadata = self._process_mapping_sheet(file_path, 'metadata')
@@ -605,42 +341,42 @@ class GenericsUtil:
 
         return data
 
-    def _build_header_str(self, factor_names):
+    def _build_header_str(self, attribute_names):
 
         header_str = ''
-        width = 100.0/len(factor_names)
+        width = 100.0/len(attribute_names)
 
         header_str += '<tr class="header">'
         header_str += '<th style="width:{0:.2f}%;">Feature ID</th>'.format(width)
 
-        for factor_name in factor_names:
+        for attribute_name in attribute_names:
             header_str += '<th style="width:{0:.2f}%;"'.format(width)
-            header_str += '>{}</th>'.format(factor_name)
+            header_str += '>{}</th>'.format(attribute_name)
         header_str += '</tr>'
 
         return header_str
 
-    def _build_html_str(self, row_mapping, conditionset_data, row_ids):
+    def _build_html_str(self, row_mapping, attributemapping_data, row_ids):
 
         log('Start building html replacement')
 
-        factor_names = [factor.get('factor') for factor in conditionset_data.get('factors')]
+        attribute_names = [attributes.get('attribute') for attributes in attributemapping_data.get('attributes')]
 
-        header_str = self._build_header_str(factor_names)
+        header_str = self._build_header_str(attribute_names)
 
         table_str = ''
 
-        conditions = conditionset_data.get('conditions')
+        instances = attributemapping_data.get('instances')
 
-        for feature_id, factor_id in row_mapping.items():
+        for feature_id, attribute_id in row_mapping.items():
             if feature_id in row_ids:
-                feature_conditions = conditions.get(factor_id)
+                feature_instances = instances.get(attribute_id)
 
                 table_str += '<tr>'
                 table_str += '<td>{}</td>'.format(feature_id)
 
-                for feature_condition in feature_conditions:
-                    table_str += '<td>{}</td>'.format(feature_condition)
+                for feature_instance in feature_instances:
+                    table_str += '<td>{}</td>'.format(feature_instance)
                 table_str += '</tr>'
 
         return header_str, table_str
@@ -731,16 +467,15 @@ class GenericsUtil:
         self.ws_url = config["workspace-url"]
         self.callback_url = config['SDK_CALLBACK_URL']
         self.token = config['KB_AUTH_TOKEN']
-        self.shock_url = config['shock-url']
-        self.srv_wiz_url = config['srv-wiz-url']
         self.scratch = config['scratch']
         self.dfu = DataFileUtil(self.callback_url)
         self.wsClient = workspaceService(self.ws_url, token=self.token)
-        self.cu = ConditionUtils(self.callback_url, service_ver="dev")
+        self.data_util = DataUtil(config)
+        self.attr_util = AttributesUtil(config)
 
     def filter_matrix(self, params):
         """
-        filter_matrix: create sub-matrix based on input feature_ids or group by factor name
+        filter_matrix: create sub-matrix based on input feature_ids
 
         arguments:
         matrix_obj_ref: object reference of a matrix
@@ -816,17 +551,17 @@ class GenericsUtil:
         matrix_data = matrix_source.get('data')
 
         row_mapping = matrix_data.get('row_mapping')
-        row_conditionset_ref = matrix_data.get('row_conditionset_ref')
+        row_attributemapping_ref = matrix_data.get('row_attributemapping_ref')
 
         row_ids = matrix_data['data']['row_ids']
 
-        if not (row_mapping and row_conditionset_ref):
-            raise ValueError('Matrix obejct is missing either row_mapping or row_conditionset_ref')
+        if not (row_mapping and row_attributemapping_ref):
+            raise ValueError('Matrix obejct is missing either row_mapping or row_attributemapping_ref')
 
-        conditionset_data = self.dfu.get_objects(
-                                    {"object_refs": [row_conditionset_ref]})['data'][0]['data']
+        attributemapping_data = self.dfu.get_objects(
+                                    {"object_refs": [row_attributemapping_ref]})['data'][0]['data']
 
-        header_str, table_str = self._build_html_str(row_mapping, conditionset_data, row_ids)
+        header_str, table_str = self._build_html_str(row_mapping, attributemapping_data, row_ids)
 
         returnVal = self._generate_search_report(header_str, table_str, workspace_name)
 
@@ -847,8 +582,8 @@ class GenericsUtil:
         input_staging_file_path: staging area file path
 
         optional arguments:
-        col_conditionset_ref: column ConditionSet reference
-        row_conditionset_ref: row ConditionSet reference
+        col_attributemapping_ref: column AttributeMapping reference
+        row_attributemapping_ref: row AttributeMapping reference
         genome_ref: genome reference
         matrix_obj_ref: Matrix reference
         """
@@ -965,70 +700,6 @@ class GenericsUtil:
 
         return returnVal
 
-    def generate_matrix_html(self, params):
-        """
-        generate_matrix_html: generate a html page for given data
-
-        arguments:
-        df: a pandas dataframe
-
-        return:
-        html_string: html as a string format
-        """
-
-        column_str, data_str, formatter_str = self._generate_html_string(params.get('df'))
-
-        with open(os.path.join(os.path.dirname(__file__), 'matrix_page_template.html'),
-                  'r') as matrix_page_template_file:
-                html_string = matrix_page_template_file.read()
-                html_string = html_string.replace('// ADD_COL', column_str)
-                html_string = html_string.replace('// ADD_DATA', data_str)
-                html_string = html_string.replace('// ADD_FORMATTER', formatter_str)
-
-        returnVal = {'html_string': html_string}
-
-        return returnVal
-
-    def fetch_data(self, params):
-        """
-        fetch_data: fetch generics data as pandas dataframe for a generics data object
-
-        arguments:
-        obj_ref: generics object reference
-
-        optional arguments:
-        generics_module: the generics data module to be retrieved from
-                        e.g. for an given data type like below:
-                        typedef structure {
-                          FloatMatrix2D data;
-                          condition_set_ref condition_set_ref;
-                        } SomeGenericsMatrix;
-                        generics_module should be
-                        {'data': 'FloatMatrix2D',
-                         'condition_set_ref': 'condition_set_ref'}
-
-        return:
-        data_matrix: a pandas dataframe in json format
-        """
-
-        log('--->\nrunning GenericsUtil.fetch_data\n' +
-            'params:\n{}'.format(json.dumps(params, indent=1)))
-
-        self._validate_fetch_data_params(params)
-
-        try:
-            data_matrix = self._retrieve_data(params.get('obj_ref'),
-                                              params.get('generics_module'))
-        except Exception:
-            error_msg = 'Running fetch_data returned an error:\n{}\n'.format(
-                                                                traceback.format_exc())
-            error_msg += 'Please try to specify generics type and name as generics_module\n'
-            raise ValueError(error_msg)
-
-        returnVal = {'data_matrix': data_matrix}
-
-        return returnVal
-
     def export_matrix(self, params):
         """
         export_matrix: univeral downloader for matrix data object
@@ -1060,19 +731,19 @@ class GenericsUtil:
         self._mkdir_p(result_directory)
         file_path = os.path.join(result_directory, '{}.xlsx'.format(obj_source.get('info')[1]))
 
-        data_matrix = self.fetch_data(params).get('data_matrix')
+        data_matrix = self.data_util.fetch_data(params).get('data_matrix')
         df = pd.read_json(data_matrix)
 
         df.to_excel(file_path, sheet_name='data')
 
         if obj_data.get('col_mapping'):
             self._write_mapping_sheet(file_path, 'col_mapping',
-                                      obj_data.get('col_mapping'), ['col_name', 'condition_name'])
+                                      obj_data.get('col_mapping'), ['col_name', 'instance_name'])
             obj_data.pop('col_mapping')
 
         if obj_data.get('row_mapping'):
             self._write_mapping_sheet(file_path, 'row_mapping',
-                                      obj_data.get('row_mapping'), ['row_name', 'condition_name'])
+                                      obj_data.get('row_mapping'), ['row_name', 'instance_name'])
             obj_data.pop('row_mapping')
 
         try:

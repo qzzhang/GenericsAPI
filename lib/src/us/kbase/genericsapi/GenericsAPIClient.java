@@ -180,24 +180,6 @@ public class GenericsAPIClient {
     }
 
     /**
-     * <p>Original spec-file function name: generate_matrix_html</p>
-     * <pre>
-     * generate_matrix_html: generate a html page for given data
-     * </pre>
-     * @param   params   instance of type {@link us.kbase.genericsapi.GenMatrixHTMLParams GenMatrixHTMLParams}
-     * @return   parameter "returnVal" of type {@link us.kbase.genericsapi.GenMatrixHTMLReturn GenMatrixHTMLReturn}
-     * @throws IOException if an IO exception occurs
-     * @throws JsonClientException if a JSON RPC exception occurs
-     */
-    public GenMatrixHTMLReturn generateMatrixHtml(GenMatrixHTMLParams params, RpcContext... jsonRpcContext) throws IOException, JsonClientException {
-        List<Object> args = new ArrayList<Object>();
-        args.add(params);
-        TypeReference<List<GenMatrixHTMLReturn>> retType = new TypeReference<List<GenMatrixHTMLReturn>>() {};
-        List<GenMatrixHTMLReturn> res = caller.jsonrpcCall("GenericsAPI.generate_matrix_html", args, retType, true, true, jsonRpcContext, this.serviceVersion);
-        return res.get(0);
-    }
-
-    /**
      * <p>Original spec-file function name: export_matrix</p>
      * <pre>
      * </pre>

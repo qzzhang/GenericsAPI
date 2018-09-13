@@ -23,7 +23,7 @@ class GenericsAPI(object):
             self, url=None, timeout=30 * 60, user_id=None,
             password=None, token=None, ignore_authrc=False,
             trust_all_ssl_certificates=False,
-            auth_svc='https://ci.kbase.us/services/auth/api/legacy/KBase/Sessions/Login'):
+            auth_svc='https://kbase.us/services/authorization/Sessions/Login'):
         if url is None:
             raise ValueError('A url is required')
         self._service_ver = None
@@ -52,20 +52,6 @@ class GenericsAPI(object):
         """
         return self._client.call_method(
             'GenericsAPI.fetch_data',
-            [params], self._service_ver, context)
-
-    def generate_matrix_html(self, params, context=None):
-        """
-        generate_matrix_html: generate a html page for given data
-        :param params: instance of type "GenMatrixHTMLParams" (Input of the
-           generate_matrix_html function df: a pandas dataframe) ->
-           structure: parameter "df" of mapping from String to String
-        :returns: instance of type "GenMatrixHTMLReturn" (Ouput of the
-           generate_matrix_html function html_string: html as a string
-           format) -> structure: parameter "html_string" of String
-        """
-        return self._client.call_method(
-            'GenericsAPI.generate_matrix_html',
             [params], self._service_ver, context)
 
     def export_matrix(self, params, context=None):

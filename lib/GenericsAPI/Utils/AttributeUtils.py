@@ -7,9 +7,9 @@ import pandas as pd
 from xlrd.biffh import XLRDError
 
 from DataFileUtil.DataFileUtilClient import DataFileUtil
-from GenericsAPI.Utils.GenericsUtil import GenericsUtil
 from KBaseSearchEngine.KBaseSearchEngineClient import KBaseSearchEngine
 from Workspace.WorkspaceClient import Workspace as workspaceService
+from GenericsAPI.Utils.DataUtil import DataUtil
 
 
 class AttributesUtil:
@@ -23,7 +23,7 @@ class AttributesUtil:
         self.scratch = config['scratch']
         self.dfu = DataFileUtil(self.callback_url)
         self.kbse = KBaseSearchEngine(config['search-url'])
-        self.gen_utils = GenericsUtil(config)
+        self.data_util = DataUtil(config)
         self.wsClient = workspaceService(self.ws_url, token=self.token)
         self.DEFAULT_ONTOLOGY_REF = "KbaseOntologies/Custom"
         self.DEFAULT_ONTOLOGY_ID = "Custom:Term"
@@ -97,7 +97,7 @@ class AttributesUtil:
         """
 
         original_matrix_ref = data.get('original_data')
-        data_matrix = self.gen_utils.fetch_data(
+        data_matrix = self.data_util.fetch_data(
             {'obj_ref': original_matrix_ref}).get('data_matrix')
 
         data_df = pd.read_json(data_matrix)
@@ -164,6 +164,7 @@ class AttributesUtil:
 
         attribute_mapping['attributes'] = [self._add_ontology_info(f) for f in attributes]
         attribute_mapping['instances'] = instance_df.to_dict('list')
+
         return attribute_mapping
 
     def _search_ontologies(self, term, closest=False):

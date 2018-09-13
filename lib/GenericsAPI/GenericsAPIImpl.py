@@ -5,6 +5,7 @@ import logging
 
 from GenericsAPI.Utils.GenericsUtil import GenericsUtil
 from GenericsAPI.Utils.AttributeUtils import AttributesUtil
+from GenericsAPI.Utils.DataUtil import DataUtil
 #END_HEADER
 
 
@@ -24,8 +25,8 @@ class GenericsAPI:
     # the latter method is running.
     ######################################### noqa
     VERSION = "0.0.1"
-    GIT_URL = "https://github.com/kbaseapps/GenericsAPI.git"
-    GIT_COMMIT_HASH = "466b195ac36b6c92ffde76d34d2a3fbda0b589ee"
+    GIT_URL = "git@github.com:Tianhao-Gu/GenericsAPI.git"
+    GIT_COMMIT_HASH = "a8edaaf0752f0ac31b33a7951ad8a62fdca06ade"
 
     #BEGIN_CLASS_HEADER
     #END_CLASS_HEADER
@@ -39,6 +40,8 @@ class GenericsAPI:
         self.config['KB_AUTH_TOKEN'] = os.environ['KB_AUTH_TOKEN']
         self.scratch = config['scratch']
         self.attr_util = AttributesUtil(self.config)
+        self.gen_util = GenericsUtil(self.config)
+        self.data_util = DataUtil(self.config)
         logging.basicConfig(level=logging.INFO)
         #END_CONSTRUCTOR
         pass
@@ -64,37 +67,12 @@ class GenericsAPI:
         # ctx is the context object
         # return variables are: returnVal
         #BEGIN fetch_data
-        generics_api = GenericsUtil(self.config)
-        returnVal = generics_api.fetch_data(params)
+        returnVal = self.data_util.fetch_data(params)
         #END fetch_data
 
         # At some point might do deeper type checking...
         if not isinstance(returnVal, dict):
             raise ValueError('Method fetch_data return value ' +
-                             'returnVal is not type dict as required.')
-        # return the results
-        return [returnVal]
-
-    def generate_matrix_html(self, ctx, params):
-        """
-        generate_matrix_html: generate a html page for given data
-        :param params: instance of type "GenMatrixHTMLParams" (Input of the
-           generate_matrix_html function df: a pandas dataframe) ->
-           structure: parameter "df" of mapping from String to String
-        :returns: instance of type "GenMatrixHTMLReturn" (Ouput of the
-           generate_matrix_html function html_string: html as a string
-           format) -> structure: parameter "html_string" of String
-        """
-        # ctx is the context object
-        # return variables are: returnVal
-        #BEGIN generate_matrix_html
-        generics_api = GenericsUtil(self.config)
-        returnVal = generics_api.generate_matrix_html(params)
-        #END generate_matrix_html
-
-        # At some point might do deeper type checking...
-        if not isinstance(returnVal, dict):
-            raise ValueError('Method generate_matrix_html return value ' +
                              'returnVal is not type dict as required.')
         # return the results
         return [returnVal]
@@ -117,8 +95,7 @@ class GenericsAPI:
         # ctx is the context object
         # return variables are: returnVal
         #BEGIN export_matrix
-        generics_api = GenericsUtil(self.config)
-        returnVal = generics_api.export_matrix(params)
+        returnVal = self.gen_util.export_matrix(params)
         #END export_matrix
 
         # At some point might do deeper type checking...
@@ -144,8 +121,7 @@ class GenericsAPI:
         # ctx is the context object
         # return variables are: returnVal
         #BEGIN validate_data
-        generics_api = GenericsUtil(self.config)
-        returnVal = generics_api.validate_data(params)
+        returnVal = self.gen_util.validate_data(params)
         #END validate_data
 
         # At some point might do deeper type checking...
@@ -186,8 +162,7 @@ class GenericsAPI:
         # ctx is the context object
         # return variables are: returnVal
         #BEGIN import_matrix_from_excel
-        generics_api = GenericsUtil(self.config)
-        returnVal = generics_api.import_matrix_from_excel(params)
+        returnVal = self.gen_util.import_matrix_from_excel(params)
         #END import_matrix_from_excel
 
         # At some point might do deeper type checking...
@@ -214,8 +189,7 @@ class GenericsAPI:
         # ctx is the context object
         # return variables are: returnVal
         #BEGIN save_object
-        generics_api = GenericsUtil(self.config)
-        returnVal = generics_api.save_object(params)
+        returnVal = self.gen_util.save_object(params)
         #END save_object
 
         # At some point might do deeper type checking...
@@ -240,8 +214,7 @@ class GenericsAPI:
         # ctx is the context object
         # return variables are: returnVal
         #BEGIN search_matrix
-        generics_api = GenericsUtil(self.config)
-        returnVal = generics_api.search_matrix(params)
+        returnVal = self.gen_util.search_matrix(params)
         #END search_matrix
 
         # At some point might do deeper type checking...
@@ -271,8 +244,7 @@ class GenericsAPI:
         # ctx is the context object
         # return variables are: returnVal
         #BEGIN filter_matrix
-        generics_api = GenericsUtil(self.config)
-        returnVal = generics_api.filter_matrix(params)
+        returnVal = self.gen_util.filter_matrix(params)
         #END filter_matrix
 
         # At some point might do deeper type checking...
