@@ -3,7 +3,7 @@
 import os
 import logging
 
-from GenericsAPI.Utils.GenericsUtil import GenericsUtil
+from GenericsAPI.Utils.MatrixUtil import MatrixUtil
 from GenericsAPI.Utils.AttributeUtils import AttributesUtil
 from GenericsAPI.Utils.DataUtil import DataUtil
 #END_HEADER
@@ -40,7 +40,7 @@ class GenericsAPI:
         self.config['KB_AUTH_TOKEN'] = os.environ['KB_AUTH_TOKEN']
         self.scratch = config['scratch']
         self.attr_util = AttributesUtil(self.config)
-        self.gen_util = GenericsUtil(self.config)
+        self.matrix_util = MatrixUtil(self.config)
         self.data_util = DataUtil(self.config)
         logging.basicConfig(level=logging.INFO)
         #END_CONSTRUCTOR
@@ -95,7 +95,7 @@ class GenericsAPI:
         # ctx is the context object
         # return variables are: returnVal
         #BEGIN export_matrix
-        returnVal = self.gen_util.export_matrix(params)
+        returnVal = self.matrix_util.export_matrix(params)
         #END export_matrix
 
         # At some point might do deeper type checking...
@@ -121,7 +121,7 @@ class GenericsAPI:
         # ctx is the context object
         # return variables are: returnVal
         #BEGIN validate_data
-        returnVal = self.gen_util.validate_data(params)
+        returnVal = self.data_util.validate_data(params)
         #END validate_data
 
         # At some point might do deeper type checking...
@@ -162,7 +162,7 @@ class GenericsAPI:
         # ctx is the context object
         # return variables are: returnVal
         #BEGIN import_matrix_from_excel
-        returnVal = self.gen_util.import_matrix_from_excel(params)
+        returnVal = self.matrix_util.import_matrix_from_excel(params)
         #END import_matrix_from_excel
 
         # At some point might do deeper type checking...
@@ -189,7 +189,7 @@ class GenericsAPI:
         # ctx is the context object
         # return variables are: returnVal
         #BEGIN save_object
-        returnVal = self.gen_util.save_object(params)
+        returnVal = self.data_util.save_object(params)
         #END save_object
 
         # At some point might do deeper type checking...
@@ -214,7 +214,7 @@ class GenericsAPI:
         # ctx is the context object
         # return variables are: returnVal
         #BEGIN search_matrix
-        returnVal = self.gen_util.search_matrix(params)
+        returnVal = self.matrix_util.search_matrix(params)
         #END search_matrix
 
         # At some point might do deeper type checking...
@@ -244,7 +244,7 @@ class GenericsAPI:
         # ctx is the context object
         # return variables are: returnVal
         #BEGIN filter_matrix
-        returnVal = self.gen_util.filter_matrix(params)
+        returnVal = self.matrix_util.filter_matrix(params)
         #END filter_matrix
 
         # At some point might do deeper type checking...
@@ -270,7 +270,7 @@ class GenericsAPI:
         #BEGIN file_to_attribute_mapping
         logging.info("Starting 'file_to_attribute_mapping' with params:{}".format(params))
         self.attr_util.validate_params(params, ("output_ws_id", "output_obj_name"),
-                                   ('input_shock_id', 'input_file_path'))
+                                       ('input_shock_id', 'input_file_path'))
         result = self.attr_util.file_to_attribute_mapping(params)
         #END file_to_attribute_mapping
 
