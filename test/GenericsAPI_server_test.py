@@ -359,6 +359,16 @@ class GenericsAPITest(unittest.TestCase):
         self.assertTrue('report_name' in returnVal)
         self.assertTrue('report_ref' in returnVal)
 
+        obj = self.dfu.get_objects(
+            {'object_refs': [returnVal['matrix_obj_ref']]}
+        )['data'][0]['data']
+        self.assertItemsEqual(obj['search_attributes'],
+                              ["Scientist | Marie Currie", "Instrument | Old Faithful"])
+        self.assertEqual(obj['description'], 'test_desc')
+        self.assertEqual(obj['scale'], 'test_scale')
+        self.assertEqual(obj['col_normalization'], 'test_col_normalization')
+        self.assertEqual(obj['row_normalization'], 'test_row_normalization')
+
     def test_search_matrix(self):
         self.start_test()
 

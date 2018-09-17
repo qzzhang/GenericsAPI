@@ -19,7 +19,9 @@ def log(message, prefix_newline=False):
     time_str = time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime(time.time()))
     print(('\n' if prefix_newline else '') + time_str + ': ' + message)
 
+
 MATRIX_TYPE = ['ExpressionMatrix', 'FitnessMatrix', 'DifferentialExpressionMatrix']
+TYPE_ATTRIBUTES = {'description', 'scale', 'row_normalization', 'col_normalization'}
 
 
 class MatrixUtil:
@@ -219,7 +221,16 @@ class MatrixUtil:
 
         # processing metadata
         metadata = self._process_mapping_sheet(file_path, 'metadata')
-        data.update(metadata)
+        data['attributes'] = {}
+        data['search_attributes'] = []
+        for k, v in metadata.items():
+            k = k.strip()
+            v = v.strip()
+            if k in TYPE_ATTRIBUTES:
+                data[k] = v
+            else:
+                data['attributes'][k] = v
+                data['search_attributes'].append(" | ".join((k, v)))
 
         return data
 
