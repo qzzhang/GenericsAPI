@@ -5,6 +5,7 @@ import shutil
 import time
 import unittest
 import uuid
+
 try:
     from ConfigParser import ConfigParser  # py2
 except:
@@ -200,13 +201,61 @@ class AttributeUtilsTest(unittest.TestCase):
     def test_tsv_import(self):
         params = {'output_ws_id': self.wsId,
                   'input_file_path': 'data/AM2.tsv',
-                  'output_obj_name': 'Condition_Set'}
+                  'output_obj_name': 'AM2'}
         ret = self.getImpl().file_to_attribute_mapping(self.getContext(), params)[0]
         assert ret and ('attribute_mapping_ref' in ret)
         data = self.dfu.get_objects({
             'object_refs': [ret['attribute_mapping_ref']]
         })['data'][0]['data']
         self.assertEqual(data, self.attribute_mapping_2)
+
+    def test_isa_import_1(self):
+        params = {'output_ws_id': self.wsId,
+                  'input_file_path': 'data/test_ISA.tsv',
+                  'output_obj_name': 'ISA_AM'}
+        ret = self.getImpl().file_to_attribute_mapping(self.getContext(), params)[0]
+        assert ret and ('attribute_mapping_ref' in ret)
+        data = self.dfu.get_objects({
+            'object_refs': [ret['attribute_mapping_ref']]
+        })['data'][0]['data']
+        self.assertEqual(len(data['instances']), 18)
+        self.assertEqual(len(data['instances'].values()[0]), 18)
+        self.assertEqual(len(data['attributes']), 18)
+        self.assertEqual(data['attributes'][-1],
+                         {u'attribute': u'Factor Value[time]',
+                          u'attribute_ont_id': u'Custom:Term',
+                          u'attribute_ont_ref': u'KbaseOntologies/Custom',
+                          u'unit': u'day',
+                          u'unit_ont_id': u'Custom:Unit',
+                          u'unit_ont_ref': u'KbaseOntologies/Custom'})
+        self.assertEqual(data['attributes'][-2],
+                         {u'attribute': u'Factor Value[compound]',
+                          u'attribute_ont_id': u'Custom:Term',
+                          u'attribute_ont_ref': u'KbaseOntologies/Custom',
+                          u'categories': {u'orotic acid': {u'attribute_ont_id': u'CHEBI:16742',
+                                                           u'value': u'orotic acid'},
+                                          u'vehicle': {u'attribute_ont_id': u':',
+                                                       u'value': u'vehicle'}}})
+
+    def test_isa_import_2(self):
+        params = {'output_ws_id': self.wsId,
+                  'input_file_path': 'data/test_ISA_2.tsv',
+                  'output_obj_name': 'ISA_AM'}
+        ret = self.getImpl().file_to_attribute_mapping(self.getContext(), params)[0]
+        assert ret and ('attribute_mapping_ref' in ret)
+        data = self.dfu.get_objects({
+            'object_refs': [ret['attribute_mapping_ref']]
+        })['data'][0]['data']
+        self.assertEqual(len(data['instances']), 6)
+        self.assertEqual(len(data['instances'].values()[0]), 12)
+        self.assertEqual(len(data['attributes']), 12)
+        self.assertEqual(data['attributes'][4],
+                         {u'attribute': u'Material Type',
+                          u'attribute_ont_id': u'Custom:Term',
+                          u'attribute_ont_ref': u'KbaseOntologies/Custom',
+                          u'categories': {
+                              u'deoxyribonucleic acid': {u'attribute_ont_id': u'CHEBI:16991',
+                                                         u'value': u'deoxyribonucleic acid'}}})
 
     def test_excel_import(self):
         shock_file = '/AM1.xlsx'

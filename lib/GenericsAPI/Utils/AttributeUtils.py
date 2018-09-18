@@ -62,8 +62,7 @@ class AttributesUtil:
             df = pd.read_csv(scratch_file_path, sep="\t", dtype='str')
         df.fillna('', inplace=True)
         if "Sample Name" in df.columns:
-            raise NotImplementedError
-            comp_set = self._isa_df_to_am_obj(df)
+            comp_set = self._isa_df_to_am_object(df)
         elif "Attribute" in df.columns:
             comp_set = self._df_to_am_obj(df)
         else:
@@ -166,6 +165,85 @@ class AttributesUtil:
         attribute_mapping['instances'] = instance_df.to_dict('list')
 
         return attribute_mapping
+
+    def _isa_df_to_am_object(self, isa_df):
+        skip_columns = {'Raw Data File', 'Derived Data File', 'Array Data File', 'Image File'}
+        if 'Sample Name'in isa_df.columns and not any(isa_df['Sample Name'].duplicated()):
+            isa_df.set_index('Sample Name', inplace=True)
+        elif 'Assay Name'in isa_df.columns and not any(isa_df['Assay Name'].duplicated()):
+            isa_df.set_index('Assay Name', inplace=True)
+        else:
+            raise ValueError("The supplied ISA file does not contain 'Sample Names' or "
+                             "'Assay Names' that are unique for each row.")
+        attribute_mapping = {'ontology_mapping_method': "User Curation - ISA format"}
+        attribute_mapping['attributes'], new_skip_cols = self._get_attributes_from_isa(
+            isa_df, skip_columns)
+        reduced_isa = isa_df.drop(columns=new_skip_cols, errors='ignore')
+        attribute_mapping['instances'] = reduced_isa.T.to_dict('list')
+
+        return attribute_mapping
+
+    def _get_attributes_from_isa(self, isa_df, skip_columns):
+        attributes = []
+        # associate attribute columns with the other columns that relate to them
+        for i, col in enumerate(isa_df.columns):
+            if col.startswith('Term Source REF'):
+                skip_columns.add(col)
+                last_attr = attributes[-1]
+                if '_unit' in last_attr:
+                    last_attr['_unit_ont'] = col
+                else:
+                    last_attr['_val_ont'] = col
+
+            elif col.startswith('Term Accession Number'):
+                # If the term Accession is a web link only grab the last bit
+                # Similarly, sometimes the number is prefixed with the term source e.x. UO_0000012
+                isa_df[col] = isa_df[col].map(lambda x: x.split("/")[-1].split("_")[-1])
+                skip_columns.add(col)
+                last_attr = attributes[-1]
+                if '_unit' in last_attr:
+                    last_attr['_unit_accession'] = col
+                else:
+                    last_attr['_val_accession'] = col
+
+            elif col.startswith('Unit'):
+                skip_columns.add(col)
+                last_attr = attributes[-1]
+                if last_attr.get('unit'):
+                    raise ValueError("More than one unit column is supplied for attribute {}"
+                                     .format(last_attr['attribute']))
+                last_attr['_unit'] = col
+
+            elif col not in skip_columns:
+                attributes.append({"attribute": col})
+
+        # handle the categories for each attribute
+        for i, attribute in enumerate(attributes):
+            if '_val_accession' in attribute:
+                category_df = isa_df[[attribute['attribute'], attribute.pop('_val_ont'),
+                                     attribute.pop('_val_accession')]].drop_duplicates()
+                category_df['attribute_ont_id'] = category_df.iloc[:, 1].str.cat(
+                    category_df.iloc[:, 2], ":")
+                category_df['value'] = category_df[attribute['attribute']]
+                attribute['categories'] = category_df.set_index(
+                    attribute['attribute'])[['value', 'attribute_ont_id']].to_dict('index')
+
+            if '_unit' in attribute:
+                units = isa_df[attribute.pop('_unit')].unique()
+                if len(units) > 1:
+                    raise ValueError("More than one unit type is supplied for attribute {}: {}"
+                                     .format(attribute['attribute'], units))
+                attribute['unit'] = units[0]
+
+                if '_unit_ont' in attribute:
+                    unit_ont = isa_df[attribute.pop('_unit_ont')].str.cat(
+                        isa_df[attribute.pop('_unit_accession')], ":").unique()
+                    if len(units) > 1:
+                        raise ValueError("More than one unit ontology is supplied for attribute "
+                                         "{}: {}".format(attribute['attribute'], unit_ont))
+                    attribute['unit_ont_id'] = unit_ont[0]
+            attributes[i] = self._add_ontology_info(attribute)
+        return attributes, skip_columns
 
     def _search_ontologies(self, term, closest=False):
         """
