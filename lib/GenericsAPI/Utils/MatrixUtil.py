@@ -554,6 +554,7 @@ class MatrixUtil:
         except KeyError:
             log('Missing key [data]')
 
+        obj_data.update(obj_data.get('attributes', {}))  # flatten for printing
         self._write_mapping_sheet(file_path, 'metadata', obj_data, ['name', 'value'])
 
         shock_id = self._upload_to_shock(file_path)
