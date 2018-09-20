@@ -6,6 +6,7 @@ import logging
 from GenericsAPI.Utils.MatrixUtil import MatrixUtil
 from GenericsAPI.Utils.AttributeUtils import AttributesUtil
 from GenericsAPI.Utils.DataUtil import DataUtil
+from GenericsAPI.Utils.CorrelationUtil import CorrelationUtil
 #END_HEADER
 
 
@@ -41,6 +42,7 @@ class GenericsAPI:
         self.scratch = config['scratch']
         self.attr_util = AttributesUtil(self.config)
         self.matrix_util = MatrixUtil(self.config)
+        self.corr_util = CorrelationUtil(self.config)
         self.data_util = DataUtil(self.config)
         logging.basicConfig(level=logging.INFO)
         #END_CONSTRUCTOR
