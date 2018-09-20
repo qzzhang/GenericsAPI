@@ -172,15 +172,17 @@ module KBaseExperiments {
       feature_mapping - map from row_id to a set feature ids in the genome
 
       Validation:
-      @unique data.row_ids
-      @unique data.col_ids
+      @unique coefficient_data.row_ids
+      @unique coefficient_data.col_ids
+      @unique significance_data.row_ids
+      @unique significance_data.col_ids
 
       @optional description correlation_parameters
       @optional genome_ref feature_mapping
       @optional significance_data
 
       @metadata ws genome_ref as genome
-      @metadata ws length(data.row_ids) as matrix_size
+      @metadata ws length(coefficient_data.row_ids) as matrix_size
     */
     typedef structure {
       string description;
