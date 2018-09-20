@@ -140,4 +140,54 @@ module KBaseExperiments {
         WSRef condition_set_ref;
         GenomeRef genome_ref;
     } ClusterSet;
+
+    /*
+      A simple 2D matrix of floating point numbers with labels/ids for rows and
+      columns.  The matrix is stored as a list of lists, with the outer list
+      containing rows, and the inner lists containing values for each column of
+      that row.  Row/Col ids should be unique.
+
+      row_ids - unique ids for rows.
+      col_ids - unique ids for columns.
+      values - two dimensional array indexed as: values[row][col]
+      @metadata ws length(row_ids) as n_rows
+      @metadata ws length(col_ids) as n_cols
+    */
+    typedef structure {
+      list<string> row_ids;
+      list<string> col_ids;
+      list<list<float>> values;
+    } FloatMatrix2D;
+
+    /*
+      A wrapper around a FloatMatrix2D designed for simple matricies of pairwise Correlation data.
+
+      KBaseMatrices Fields:
+      description - short optional description of the dataset
+      coefficient_data - contains pairwise correlation coefficient values
+      significance_data - contains pairwise significance values
+
+      Additional Fields:
+      genome_ref - a reference to the aligned genome
+      feature_mapping - map from row_id to a set feature ids in the genome
+
+      Validation:
+      @unique data.row_ids
+      @unique data.col_ids
+
+      @optional description correlation_parameters
+      @optional genome_ref feature_mapping
+      @optional significance_data
+
+      @metadata ws genome_ref as genome
+      @metadata ws length(data.row_ids) as matrix_size
+    */
+    typedef structure {
+      string description;
+      mapping<string, string> correlation_parameters;
+      GenomeRef genome_ref;
+      mapping<string, list<string>> feature_mapping;
+      FloatMatrix2D coefficient_data;
+      FloatMatrix2D significance_data;
+    } CorrelationMatrix;
 };
