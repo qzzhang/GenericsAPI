@@ -222,4 +222,36 @@ module KBaseMatrices{
       mapping<string, list<string>> feature_mapping;
       FloatMatrix2D data;
     } FitnessMatrix;
+
+    /*
+      A wrapper around a FloatMatrix2D designed for simple matricies of pairwise Correlation data.
+
+      KBaseMatrices Fields:
+      description - short optional description of the dataset
+      coefficient_data - contains pairwise correlation coefficient values
+      significance_data - contains pairwise significance values
+
+      Additional Fields:
+      genome_ref - a reference to the aligned genome
+      feature_mapping - map from row_id to a set feature ids in the genome
+
+      Validation:
+      @unique data.row_ids
+      @unique data.col_ids
+
+      @optional description correlation_parameters
+      @optional genome_ref feature_mapping
+      @optional significance_data
+
+      @metadata ws genome_ref as genome
+      @metadata ws length(data.row_ids) as matrix_size
+    */
+    typedef structure {
+      string description;
+      mapping<string, string> correlation_parameters;
+      ws_genome_id genome_ref;
+      mapping<string, list<string>> feature_mapping;
+      FloatMatrix2D coefficient_data;
+      FloatMatrix2D significance_data;
+    } CorrelationMatrix;
 };
