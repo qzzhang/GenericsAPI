@@ -27,7 +27,7 @@ class GenericsAPI:
     ######################################### noqa
     VERSION = "0.0.1"
     GIT_URL = "git@github.com:Tianhao-Gu/GenericsAPI.git"
-    GIT_COMMIT_HASH = "a8edaaf0752f0ac31b33a7951ad8a62fdca06ade"
+    GIT_COMMIT_HASH = "4381310ede6e2bb25c2b6d99eaa6a9c37971c8bf"
 
     #BEGIN_CLASS_HEADER
     #END_CLASS_HEADER
@@ -380,6 +380,46 @@ class GenericsAPI:
                              'result is not type dict as required.')
         # return the results
         return [result]
+
+    def compute_correlation_matrix(self, ctx, params):
+        """
+        compute_correlation_matrix: create sub-matrix based on input filter_ids
+        :param params: instance of type "CompCorrParams" (Input of the
+           filter_matrix function input_obj_ref: object reference of a matrix
+           workspace_name: workspace name objects to be saved to
+           corr_matrix_name: correlation matrix object name dimension:
+           compute correlation on column or row, one of ['col', 'row']
+           method: correlation method, one of ['pearson', 'kendall',
+           'spearman'] plot_corr_matrix: plot correlation matrix in report,
+           default False plot_scatter_matrix: plot scatter matrix in report,
+           default False compute_significance: also compute Significance in
+           addition to correlation matrix) -> structure: parameter
+           "input_obj_ref" of type "obj_ref" (An X/Y/Z style reference),
+           parameter "workspace_name" of type "workspace_name" (workspace
+           name of the object), parameter "corr_matrix_name" of String,
+           parameter "dimension" of String, parameter "method" of String,
+           parameter "plot_corr_matrix" of type "boolean" (A boolean - 0 for
+           false, 1 for true. @range (0, 1)), parameter "plot_scatter_matrix"
+           of type "boolean" (A boolean - 0 for false, 1 for true. @range (0,
+           1)), parameter "compute_significance" of type "boolean" (A boolean
+           - 0 for false, 1 for true. @range (0, 1))
+        :returns: instance of type "CompCorrOutput" -> structure: parameter
+           "report_name" of String, parameter "report_ref" of String,
+           parameter "corr_matrix_obj_ref" of type "obj_ref" (An X/Y/Z style
+           reference)
+        """
+        # ctx is the context object
+        # return variables are: returnVal
+        #BEGIN compute_correlation_matrix
+        returnVal = self.corr_util.compute_correlation_matrix(params)
+        #END compute_correlation_matrix
+
+        # At some point might do deeper type checking...
+        if not isinstance(returnVal, dict):
+            raise ValueError('Method compute_correlation_matrix return value ' +
+                             'returnVal is not type dict as required.')
+        # return the results
+        return [returnVal]
     def status(self, ctx):
         #BEGIN_STATUS
         returnVal = {'state': "OK",

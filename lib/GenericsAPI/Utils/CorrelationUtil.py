@@ -5,8 +5,12 @@ import uuid
 import errno
 import traceback
 from matplotlib import pyplot as plt
+import json
+import shutil
 
 from GenericsAPI.Utils.DataUtil import DataUtil
+from DataFileUtil.DataFileUtilClient import DataFileUtil
+from KBaseReport.KBaseReportClient import KBaseReport
 
 
 def log(message, prefix_newline=False):
@@ -32,10 +36,230 @@ class CorrelationUtil:
             else:
                 raise
 
+    def _validate_compute_corr_matrix_params(self, params):
+        """
+        _validate_compute_corr_matrix_params:
+            validates params passed to compute_correlation_matrix method
+        """
+
+        log('start validating compute_corrrelation_matrix params')
+
+        # check for required parameters
+        for p in ['input_obj_ref', 'workspace_name', 'corr_matrix_name']:
+            if p not in params:
+                raise ValueError('"{}" parameter is required, but missing'.format(p))
+
+    def _generate_visualization_content(self, output_directory, corr_matrix_obj_ref,
+                                        corr_matrix_plot_path, scatter_plot_path):
+
+        """
+        <div class="tab">
+            <button class="tablinks" onclick="openTab(event, 'CorrelationMatrix')" id="defaultOpen">Correlation Matrix</button>
+        </div>
+
+        <div id="CorrelationMatrix" class="tabcontent">
+            <p>CorrelationMatrix_Content</p>
+        </div>"""
+
+        tab_def_content = ''
+        tab_content = ''
+
+        corr_data = self.dfu.get_objects({'object_refs': [corr_matrix_obj_ref]})['data'][0]['data']
+
+        coefficient_data = corr_data.get('coefficient_data')
+        significance_data = corr_data.get('significance_data')
+
+        tab_def_content += """
+        <div class="tab">
+            <button class="tablinks" onclick="openTab(event, 'CorrelationMatrix')" id="defaultOpen">Correlation Matrix</button>
+        """
+
+        tab_content += """
+        <div id="CorrelationMatrix" class="tabcontent">
+            <p>CorrelationMatrix_Content</p>
+        </div>
+        """
+
+        if corr_matrix_plot_path:
+            tab_def_content += """
+            <button class="tablinks" onclick="openTab(event, 'CorrelationMatrixPlot')">Correlation Matrix Plot</button>
+            """
+
+            tab_content += """
+            <div id="CorrelationMatrixPlot" class="tabcontent">
+            """
+            corr_matrix_plot_name = 'CorrelationMatrixPlot.png'
+            corr_matrix_plot_display_name = 'Correlation Matrix Plot'
+
+            shutil.copy2(corr_matrix_plot_path,
+                         os.path.join(output_directory, corr_matrix_plot_name))
+
+            tab_content += '<div class="gallery">'
+            tab_content += '<a target="_blank" href="{}">'.format(corr_matrix_plot_name)
+            tab_content += '<img src="{}" '.format(corr_matrix_plot_name)
+            tab_content += 'alt="{}" width="600" height="400">'.format(
+                                                                corr_matrix_plot_display_name)
+            tab_content += '</a><div class="desc">{}</div></div>'.format(
+                                                                corr_matrix_plot_display_name)
+
+            tab_content += """</div>"""
+
+        if scatter_plot_path:
+
+            tab_def_content += """
+            <button class="tablinks" onclick="openTab(event, 'ScatterMatrixPlot')">Scatter Matrix Plot</button>
+            """
+
+            tab_content += """
+            <div id="ScatterMatrixPlot" class="tabcontent">
+            """
+
+            scatter_plot_name = 'ScatterMatrixPlot.png'
+            scatter_plot_display_name = 'Scatter Matrix Plot'
+
+            shutil.copy2(scatter_plot_path,
+                         os.path.join(output_directory, scatter_plot_name))
+
+            tab_content += '<div class="gallery">'
+            tab_content += '<a target="_blank" href="{}">'.format(scatter_plot_name)
+            tab_content += '<img src="{}" '.format(scatter_plot_name)
+            tab_content += 'alt="{}" width="600" height="400">'.format(
+                                                                scatter_plot_display_name)
+            tab_content += '</a><div class="desc">{}</div></div>'.format(
+                                                                scatter_plot_display_name)
+
+            tab_content += """</div>"""
+
+        tab_def_content += """</div>"""
+
+        return tab_def_content + tab_content
+
+    def _generate_corr_html_report(self, corr_matrix_obj_ref, corr_matrix_plot_path,
+                                   scatter_plot_path):
+
+        """
+        _generate_corr_html_report: generate html summary report for correlation
+        """
+
+        log('Start generating html report')
+        html_report = list()
+
+        output_directory = os.path.join(self.scratch, str(uuid.uuid4()))
+        self._mkdir_p(output_directory)
+        result_file_path = os.path.join(output_directory, 'corr_report.html')
+
+        visualization_content = self._generate_visualization_content(output_directory,
+                                                                     corr_matrix_obj_ref,
+                                                                     corr_matrix_plot_path,
+                                                                     scatter_plot_path)
+
+        with open(result_file_path, 'w') as result_file:
+            with open(os.path.join(os.path.dirname(__file__), 'corr_template.html'),
+                      'r') as report_template_file:
+                report_template = report_template_file.read()
+                report_template = report_template.replace('<p>Visualization_Content</p>',
+                                                          visualization_content)
+                result_file.write(report_template)
+
+        report_shock_id = self.dfu.file_to_shock({'file_path': output_directory,
+                                                  'pack': 'zip'})['shock_id']
+
+        html_report.append({'shock_id': report_shock_id,
+                            'name': os.path.basename(result_file_path),
+                            'label': os.path.basename(result_file_path),
+                            'description': 'HTML summary report for Compute Correlation App'
+                            })
+        return html_report
+
+    def _generate_corr_report(self, corr_matrix_obj_ref, workspace_name, corr_matrix_plot_path,
+                              scatter_plot_path):
+        """
+        _generate_report: generate summary report
+        """
+        log('Start creating report')
+
+        output_html_files = self._generate_corr_html_report(corr_matrix_obj_ref,
+                                                            corr_matrix_plot_path,
+                                                            scatter_plot_path)
+
+        report_params = {'message': '',
+                         'objects_created': [{'ref': corr_matrix_obj_ref,
+                                              'description': 'Correlation Matrix'}],
+                         'workspace_name': workspace_name,
+                         'html_links': output_html_files,
+                         'direct_html_link_index': 0,
+                         'html_window_height': 333,
+                         'report_object_name': 'compute_correlation_matrix_' + str(uuid.uuid4())}
+
+        kbase_report_client = KBaseReport(self.callback_url, token=self.token)
+        output = kbase_report_client.create_extended_report(report_params)
+
+        report_output = {'report_name': output['name'], 'report_ref': output['ref']}
+
+        return report_output
+
+    def _corr_for_matrix(self, input_obj_ref, method, dimension):
+        """
+        _corr_for_matrix: compute correlation matrix df for KBaseMatrices object
+        """
+
+        data_matrix = self.data_util.fetch_data({'obj_ref': input_obj_ref}).get('data_matrix')
+
+        data_df = pd.read_json(data_matrix)
+
+        corr_df = self.df_to_corr(data_df, method=method, dimension=dimension)
+
+        return corr_df, data_df
+
+    def _df_to_list(self, df):
+        """
+        _df_to_list: convert Dataframe to FloatMatrix2D matrix data
+        """
+
+        df.fillna(0, inplace=True)
+        matrix_data = {'row_ids': df.index.tolist(),
+                       'col_ids': df.columns.tolist(),
+                       'values': df.values.tolist()}
+
+        return matrix_data
+
+    def _save_corr_matrix(self, workspace_name, corr_matrix_name, corr_df, method):
+        """
+        _save_corr_matrix: save KBaseExperiments.CorrelationMatrix object
+        """
+
+        if not isinstance(workspace_name, int):
+            ws_name_id = self.dfu.ws_name_to_id(workspace_name)
+        else:
+            ws_name_id = workspace_name
+
+        corr_data = {}
+
+        corr_data.update({'coefficient_data': self._df_to_list(corr_df)})
+        corr_data.update({'correlation_parameters': {'method': method}})
+
+        obj_type = 'KBaseExperiments.CorrelationMatrix'
+        info = self.dfu.save_objects({
+            "id": ws_name_id,
+            "objects": [{
+                "type": obj_type,
+                "data": corr_data,
+                "name": corr_matrix_name
+            }]
+        })[0]
+
+        return "%s/%s/%s" % (info[6], info[0], info[4])
+
     def __init__(self, config):
+        self.ws_url = config["workspace-url"]
+        self.callback_url = config['SDK_CALLBACK_URL']
+        self.token = config['KB_AUTH_TOKEN']
         self.scratch = config['scratch']
+
+        self.data_util = DataUtil(config)
+        self.dfu = DataFileUtil(self.callback_url)
+
         plt.switch_backend('agg')
-        # self.data_util = DataUtil(config)
 
     def df_to_corr(self, df, method='pearson', dimension='col'):
         """
@@ -137,3 +361,61 @@ class CorrelationUtil:
             plt.savefig(scatter_plot_path)
 
         return scatter_plot_path
+
+    def compute_correlation_matrix(self, params):
+        """
+        input_obj_ref: object reference of a matrix
+        workspace_name: workspace name objects to be saved to
+        dimension: compute correlation on column or row, one of ['col', 'row']
+        corr_matrix_name: correlation matrix object name
+        method: correlation method, one of ['pearson', 'kendall', 'spearman']
+        compute_significance: compute pairwise significance value, default False
+        plot_corr_matrix: plot correlation matrix in repor, default False
+        plot_scatter_matrix: plot scatter matrix in report, default False
+        """
+
+        log('--->\nrunning CorrelationUtil.compute_correlation_matrix\n' +
+            'params:\n{}'.format(json.dumps(params, indent=1)))
+
+        self._validate_compute_corr_matrix_params(params)
+
+        input_obj_ref = params.get('input_obj_ref')
+        workspace_name = params.get('workspace_name')
+        corr_matrix_name = params.get('corr_matrix_name')
+
+        method = params.get('method', 'pearson')
+        dimension = params.get('dimension', 'row')
+        plot_corr_matrix = params.get('plot_corr_matrix', False)
+        plot_scatter_matrix = params.get('plot_scatter_matrix', False)
+        compute_significance = params.get('compute_significance', False)
+
+        res = self.dfu.get_objects({'object_refs': [input_obj_ref]})['data'][0]
+        obj_type = res['info'][2]
+
+        if "KBaseMatrices" in obj_type:
+            corr_df, data_df = self._corr_for_matrix(input_obj_ref, method, dimension)
+        else:
+            err_msg = 'Ooops! [{}] is not supported.\n'.format(obj_type)
+            err_msg += 'Please supply KBaseMatrices object'
+            raise ValueError("err_msg")
+
+        if plot_corr_matrix:
+            corr_matrix_plot_path = self.plot_corr_matrix(corr_df)
+        else:
+            corr_matrix_plot_path = None
+
+        if plot_scatter_matrix:
+            scatter_plot_path = self.plot_scatter_matrix(data_df, dimension=dimension)
+        else:
+            scatter_plot_path = None
+
+        corr_matrix_obj_ref = self._save_corr_matrix(workspace_name, corr_matrix_name, corr_df, method)
+
+        returnVal = {'corr_matrix_obj_ref': corr_matrix_obj_ref}
+
+        report_output = self._generate_corr_report(corr_matrix_obj_ref, workspace_name,
+                                                   corr_matrix_plot_path, scatter_plot_path)
+
+        returnVal.update(report_output)
+
+        return returnVal

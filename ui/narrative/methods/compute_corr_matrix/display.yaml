@@ -1,0 +1,80 @@
+name     : Compute Correlation Matrix
+subtitle : Create a KBaseExperiments.CorrelationMatrix with KBaseMatrices object
+tooltip  : Create a KBaseExperiments.CorrelationMatrix with KBaseMatrices object
+
+icon: data-blue.png
+
+screenshots :
+    []
+
+suggestions :
+    apps:
+        related :
+            []
+        next :
+            []
+    methods:
+        related :
+            []
+        next :
+            []
+
+parameters :
+    input_obj_ref :
+        ui-name: |
+            Matrix Object
+        short-hint : |
+            One of ExpressionMatrix, FitnessMatrix, DifferentialExpressionMatrix Object
+        long-hint  : |
+            One of ExpressionMatrix, FitnessMatrix, DifferentialExpressionMatrix Object
+
+    method:
+        ui-name: |
+            Correlation Method
+        short-hint : |
+            Correlation method, one of ['pearson', 'kendall', 'spearman']
+        long-hint  : |
+            Correlation method, one of ['pearson', 'kendall', 'spearman']
+
+    dimension:
+        ui-name: |
+            Compute Correlation Matrix On
+        short-hint : |
+            Compute correlation on column or row
+        long-hint  : |
+            Compute correlation on column or row
+
+    plot_corr_matrix:
+        ui-name: |
+            Plot Correlation Matrix
+        short-hint : |
+            Plot correlation matrix in report
+        long-hint  : |
+            Plot correlation matrix in report
+
+    plot_scatter_matrix:
+        ui-name: |
+            Plot Scatter Matrix
+        short-hint : |
+            Plot scatter matrix in report
+        long-hint  : |
+            Plot scatter matrix in report
+
+    compute_significance:
+        ui-name: |
+            Compute Significance
+        short-hint : |
+            Also compute Significance in addition to correlation matrix
+        long-hint  : |
+            Also compute Significance in addition to correlation matrix
+
+    corr_matrix_name:
+        ui-name: |
+            Correlation Matrix Name
+        short-hint : |
+            Correlation Matrix Name
+        long-hint  : |
+            Correlation Matrix Name
+
+description : |
+    <p> Create a KBaseExperiments.CorrelationMatrix with KBaseMatrices object </p>

@@ -1276,6 +1276,120 @@ ExportOutput is a reference to a hash where the following keys are defined:
     }
 }
  
+
+
+=head2 compute_correlation_matrix
+
+  $returnVal = $obj->compute_correlation_matrix($params)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$params is a GenericsAPI.CompCorrParams
+$returnVal is a GenericsAPI.CompCorrOutput
+CompCorrParams is a reference to a hash where the following keys are defined:
+	input_obj_ref has a value which is a GenericsAPI.obj_ref
+	workspace_name has a value which is a GenericsAPI.workspace_name
+	corr_matrix_name has a value which is a string
+	dimension has a value which is a string
+	method has a value which is a string
+	plot_corr_matrix has a value which is a GenericsAPI.boolean
+	plot_scatter_matrix has a value which is a GenericsAPI.boolean
+	compute_significance has a value which is a GenericsAPI.boolean
+obj_ref is a string
+workspace_name is a string
+boolean is an int
+CompCorrOutput is a reference to a hash where the following keys are defined:
+	report_name has a value which is a string
+	report_ref has a value which is a string
+	corr_matrix_obj_ref has a value which is a GenericsAPI.obj_ref
+
+</pre>
+
+=end html
+
+=begin text
+
+$params is a GenericsAPI.CompCorrParams
+$returnVal is a GenericsAPI.CompCorrOutput
+CompCorrParams is a reference to a hash where the following keys are defined:
+	input_obj_ref has a value which is a GenericsAPI.obj_ref
+	workspace_name has a value which is a GenericsAPI.workspace_name
+	corr_matrix_name has a value which is a string
+	dimension has a value which is a string
+	method has a value which is a string
+	plot_corr_matrix has a value which is a GenericsAPI.boolean
+	plot_scatter_matrix has a value which is a GenericsAPI.boolean
+	compute_significance has a value which is a GenericsAPI.boolean
+obj_ref is a string
+workspace_name is a string
+boolean is an int
+CompCorrOutput is a reference to a hash where the following keys are defined:
+	report_name has a value which is a string
+	report_ref has a value which is a string
+	corr_matrix_obj_ref has a value which is a GenericsAPI.obj_ref
+
+
+=end text
+
+=item Description
+
+compute_correlation_matrix: create sub-matrix based on input filter_ids
+
+=back
+
+=cut
+
+ sub compute_correlation_matrix
+{
+    my($self, @args) = @_;
+
+# Authentication: required
+
+    if ((my $n = @args) != 1)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function compute_correlation_matrix (received $n, expecting 1)");
+    }
+    {
+	my($params) = @args;
+
+	my @_bad_arguments;
+        (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument 1 \"params\" (value was \"$params\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to compute_correlation_matrix:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'compute_correlation_matrix');
+	}
+    }
+
+    my $url = $self->{url};
+    my $result = $self->{client}->call($url, $self->{headers}, {
+	    method => "GenericsAPI.compute_correlation_matrix",
+	    params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'compute_correlation_matrix',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method compute_correlation_matrix",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'compute_correlation_matrix',
+				       );
+    }
+}
+ 
   
 sub status
 {
@@ -1319,16 +1433,16 @@ sub version {
             Bio::KBase::Exceptions::JSONRPC->throw(
                 error => $result->error_message,
                 code => $result->content->{code},
-                method_name => 'export_cluster_set_excel',
+                method_name => 'compute_correlation_matrix',
             );
         } else {
             return wantarray ? @{$result->result} : $result->result->[0];
         }
     } else {
         Bio::KBase::Exceptions::HTTP->throw(
-            error => "Error invoking method export_cluster_set_excel",
+            error => "Error invoking method compute_correlation_matrix",
             status_line => $self->{client}->status_line,
-            method_name => 'export_cluster_set_excel',
+            method_name => 'compute_correlation_matrix',
         );
     }
 }
@@ -2203,6 +2317,97 @@ input_ref has a value which is a GenericsAPI.obj_ref
 
 a reference to a hash where the following keys are defined:
 input_ref has a value which is a GenericsAPI.obj_ref
+
+
+=end text
+
+=back
+
+
+
+=head2 CompCorrParams
+
+=over 4
+
+
+
+=item Description
+
+Input of the filter_matrix function
+input_obj_ref: object reference of a matrix
+workspace_name: workspace name objects to be saved to
+corr_matrix_name: correlation matrix object name
+dimension: compute correlation on column or row, one of ['col', 'row']
+method: correlation method, one of ['pearson', 'kendall', 'spearman']
+plot_corr_matrix: plot correlation matrix in report, default False
+plot_scatter_matrix: plot scatter matrix in report, default False
+compute_significance: also compute Significance in addition to correlation matrix
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+input_obj_ref has a value which is a GenericsAPI.obj_ref
+workspace_name has a value which is a GenericsAPI.workspace_name
+corr_matrix_name has a value which is a string
+dimension has a value which is a string
+method has a value which is a string
+plot_corr_matrix has a value which is a GenericsAPI.boolean
+plot_scatter_matrix has a value which is a GenericsAPI.boolean
+compute_significance has a value which is a GenericsAPI.boolean
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+input_obj_ref has a value which is a GenericsAPI.obj_ref
+workspace_name has a value which is a GenericsAPI.workspace_name
+corr_matrix_name has a value which is a string
+dimension has a value which is a string
+method has a value which is a string
+plot_corr_matrix has a value which is a GenericsAPI.boolean
+plot_scatter_matrix has a value which is a GenericsAPI.boolean
+compute_significance has a value which is a GenericsAPI.boolean
+
+
+=end text
+
+=back
+
+
+
+=head2 CompCorrOutput
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+report_name has a value which is a string
+report_ref has a value which is a string
+corr_matrix_obj_ref has a value which is a GenericsAPI.obj_ref
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+report_name has a value which is a string
+report_ref has a value which is a string
+corr_matrix_obj_ref has a value which is a GenericsAPI.obj_ref
 
 
 =end text
