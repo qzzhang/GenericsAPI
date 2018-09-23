@@ -240,6 +240,37 @@ class GenericsAPI(object):
             'GenericsAPI.export_cluster_set_excel',
             [params], self._service_ver, context)
 
+    def compute_correlation_matrix(self, params, context=None):
+        """
+        compute_correlation_matrix: create sub-matrix based on input filter_ids
+        :param params: instance of type "CompCorrParams" (Input of the
+           filter_matrix function input_obj_ref: object reference of a matrix
+           workspace_name: workspace name objects to be saved to
+           corr_matrix_name: correlation matrix object name dimension:
+           compute correlation on column or row, one of ['col', 'row']
+           method: correlation method, one of ['pearson', 'kendall',
+           'spearman'] plot_corr_matrix: plot correlation matrix in report,
+           default False plot_scatter_matrix: plot scatter matrix in report,
+           default False compute_significance: also compute Significance in
+           addition to correlation matrix) -> structure: parameter
+           "input_obj_ref" of type "obj_ref" (An X/Y/Z style reference),
+           parameter "workspace_name" of type "workspace_name" (workspace
+           name of the object), parameter "corr_matrix_name" of String,
+           parameter "dimension" of String, parameter "method" of String,
+           parameter "plot_corr_matrix" of type "boolean" (A boolean - 0 for
+           false, 1 for true. @range (0, 1)), parameter "plot_scatter_matrix"
+           of type "boolean" (A boolean - 0 for false, 1 for true. @range (0,
+           1)), parameter "compute_significance" of type "boolean" (A boolean
+           - 0 for false, 1 for true. @range (0, 1))
+        :returns: instance of type "CompCorrOutput" -> structure: parameter
+           "report_name" of String, parameter "report_ref" of String,
+           parameter "corr_matrix_obj_ref" of type "obj_ref" (An X/Y/Z style
+           reference)
+        """
+        return self._client.call_method(
+            'GenericsAPI.compute_correlation_matrix',
+            [params], self._service_ver, context)
+
     def status(self, context=None):
         return self._client.call_method('GenericsAPI.status',
                                         [], self._service_ver, context)

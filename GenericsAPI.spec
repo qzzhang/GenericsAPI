@@ -233,4 +233,35 @@ module GenericsAPI {
     funcdef export_cluster_set_excel(ExportClusterSetParams params)
         returns (ExportOutput result) authentication required;
 
+
+  /* Input of the filter_matrix function
+    input_obj_ref: object reference of a matrix
+    workspace_name: workspace name objects to be saved to
+    corr_matrix_name: correlation matrix object name
+    dimension: compute correlation on column or row, one of ['col', 'row']
+    method: correlation method, one of ['pearson', 'kendall', 'spearman']
+    plot_corr_matrix: plot correlation matrix in report, default False
+    plot_scatter_matrix: plot scatter matrix in report, default False
+    compute_significance: also compute Significance in addition to correlation matrix
+  */
+  typedef structure {
+      obj_ref input_obj_ref;
+      workspace_name workspace_name;
+      string corr_matrix_name;
+      string dimension;
+      string method;
+      boolean plot_corr_matrix;
+      boolean plot_scatter_matrix;
+      boolean compute_significance;
+  } CompCorrParams;
+
+  typedef structure {
+      string report_name;
+      string report_ref;
+      obj_ref corr_matrix_obj_ref;
+  } CompCorrOutput;
+
+  /* compute_correlation_matrix: create sub-matrix based on input filter_ids*/
+  funcdef compute_correlation_matrix (CompCorrParams params) returns (CompCorrOutput returnVal) authentication required;
+
 };

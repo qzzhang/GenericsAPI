@@ -371,6 +371,24 @@ public class GenericsAPIClient {
         return res.get(0);
     }
 
+    /**
+     * <p>Original spec-file function name: compute_correlation_matrix</p>
+     * <pre>
+     * compute_correlation_matrix: create sub-matrix based on input filter_ids
+     * </pre>
+     * @param   params   instance of type {@link us.kbase.genericsapi.CompCorrParams CompCorrParams}
+     * @return   parameter "returnVal" of type {@link us.kbase.genericsapi.CompCorrOutput CompCorrOutput}
+     * @throws IOException if an IO exception occurs
+     * @throws JsonClientException if a JSON RPC exception occurs
+     */
+    public CompCorrOutput computeCorrelationMatrix(CompCorrParams params, RpcContext... jsonRpcContext) throws IOException, JsonClientException {
+        List<Object> args = new ArrayList<Object>();
+        args.add(params);
+        TypeReference<List<CompCorrOutput>> retType = new TypeReference<List<CompCorrOutput>>() {};
+        List<CompCorrOutput> res = caller.jsonrpcCall("GenericsAPI.compute_correlation_matrix", args, retType, true, true, jsonRpcContext, this.serviceVersion);
+        return res.get(0);
+    }
+
     public Map<String, Object> status(RpcContext... jsonRpcContext) throws IOException, JsonClientException {
         List<Object> args = new ArrayList<Object>();
         TypeReference<List<Map<String, Object>>> retType = new TypeReference<List<Map<String, Object>>>() {};

@@ -381,6 +381,10 @@ class Application(object):
                              name='GenericsAPI.export_cluster_set_excel',
                              types=[dict])
         self.method_authentication['GenericsAPI.export_cluster_set_excel'] = 'required'  # noqa
+        self.rpc_service.add(impl_GenericsAPI.compute_correlation_matrix,
+                             name='GenericsAPI.compute_correlation_matrix',
+                             types=[dict])
+        self.method_authentication['GenericsAPI.compute_correlation_matrix'] = 'required'  # noqa
         self.rpc_service.add(impl_GenericsAPI.status,
                              name='GenericsAPI.status',
                              types=[dict])
