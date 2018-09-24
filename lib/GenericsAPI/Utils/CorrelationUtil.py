@@ -49,6 +49,39 @@ class CorrelationUtil:
             if p not in params:
                 raise ValueError('"{}" parameter is required, but missing'.format(p))
 
+    def _build_table_content(self, matrix_2D):
+        """
+        _build_table_content: generate HTML table content for FloatMatrix2D object
+        """
+
+        table_content = """\n<table>\n"""
+
+        row_ids = matrix_2D.get('row_ids')
+        col_ids = matrix_2D.get('col_ids')
+        values = matrix_2D.get('values')
+
+        # build header row
+        table_content += """\n<tr>\n"""
+        table_content += """\n <td></td>\n"""
+        for row_id in row_ids:
+            table_content += """\n <td>{}</td>\n""".format(row_id)
+        table_content += """\n</tr>\n"""
+
+        # build body rows
+        for idx, value in enumerate(values):
+            table_content += """\n<tr>\n"""
+
+            table_content += """\n <td>{}</td>\n""".format(row_ids[idx])
+
+            for val in value:
+                table_content += """\n <td>{}</td>\n""".format(val)
+
+            table_content += """\n</tr>\n"""
+
+        table_content += """\n</table>\n"""
+
+        return table_content
+
     def _generate_visualization_content(self, output_directory, corr_matrix_obj_ref,
                                         corr_matrix_plot_path, scatter_plot_path):
 
@@ -74,11 +107,17 @@ class CorrelationUtil:
             <button class="tablinks" onclick="openTab(event, 'CorrelationMatrix')" id="defaultOpen">Correlation Matrix</button>
         """
 
+        corr_table_content = self._build_table_content(coefficient_data)
         tab_content += """
-        <div id="CorrelationMatrix" class="tabcontent">
-            <p>CorrelationMatrix_Content</p>
-        </div>
-        """
+        <div id="CorrelationMatrix" class="tabcontent">{}</div>""".format(corr_table_content)
+
+        if significance_data:
+            tab_def_content += """
+            <button class="tablinks" onclick="openTab(event, 'SignificanceMatrix')">Significance Matrix</button>
+            """
+            sig_table_content = self._build_table_content(significance_data)
+            tab_content += """
+            <div id="SignificanceMatrix" class="tabcontent">{}</div>""".format(sig_table_content)
 
         if corr_matrix_plot_path:
             tab_def_content += """
@@ -211,6 +250,14 @@ class CorrelationUtil:
 
         return corr_df, data_df
 
+    def _compute_significance(self, data_df):
+        """
+        _compute_significance: compute pairwsie significance dataframe
+        """
+        sig_df = None
+
+        return sig_df
+
     def _df_to_list(self, df):
         """
         _df_to_list: convert Dataframe to FloatMatrix2D matrix data
@@ -223,7 +270,7 @@ class CorrelationUtil:
 
         return matrix_data
 
-    def _save_corr_matrix(self, workspace_name, corr_matrix_name, corr_df, method):
+    def _save_corr_matrix(self, workspace_name, corr_matrix_name, corr_df, sig_df, method):
         """
         _save_corr_matrix: save KBaseExperiments.CorrelationMatrix object
         """
@@ -237,6 +284,9 @@ class CorrelationUtil:
 
         corr_data.update({'coefficient_data': self._df_to_list(corr_df)})
         corr_data.update({'correlation_parameters': {'method': method}})
+
+        if sig_df:
+            corr_data.update({'significance_data': self._df_to_list(sig_df)})
 
         obj_type = 'KBaseExperiments.CorrelationMatrix'
         info = self.dfu.save_objects({
@@ -394,6 +444,9 @@ class CorrelationUtil:
 
         if "KBaseMatrices" in obj_type:
             corr_df, data_df = self._corr_for_matrix(input_obj_ref, method, dimension)
+            sig_df = None
+            if compute_significance:
+                sig_df = self._compute_significance(data_df)
         else:
             err_msg = 'Ooops! [{}] is not supported.\n'.format(obj_type)
             err_msg += 'Please supply KBaseMatrices object'
@@ -409,7 +462,8 @@ class CorrelationUtil:
         else:
             scatter_plot_path = None
 
-        corr_matrix_obj_ref = self._save_corr_matrix(workspace_name, corr_matrix_name, corr_df, method)
+        corr_matrix_obj_ref = self._save_corr_matrix(workspace_name, corr_matrix_name, corr_df,
+                                                     sig_df, method)
 
         returnVal = {'corr_matrix_obj_ref': corr_matrix_obj_ref}
 
