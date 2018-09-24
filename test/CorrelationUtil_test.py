@@ -171,7 +171,8 @@ class GenericsAPITest(unittest.TestCase):
                   'workspace_name': self.wsName,
                   'corr_matrix_name': 'test_corr_matrix',
                   'plot_corr_matrix': True,
-                  'plot_scatter_matrix': True}
+                  'plot_scatter_matrix': True,
+                  'compute_significance': True}
 
         ret = self.getImpl().compute_correlation_matrix(self.ctx, params)[0]
 
@@ -186,6 +187,9 @@ class GenericsAPITest(unittest.TestCase):
         corr_items = ['WRI_RS00010_CDS_1', 'WRI_RS00015_CDS_1', 'WRI_RS00025_CDS_1']
         self.assertItemsEqual(obj_data.get('coefficient_data').get('row_ids'), corr_items)
         self.assertItemsEqual(obj_data.get('coefficient_data').get('col_ids'), corr_items)
+
+        self.assertItemsEqual(obj_data.get('significance_data').get('row_ids'), corr_items)
+        self.assertItemsEqual(obj_data.get('significance_data').get('col_ids'), corr_items)
 
     def test_init_ok(self):
         self.start_test()

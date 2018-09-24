@@ -7,6 +7,7 @@ import traceback
 from matplotlib import pyplot as plt
 import json
 import shutil
+from scipy import stats
 
 from GenericsAPI.Utils.DataUtil import DataUtil
 from DataFileUtil.DataFileUtilClient import DataFileUtil
@@ -250,11 +251,24 @@ class CorrelationUtil:
 
         return corr_df, data_df
 
-    def _compute_significance(self, data_df):
+    def _compute_significance(self, data_df, dimension):
         """
         _compute_significance: compute pairwsie significance dataframe
+                               two-sided p-value for a hypothesis test
         """
-        sig_df = None
+
+        log('Start computing significance matrix')
+        if dimension == 'row':
+            data_df = data_df.T
+
+        data_df = data_df.dropna()._get_numeric_data()
+        dfcols = pd.DataFrame(columns=data_df.columns)
+        sig_df = dfcols.transpose().join(dfcols, how='outer')
+
+        for r in data_df.columns:
+            for c in data_df.columns:
+                pvalue = stats.linregress(data_df[r], data_df[c])[3]
+                sig_df[r][c] = round(pvalue, 4)
 
         return sig_df
 
@@ -285,7 +299,7 @@ class CorrelationUtil:
         corr_data.update({'coefficient_data': self._df_to_list(corr_df)})
         corr_data.update({'correlation_parameters': {'method': method}})
 
-        if sig_df:
+        if sig_df is not None:
             corr_data.update({'significance_data': self._df_to_list(sig_df)})
 
         obj_type = 'KBaseExperiments.CorrelationMatrix'
@@ -446,7 +460,7 @@ class CorrelationUtil:
             corr_df, data_df = self._corr_for_matrix(input_obj_ref, method, dimension)
             sig_df = None
             if compute_significance:
-                sig_df = self._compute_significance(data_df)
+                sig_df = self._compute_significance(data_df, dimension)
         else:
             err_msg = 'Ooops! [{}] is not supported.\n'.format(obj_type)
             err_msg += 'Please supply KBaseMatrices object'
