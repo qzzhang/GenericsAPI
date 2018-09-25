@@ -22,6 +22,7 @@ def log(message, prefix_newline=False):
 
 MATRIX_TYPE = ['ExpressionMatrix', 'FitnessMatrix', 'DifferentialExpressionMatrix']
 TYPE_ATTRIBUTES = {'description', 'scale', 'row_normalization', 'col_normalization'}
+SCALE_TYPES = {'raw', 'ln', 'log2', 'log10'}
 
 
 class MatrixUtil:
@@ -34,13 +35,17 @@ class MatrixUtil:
         log('start validating import_matrix_from_excel params')
 
         # check for required parameters
-        for p in ['obj_type', 'matrix_name', 'workspace_name']:
+        for p in ['obj_type', 'matrix_name', 'workspace_name', 'scale']:
             if p not in params:
                 raise ValueError('"{}" parameter is required, but missing'.format(p))
 
         obj_type = params.get('obj_type')
         if obj_type not in MATRIX_TYPE:
             raise ValueError('Unknown matrix object type: {}'.format(obj_type))
+
+        scale = params.get('scale')
+        if scale not in SCALE_TYPES:
+            raise ValueError('Unknown scale type: {}'.format(scale))
 
         if params.get('input_file_path'):
             file_path = params.get('input_file_path')
@@ -62,7 +67,7 @@ class MatrixUtil:
         refs = {k: v for k, v in params.items() if k in refs_key}
 
         return (obj_type, file_path, params.get('workspace_name'),
-                params.get('matrix_name'), refs)
+                params.get('matrix_name'), refs, scale)
 
     def _upload_to_shock(self, file_path):
         """
@@ -480,7 +485,7 @@ class MatrixUtil:
         """
 
         (obj_type, file_path, workspace_name,
-         matrix_name, refs) = self._validate_import_matrix_from_excel_params(params)
+         matrix_name, refs, scale) = self._validate_import_matrix_from_excel_params(params)
 
         if not isinstance(workspace_name, int):
             workspace_id = self.dfu.ws_name_to_id(workspace_name)
@@ -488,6 +493,7 @@ class MatrixUtil:
             workspace_id = workspace_name
 
         data = self._file_to_data(file_path, refs, matrix_name, workspace_id)
+        data['scale'] = scale
 
         matrix_obj_ref = self.data_util.save_object({
                                                 'obj_type': 'KBaseMatrices.{}'.format(obj_type),

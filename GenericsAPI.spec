@@ -109,6 +109,7 @@ module GenericsAPI {
       string input_file_path;
       string input_staging_file_path;
       string matrix_name;
+      string scale;
       workspace_name workspace_name;
 
       obj_ref genome_ref;
