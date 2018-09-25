@@ -8,6 +8,7 @@ from xlrd.biffh import XLRDError
 from openpyxl import load_workbook
 import collections
 import shutil
+import pprint
 
 from DataFileUtil.DataFileUtilClient import DataFileUtil
 from KBaseReport.KBaseReportClient import KBaseReport
@@ -185,24 +186,24 @@ class MatrixUtil:
         data = refs
 
         try:
-            pd.read_excel(file_path)
-        except XLRDError:
-            # TODO: convert csv file to excel
-            log('Found csv file')
-            raise ValueError('Please provide .xlsx file only')
-
-        # processing data sheet
-        try:
             df = pd.read_excel(file_path, sheet_name='data')
-        except XLRDError:
-            raise ValueError('Cannot find <data> sheetss')
-        else:
-            df.fillna(0, inplace=True)
-            matrix_data = {'row_ids': df.index.tolist(),
-                           'col_ids': df.columns.tolist(),
-                           'values': df.values.tolist()}
 
-            data.update({'data': matrix_data})
+        except XLRDError:
+            try:
+                df = pd.read_excel(file_path)
+                print('WARNING: A sheet named "data" was not found in the attached file, '
+                      'proceeding with the first sheet as the data sheet.')
+
+            except XLRDError:
+                df = pd.read_csv(file_path, index_col=0)
+
+        df.fillna(0, inplace=True)
+        matrix_data = {'row_ids': df.index.tolist(),
+                       'col_ids': df.columns.tolist(),
+                       'values': df.values.tolist()}
+
+        data.update({'data': matrix_data})
+        pprint.pprint(data)
 
         # processing col/row_mapping
         col_mapping = self._process_mapping_sheet(file_path, 'col_mapping')
