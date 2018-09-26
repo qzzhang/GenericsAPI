@@ -45,6 +45,36 @@
       "text_options" : {}
     },
     {
+      "id" : "scale",
+      "optional" : false,
+      "advanced" : false,
+      "allow_multiple" : false,
+      "default_values" : ["log2"],
+      "field_type" : "dropdown",
+      "dropdown_options":
+      {
+        "options":
+        [
+          {
+              "display": "Raw Counts",
+              "value": "raw"
+          },
+          {
+              "display": "Log 2",
+              "value": "log2"
+          },
+          {
+              "display": "Log 10",
+              "value": "log10"
+          },
+          {
+              "display": "Natural Log",
+              "value": "ln"
+          }
+        ]
+      }
+    },
+    {
       "id" : "matrix_name",
       "optional" : false,
       "advanced" : false,
@@ -118,6 +148,10 @@
         {
           "input_parameter": "input_staging_file_path",
           "target_property": "input_staging_file_path"
+        },
+        {
+          "input_parameter": "scale",
+          "target_property": "scale"
         },
         {
           "input_parameter": "matrix_name",

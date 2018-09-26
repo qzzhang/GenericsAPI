@@ -23,7 +23,7 @@ class GenericsAPI(object):
             self, url=None, timeout=30 * 60, user_id=None,
             password=None, token=None, ignore_authrc=False,
             trust_all_ssl_certificates=False,
-            auth_svc='https://kbase.us/services/authorization/Sessions/Login'):
+            auth_svc='https://ci.kbase.us/services/auth/api/legacy/KBase/Sessions/Login'):
         if url is None:
             raise ValueError('A url is required')
         self._service_ver = None
@@ -106,12 +106,12 @@ class GenericsAPI(object):
            structure: parameter "obj_type" of String, parameter
            "input_shock_id" of String, parameter "input_file_path" of String,
            parameter "input_staging_file_path" of String, parameter
-           "matrix_name" of String, parameter "workspace_name" of type
-           "workspace_name" (workspace name of the object), parameter
-           "genome_ref" of type "obj_ref" (An X/Y/Z style reference),
-           parameter "col_attributemapping_ref" of type "obj_ref" (An X/Y/Z
-           style reference), parameter "row_attributemapping_ref" of type
-           "obj_ref" (An X/Y/Z style reference), parameter
+           "matrix_name" of String, parameter "scale" of String, parameter
+           "workspace_name" of type "workspace_name" (workspace name of the
+           object), parameter "genome_ref" of type "obj_ref" (An X/Y/Z style
+           reference), parameter "col_attributemapping_ref" of type "obj_ref"
+           (An X/Y/Z style reference), parameter "row_attributemapping_ref"
+           of type "obj_ref" (An X/Y/Z style reference), parameter
            "diff_expr_matrix_ref" of type "obj_ref" (An X/Y/Z style reference)
         :returns: instance of type "ImportMatrixOutput" -> structure:
            parameter "report_name" of String, parameter "report_ref" of

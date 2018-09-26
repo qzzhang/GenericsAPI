@@ -36,6 +36,14 @@ parameters :
         long-hint  : |
             Recognized extensions for the input file is .xlsx
 
+    scale:
+      ui-name : |
+          Data Scale
+      short-hint : |
+          Scale factor for the data in the matrix
+      long-hint  : |
+          Scale factor for the data in the matrix
+
     matrix_name :
         ui-name : |
             Matrix Object Name

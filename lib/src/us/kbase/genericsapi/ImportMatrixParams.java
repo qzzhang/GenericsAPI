@@ -37,6 +37,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
     "input_file_path",
     "input_staging_file_path",
     "matrix_name",
+    "scale",
     "workspace_name",
     "genome_ref",
     "col_attributemapping_ref",
@@ -55,6 +56,8 @@ public class ImportMatrixParams {
     private String inputStagingFilePath;
     @JsonProperty("matrix_name")
     private String matrixName;
+    @JsonProperty("scale")
+    private String scale;
     @JsonProperty("workspace_name")
     private String workspaceName;
     @JsonProperty("genome_ref")
@@ -139,6 +142,21 @@ public class ImportMatrixParams {
 
     public ImportMatrixParams withMatrixName(String matrixName) {
         this.matrixName = matrixName;
+        return this;
+    }
+
+    @JsonProperty("scale")
+    public String getScale() {
+        return scale;
+    }
+
+    @JsonProperty("scale")
+    public void setScale(String scale) {
+        this.scale = scale;
+    }
+
+    public ImportMatrixParams withScale(String scale) {
+        this.scale = scale;
         return this;
     }
 
@@ -229,7 +247,7 @@ public class ImportMatrixParams {
 
     @Override
     public String toString() {
-        return ((((((((((((((((((((((("ImportMatrixParams"+" [objType=")+ objType)+", inputShockId=")+ inputShockId)+", inputFilePath=")+ inputFilePath)+", inputStagingFilePath=")+ inputStagingFilePath)+", matrixName=")+ matrixName)+", workspaceName=")+ workspaceName)+", genomeRef=")+ genomeRef)+", colAttributemappingRef=")+ colAttributemappingRef)+", rowAttributemappingRef=")+ rowAttributemappingRef)+", diffExprMatrixRef=")+ diffExprMatrixRef)+", additionalProperties=")+ additionalProperties)+"]");
+        return ((((((((((((((((((((((((("ImportMatrixParams"+" [objType=")+ objType)+", inputShockId=")+ inputShockId)+", inputFilePath=")+ inputFilePath)+", inputStagingFilePath=")+ inputStagingFilePath)+", matrixName=")+ matrixName)+", scale=")+ scale)+", workspaceName=")+ workspaceName)+", genomeRef=")+ genomeRef)+", colAttributemappingRef=")+ colAttributemappingRef)+", rowAttributemappingRef=")+ rowAttributemappingRef)+", diffExprMatrixRef=")+ diffExprMatrixRef)+", additionalProperties=")+ additionalProperties)+"]");
     }
 
 }
