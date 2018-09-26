@@ -7,6 +7,7 @@ from GenericsAPI.Utils.MatrixUtil import MatrixUtil
 from GenericsAPI.Utils.AttributeUtils import AttributesUtil
 from GenericsAPI.Utils.DataUtil import DataUtil
 from GenericsAPI.Utils.CorrelationUtil import CorrelationUtil
+from GenericsAPI.Utils.NetworkUtil import NetworkUtil
 #END_HEADER
 
 
@@ -44,6 +45,7 @@ class GenericsAPI:
         self.matrix_util = MatrixUtil(self.config)
         self.corr_util = CorrelationUtil(self.config)
         self.data_util = DataUtil(self.config)
+        self.network_util = NetworkUtil(self.config)
         logging.basicConfig(level=logging.INFO)
         #END_CONSTRUCTOR
         pass
