@@ -58,7 +58,7 @@ class GenericsAPITest(unittest.TestCase):
         cls.dfu = DataFileUtil(cls.callback_url)
 
         suffix = int(time.time() * 1000)
-        cls.wsName = "test_kb_ke_apps_" + str(suffix)
+        cls.wsName = "test_GenericsAPI_" + str(suffix)
         cls.wsClient.create_workspace({'workspace': cls.wsName})
         cls.prepare_data()
 

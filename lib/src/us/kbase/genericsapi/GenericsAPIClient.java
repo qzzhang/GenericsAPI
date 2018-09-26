@@ -389,6 +389,24 @@ public class GenericsAPIClient {
         return res.get(0);
     }
 
+    /**
+     * <p>Original spec-file function name: build_network</p>
+     * <pre>
+     * build_network: filter correlation matrix and build network
+     * </pre>
+     * @param   params   instance of type {@link us.kbase.genericsapi.BuildNetworkParams BuildNetworkParams}
+     * @return   parameter "returnVal" of type {@link us.kbase.genericsapi.BuildNetworkOutput BuildNetworkOutput}
+     * @throws IOException if an IO exception occurs
+     * @throws JsonClientException if a JSON RPC exception occurs
+     */
+    public BuildNetworkOutput buildNetwork(BuildNetworkParams params, RpcContext... jsonRpcContext) throws IOException, JsonClientException {
+        List<Object> args = new ArrayList<Object>();
+        args.add(params);
+        TypeReference<List<BuildNetworkOutput>> retType = new TypeReference<List<BuildNetworkOutput>>() {};
+        List<BuildNetworkOutput> res = caller.jsonrpcCall("GenericsAPI.build_network", args, retType, true, true, jsonRpcContext, this.serviceVersion);
+        return res.get(0);
+    }
+
     public Map<String, Object> status(RpcContext... jsonRpcContext) throws IOException, JsonClientException {
         List<Object> args = new ArrayList<Object>();
         TypeReference<List<Map<String, Object>>> retType = new TypeReference<List<Map<String, Object>>>() {};

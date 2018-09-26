@@ -1392,6 +1392,110 @@ compute_correlation_matrix: create sub-matrix based on input filter_ids
     }
 }
  
+
+
+=head2 build_network
+
+  $returnVal = $obj->build_network($params)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$params is a GenericsAPI.BuildNetworkParams
+$returnVal is a GenericsAPI.BuildNetworkOutput
+BuildNetworkParams is a reference to a hash where the following keys are defined:
+	corr_matrix_ref has a value which is a GenericsAPI.obj_ref
+	workspace_name has a value which is a GenericsAPI.workspace_name
+	network_obj_name has a value which is a string
+	filter_on_threshold has a value which is a reference to a hash where the key is a string and the value is a string
+obj_ref is a string
+workspace_name is a string
+BuildNetworkOutput is a reference to a hash where the following keys are defined:
+	report_name has a value which is a string
+	report_ref has a value which is a string
+	network_obj_ref has a value which is a GenericsAPI.obj_ref
+
+</pre>
+
+=end html
+
+=begin text
+
+$params is a GenericsAPI.BuildNetworkParams
+$returnVal is a GenericsAPI.BuildNetworkOutput
+BuildNetworkParams is a reference to a hash where the following keys are defined:
+	corr_matrix_ref has a value which is a GenericsAPI.obj_ref
+	workspace_name has a value which is a GenericsAPI.workspace_name
+	network_obj_name has a value which is a string
+	filter_on_threshold has a value which is a reference to a hash where the key is a string and the value is a string
+obj_ref is a string
+workspace_name is a string
+BuildNetworkOutput is a reference to a hash where the following keys are defined:
+	report_name has a value which is a string
+	report_ref has a value which is a string
+	network_obj_ref has a value which is a GenericsAPI.obj_ref
+
+
+=end text
+
+=item Description
+
+build_network: filter correlation matrix and build network
+
+=back
+
+=cut
+
+ sub build_network
+{
+    my($self, @args) = @_;
+
+# Authentication: required
+
+    if ((my $n = @args) != 1)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function build_network (received $n, expecting 1)");
+    }
+    {
+	my($params) = @args;
+
+	my @_bad_arguments;
+        (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument 1 \"params\" (value was \"$params\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to build_network:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'build_network');
+	}
+    }
+
+    my $url = $self->{url};
+    my $result = $self->{client}->call($url, $self->{headers}, {
+	    method => "GenericsAPI.build_network",
+	    params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'build_network',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method build_network",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'build_network',
+				       );
+    }
+}
+ 
   
 sub status
 {
@@ -1435,16 +1539,16 @@ sub version {
             Bio::KBase::Exceptions::JSONRPC->throw(
                 error => $result->error_message,
                 code => $result->content->{code},
-                method_name => 'compute_correlation_matrix',
+                method_name => 'build_network',
             );
         } else {
             return wantarray ? @{$result->result} : $result->result->[0];
         }
     } else {
         Bio::KBase::Exceptions::HTTP->throw(
-            error => "Error invoking method compute_correlation_matrix",
+            error => "Error invoking method build_network",
             status_line => $self->{client}->status_line,
-            method_name => 'compute_correlation_matrix',
+            method_name => 'build_network',
         );
     }
 }
@@ -2412,6 +2516,87 @@ a reference to a hash where the following keys are defined:
 report_name has a value which is a string
 report_ref has a value which is a string
 corr_matrix_obj_ref has a value which is a GenericsAPI.obj_ref
+
+
+=end text
+
+=back
+
+
+
+=head2 BuildNetworkParams
+
+=over 4
+
+
+
+=item Description
+
+Input of the build_network function
+corr_matrix_ref: CorrelationMatrix object
+workspace_name: workspace name objects to be saved to
+network_obj_name: Network object name
+filter_on_threshold: Dictory holder that holds filter on thredshold params
+params in filter_on_threshold:
+  coefficient_threshold: correlation coefficient threshold (select pairs with greater correlation coefficient)
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+corr_matrix_ref has a value which is a GenericsAPI.obj_ref
+workspace_name has a value which is a GenericsAPI.workspace_name
+network_obj_name has a value which is a string
+filter_on_threshold has a value which is a reference to a hash where the key is a string and the value is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+corr_matrix_ref has a value which is a GenericsAPI.obj_ref
+workspace_name has a value which is a GenericsAPI.workspace_name
+network_obj_name has a value which is a string
+filter_on_threshold has a value which is a reference to a hash where the key is a string and the value is a string
+
+
+=end text
+
+=back
+
+
+
+=head2 BuildNetworkOutput
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+report_name has a value which is a string
+report_ref has a value which is a string
+network_obj_ref has a value which is a GenericsAPI.obj_ref
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+report_name has a value which is a string
+report_ref has a value which is a string
+network_obj_ref has a value which is a GenericsAPI.obj_ref
 
 
 =end text

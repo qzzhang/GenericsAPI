@@ -57,7 +57,7 @@ class GenericsAPITest(unittest.TestCase):
         cls.corr_util = CorrelationUtil(cls.cfg)
 
         suffix = int(time.time() * 1000)
-        cls.wsName = "test_kb_ke_apps_" + str(suffix)
+        cls.wsName = "test_corr_util_" + str(suffix)
         cls.wsClient.create_workspace({'workspace': cls.wsName})
 
     @classmethod
