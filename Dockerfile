@@ -20,12 +20,18 @@ RUN pip install pandas \
 RUN pip uninstall networkx -y \
     && pip install networkx==2.1
 
+RUN mkdir -p /kb/module/work
+RUN chmod -R a+rw /kb/module
+# install SigmaJS http://sigmajs.org/
+RUN cd /kb/module && \
+    wget https://github.com/jacomyal/sigma.js/archive/v1.2.1.zip && \
+    unzip v1.2.1.zip && \
+    rm -rf v1.2.1.zip && \
+    mv sigma.js-1.2.1 sigma_js
+
 # -----------------------------------------
 
 COPY ./ /kb/module
-RUN mkdir -p /kb/module/work
-RUN chmod -R a+rw /kb/module
-
 WORKDIR /kb/module
 
 RUN make all

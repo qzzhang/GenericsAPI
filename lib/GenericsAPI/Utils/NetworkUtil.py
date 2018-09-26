@@ -58,30 +58,17 @@ class NetworkUtil:
 
         return links
 
-    def _generate_visualization_content(self, output_directory, graph_path):
+    def _generate_visualization_content(self, graph):
         """
         _generate_visualization_content: generate visualization html content
         """
 
-        visualization_content = ''
+        graph_nodes_content = str(graph.nodes()).replace('u', '')
+        graph_edges_content = str([list(edge) for edge in graph.edges()]).replace('u', '')
 
-        network_plot_name = 'network_plot.png'
-        network_plot_display_name = 'network'
+        return graph_nodes_content, graph_edges_content
 
-        shutil.copy2(graph_path,
-                     os.path.join(output_directory, network_plot_name))
-
-        visualization_content += '<div class="gallery">'
-        visualization_content += '<a target="_blank" href="{}">'.format(network_plot_name)
-        visualization_content += '<img src="{}" '.format(network_plot_name)
-        visualization_content += 'alt="{}" width="800" height="800">'.format(
-                                                            network_plot_display_name)
-        visualization_content += '</a><div class="desc">{}</div></div>'.format(
-                                                                network_plot_display_name)
-
-        return visualization_content
-
-    def _generate_network_html_report(self, graph_path):
+    def _generate_network_html_report(self, graph):
         """
         _generate_network_html_report: generate html summary report
         """
@@ -93,15 +80,19 @@ class NetworkUtil:
         self._mkdir_p(output_directory)
         result_file_path = os.path.join(output_directory, 'network_report.html')
 
-        visualization_content = self._generate_visualization_content(output_directory,
-                                                                     graph_path)
+        print 'fdsafds'
+        print result_file_path
+
+        graph_nodes_content, graph_edges_content = self._generate_visualization_content(graph)
 
         with open(result_file_path, 'w') as result_file:
             with open(os.path.join(os.path.dirname(__file__), 'network_template.html'),
                       'r') as report_template_file:
                 report_template = report_template_file.read()
-                report_template = report_template.replace('<p>Visualization_Content</p>',
-                                                          visualization_content)
+                report_template = report_template.replace('//GRAPH_NODES',
+                                                          graph_nodes_content)
+                report_template = report_template.replace('//GRAPH_EDGES',
+                                                          graph_edges_content)
                 result_file.write(report_template)
 
         report_shock_id = self.dfu.file_to_shock({'file_path': output_directory,
@@ -114,13 +105,13 @@ class NetworkUtil:
                             })
         return html_report
 
-    def _generate_network_report(self, graph_path, network_obj_ref, workspace_name):
+    def _generate_network_report(self, graph, network_obj_ref, workspace_name):
         """
         _generate_report: generate summary report
         """
         log('Start creating report')
 
-        output_html_files = self._generate_network_html_report(graph_path)
+        output_html_files = self._generate_network_html_report(graph)
 
         report_params = {'message': '',
                          'objects_created': [{'ref': network_obj_ref,
@@ -268,17 +259,15 @@ class NetworkUtil:
             links_filtered = self._filter_links_threshold(links, coefficient_threshold)
             graph = self.df_to_graph(links_filtered, source='source', target='target')
 
-            result_dir = os.path.join(self.scratch, str(uuid.uuid4()) + '_network_plots')
-            self._mkdir_p(result_dir)
-
-            graph_path = os.path.join(result_dir, 'network_plot.png')
-
-            self.draw_graph(graph, graph_path)
+            # result_dir = os.path.join(self.scratch, str(uuid.uuid4()) + '_network_plots')
+            # self._mkdir_p(result_dir)
+            # graph_path = os.path.join(result_dir, 'network_plot.png')
+            # self.draw_graph(graph, graph_path)
 
         network_obj_ref = self._build_network_object(graph, workspace_name, network_obj_name)
 
         returnVal = {'network_obj_ref': network_obj_ref}
-        report_output = self._generate_network_report(graph_path, network_obj_ref, workspace_name)
+        report_output = self._generate_network_report(graph, network_obj_ref, workspace_name)
 
         returnVal.update(report_output)
         return returnVal
