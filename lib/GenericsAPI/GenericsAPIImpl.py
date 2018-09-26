@@ -27,7 +27,7 @@ class GenericsAPI:
     # the latter method is running.
     ######################################### noqa
     VERSION = "0.0.1"
-    GIT_URL = "git@github.com:Tianhao-Gu/GenericsAPI.git"
+    GIT_URL = "https://github.com/kbaseapps/GenericsAPI.git"
     GIT_COMMIT_HASH = "4381310ede6e2bb25c2b6d99eaa6a9c37971c8bf"
 
     #BEGIN_CLASS_HEADER
@@ -151,12 +151,12 @@ class GenericsAPI:
            structure: parameter "obj_type" of String, parameter
            "input_shock_id" of String, parameter "input_file_path" of String,
            parameter "input_staging_file_path" of String, parameter
-           "matrix_name" of String, parameter "workspace_name" of type
-           "workspace_name" (workspace name of the object), parameter
-           "genome_ref" of type "obj_ref" (An X/Y/Z style reference),
-           parameter "col_attributemapping_ref" of type "obj_ref" (An X/Y/Z
-           style reference), parameter "row_attributemapping_ref" of type
-           "obj_ref" (An X/Y/Z style reference), parameter
+           "matrix_name" of String, parameter "scale" of String, parameter
+           "workspace_name" of type "workspace_name" (workspace name of the
+           object), parameter "genome_ref" of type "obj_ref" (An X/Y/Z style
+           reference), parameter "col_attributemapping_ref" of type "obj_ref"
+           (An X/Y/Z style reference), parameter "row_attributemapping_ref"
+           of type "obj_ref" (An X/Y/Z style reference), parameter
            "diff_expr_matrix_ref" of type "obj_ref" (An X/Y/Z style reference)
         :returns: instance of type "ImportMatrixOutput" -> structure:
            parameter "report_name" of String, parameter "report_ref" of
