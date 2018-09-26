@@ -1,5 +1,8 @@
 module KBaseExperiments {
 
+    /* A boolean - 0 for false, 1 for true.
+      @range (0, 1)
+    */
     typedef int bool;
 
      /* Ref to a genome
@@ -192,4 +195,57 @@ module KBaseExperiments {
       FloatMatrix2D coefficient_data;
       FloatMatrix2D significance_data;
     } CorrelationMatrix;
+
+    /*
+      Represents a node in a network.
+      string label - String representation of a node
+      mapping<string,string> properties - Other node properties
+
+      @optional properties
+    */
+    typedef structure {
+      string label;
+      mapping<string, string> properties;
+    } Node;
+
+    /* Identifier of a node */
+    typedef string node_id;
+
+    /*
+      Represents an edge in a network.
+      node_id node_1 - Identifier (key of Network.nodes) of the first node (source node, if the edge is directed) connected by a given edge 
+      node_id node_2 - Identifier (key of Network.nodes) of the second node (target node, if the edge is directed) connected by a given edge
+      boolean directed - Specify whether the edge is directed or not. 1 if it is directed, 0 if it is not directed
+      float weight - Weight of an edge
+      string label - String representation of an edge
+      mapping<string,string> properties - Other edge properties
+
+      @optional directed weight label properties
+    */
+    typedef structure {
+      node_id node_1_id;
+      node_id node_2_id;
+      bool directed;
+      float weight;
+      string label;
+      mapping<string, string> properties;
+    } Edge;
+
+    /*
+      Represents a network
+      list<Edge> edges - A list of all edges in a network
+      mapping<node_id, Node>> nodes - A dict of all nodes in a network
+      mapping<string,string> network_properties - Other network properties
+
+      @optional description network_properties
+
+      @metadata ws length(nodes) as n_nodes
+      @metadata ws length(edges) as n_edges
+    */
+    typedef structure {
+      string description;
+      list<Edge> edges;
+      mapping<node_id, Node> nodes;
+      mapping<string, string> network_properties;
+    } Network;
 };
