@@ -21,6 +21,8 @@ def log(message, prefix_newline=False):
 
 class NetworkUtil:
 
+    SIGMA_PATH = '/kb/module/sigma_js'
+
     def _mkdir_p(self, path):
         """
         _mkdir_p: make directory for given path
@@ -80,8 +82,7 @@ class NetworkUtil:
         self._mkdir_p(output_directory)
         result_file_path = os.path.join(output_directory, 'network_report.html')
 
-        print 'fdsafds'
-        print result_file_path
+        shutil.copytree(self.SIGMA_PATH, os.path.join(output_directory, 'sigma_js'))
 
         graph_nodes_content, graph_edges_content = self._generate_visualization_content(graph)
 
