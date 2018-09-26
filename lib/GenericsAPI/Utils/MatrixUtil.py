@@ -8,6 +8,7 @@ from xlrd.biffh import XLRDError
 from openpyxl import load_workbook
 import collections
 import shutil
+import pprint
 
 from DataFileUtil.DataFileUtilClient import DataFileUtil
 from KBaseReport.KBaseReportClient import KBaseReport
@@ -22,6 +23,7 @@ def log(message, prefix_newline=False):
 
 MATRIX_TYPE = ['ExpressionMatrix', 'FitnessMatrix', 'DifferentialExpressionMatrix']
 TYPE_ATTRIBUTES = {'description', 'scale', 'row_normalization', 'col_normalization'}
+SCALE_TYPES = {'raw', 'ln', 'log2', 'log10'}
 
 
 class MatrixUtil:
@@ -34,13 +36,17 @@ class MatrixUtil:
         log('start validating import_matrix_from_excel params')
 
         # check for required parameters
-        for p in ['obj_type', 'matrix_name', 'workspace_name']:
+        for p in ['obj_type', 'matrix_name', 'workspace_name', 'scale']:
             if p not in params:
                 raise ValueError('"{}" parameter is required, but missing'.format(p))
 
         obj_type = params.get('obj_type')
         if obj_type not in MATRIX_TYPE:
             raise ValueError('Unknown matrix object type: {}'.format(obj_type))
+
+        scale = params.get('scale')
+        if scale not in SCALE_TYPES:
+            raise ValueError('Unknown scale type: {}'.format(scale))
 
         if params.get('input_file_path'):
             file_path = params.get('input_file_path')
@@ -62,7 +68,7 @@ class MatrixUtil:
         refs = {k: v for k, v in params.items() if k in refs_key}
 
         return (obj_type, file_path, params.get('workspace_name'),
-                params.get('matrix_name'), refs)
+                params.get('matrix_name'), refs, scale)
 
     def _upload_to_shock(self, file_path):
         """
@@ -180,24 +186,24 @@ class MatrixUtil:
         data = refs
 
         try:
-            pd.read_excel(file_path)
-        except XLRDError:
-            # TODO: convert csv file to excel
-            log('Found csv file')
-            raise ValueError('Please provide .xlsx file only')
-
-        # processing data sheet
-        try:
             df = pd.read_excel(file_path, sheet_name='data')
-        except XLRDError:
-            raise ValueError('Cannot find <data> sheetss')
-        else:
-            df.fillna(0, inplace=True)
-            matrix_data = {'row_ids': df.index.tolist(),
-                           'col_ids': df.columns.tolist(),
-                           'values': df.values.tolist()}
 
-            data.update({'data': matrix_data})
+        except XLRDError:
+            try:
+                df = pd.read_excel(file_path)
+                print('WARNING: A sheet named "data" was not found in the attached file, '
+                      'proceeding with the first sheet as the data sheet.')
+
+            except XLRDError:
+                df = pd.read_csv(file_path, index_col=0)
+
+        df.fillna(0, inplace=True)
+        matrix_data = {'row_ids': df.index.tolist(),
+                       'col_ids': df.columns.tolist(),
+                       'values': df.values.tolist()}
+
+        data.update({'data': matrix_data})
+        pprint.pprint(data)
 
         # processing col/row_mapping
         col_mapping = self._process_mapping_sheet(file_path, 'col_mapping')
@@ -480,7 +486,7 @@ class MatrixUtil:
         """
 
         (obj_type, file_path, workspace_name,
-         matrix_name, refs) = self._validate_import_matrix_from_excel_params(params)
+         matrix_name, refs, scale) = self._validate_import_matrix_from_excel_params(params)
 
         if not isinstance(workspace_name, int):
             workspace_id = self.dfu.ws_name_to_id(workspace_name)
@@ -488,6 +494,7 @@ class MatrixUtil:
             workspace_id = workspace_name
 
         data = self._file_to_data(file_path, refs, matrix_name, workspace_id)
+        data['scale'] = scale
 
         matrix_obj_ref = self.data_util.save_object({
                                                 'obj_type': 'KBaseMatrices.{}'.format(obj_type),

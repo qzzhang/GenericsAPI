@@ -89,7 +89,9 @@ class AttributeUtilsTest(unittest.TestCase):
         params = {'obj_type': obj_type,
                   'matrix_name': 'test_ExpressionMatrix',
                   'workspace_name': self.wsName,
-                  'input_file_path': matrix_file_path}
+                  'input_file_path': matrix_file_path,
+                  'scale': "log2",
+                  }
         expr_matrix_ref = self.serviceImpl.import_matrix_from_excel(
             self.ctx, params)[0].get('matrix_obj_ref')
 

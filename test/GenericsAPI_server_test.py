@@ -353,7 +353,9 @@ class GenericsAPITest(unittest.TestCase):
                   'matrix_name': 'test_ExpressionMatrix',
                   'workspace_name': self.wsName,
                   'input_file_path': os.path.join('data', 'test_import.xlsx'),
-                  'genome_ref': self.genome_ref}
+                  'genome_ref': self.genome_ref,
+                  'scale': 'log2',
+                  }
         returnVal = self.getImpl().import_matrix_from_excel(self.ctx, params)[0]
         self.assertTrue('matrix_obj_ref' in returnVal)
         self.assertTrue('report_name' in returnVal)
@@ -365,9 +367,63 @@ class GenericsAPITest(unittest.TestCase):
         self.assertItemsEqual(obj['search_attributes'],
                               ["Scientist | Marie Currie", "Instrument | Old Faithful"])
         self.assertEqual(obj['description'], 'test_desc')
-        self.assertEqual(obj['scale'], 'test_scale')
+        self.assertEqual(obj['scale'], 'log2')
         self.assertEqual(obj['col_normalization'], 'test_col_normalization')
         self.assertEqual(obj['row_normalization'], 'test_row_normalization')
+
+    def test_import_matrix_from_csv(self):
+        self.start_test()
+
+        obj_type = 'ExpressionMatrix'
+        params = {'obj_type': obj_type,
+                  'matrix_name': 'test_ExpressionMatrix',
+                  'workspace_name': self.wsName,
+                  'input_file_path': os.path.join('data', 'generic_data.csv'),
+                  'scale': 'log2',
+                  }
+        returnVal = self.getImpl().import_matrix_from_excel(self.ctx, params)[0]
+        self.assertTrue('matrix_obj_ref' in returnVal)
+        self.assertTrue('report_name' in returnVal)
+        self.assertTrue('report_ref' in returnVal)
+
+    def test_bad_import_matrix_params(self):
+        self.start_test()
+
+        with self.assertRaisesRegexp(ValueError, "parameter is required, but missing"):
+            params = {'obj_type': 'ExpressionMatrix',
+                      'matrix_name': 'test_ExpressionMatrix',
+                      'workspace_name': self.wsName,
+                      'input_file_path': os.path.join('data', 'test_import.xlsx'),
+                      }
+            returnVal = self.getImpl().import_matrix_from_excel(self.ctx, params)[0]
+
+        with self.assertRaisesRegexp(ValueError, "Unknown matrix object type"):
+            params = {'obj_type': 'foo',
+                      'matrix_name': 'test_ExpressionMatrix',
+                      'workspace_name': self.wsName,
+                      'input_file_path': os.path.join('data', 'test_import.xlsx'),
+                      'scale': 'log2'
+                      }
+            returnVal = self.getImpl().import_matrix_from_excel(self.ctx, params)[0]
+
+        with self.assertRaisesRegexp(ValueError, "Unknown scale type"):
+            params = {'obj_type': 'ExpressionMatrix',
+                      'matrix_name': 'test_ExpressionMatrix',
+                      'workspace_name': self.wsName,
+                      'input_file_path': os.path.join('data', 'test_import.xlsx'),
+                      'scale': 'foo'
+                      }
+            returnVal = self.getImpl().import_matrix_from_excel(self.ctx, params)[0]
+
+        with self.assertRaisesRegexp(ValueError, "input_shock_id or input_file_path"):
+            params = {'obj_type': 'ExpressionMatrix',
+                      'matrix_name': 'test_ExpressionMatrix',
+                      'workspace_name': self.wsName,
+                      'scale': 'log2'
+                      }
+            returnVal = self.getImpl().import_matrix_from_excel(self.ctx, params)[0]
+
+
 
     def test_search_matrix(self):
         self.start_test()
