@@ -21,7 +21,6 @@ def log(message, prefix_newline=False):
     print(('\n' if prefix_newline else '') + time_str + ': ' + message)
 
 
-MATRIX_TYPE = ['ExpressionMatrix', 'FitnessMatrix', 'DifferentialExpressionMatrix']
 TYPE_ATTRIBUTES = {'description', 'scale', 'row_normalization', 'col_normalization'}
 SCALE_TYPES = {'raw', 'ln', 'log2', 'log10'}
 
@@ -41,7 +40,7 @@ class MatrixUtil:
                 raise ValueError('"{}" parameter is required, but missing'.format(p))
 
         obj_type = params.get('obj_type')
-        if obj_type not in MATRIX_TYPE:
+        if obj_type not in self.matrix_types:
             raise ValueError('Unknown matrix object type: {}'.format(obj_type))
 
         scale = params.get('scale')
@@ -369,6 +368,8 @@ class MatrixUtil:
         self.dfu = DataFileUtil(self.callback_url)
         self.data_util = DataUtil(config)
         self.attr_util = AttributesUtil(config)
+        self.matrix_types = [x.split(".")[1].split('-')[0]
+                             for x in self.data_util.list_generic_types()]
 
     def filter_matrix(self, params):
         """

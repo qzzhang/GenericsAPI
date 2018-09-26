@@ -14,7 +14,9 @@ def log(message, prefix_newline=False):
     time_str = time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime(time.time()))
     print(('\n' if prefix_newline else '') + time_str + ': ' + message)
 
+
 GENERICS_TYPE = ['FloatMatrix2D']  # add case in _convert_data for each additional type
+GENERICS_MODULES = ['KBaseMatrices']
 
 
 class DataUtil:
@@ -250,6 +252,21 @@ class DataUtil:
         self.scratch = config['scratch']
         self.wsClient = workspaceService(self.ws_url, token=self.token)
         self.dfu = DataFileUtil(self.callback_url)
+
+    def list_generic_types(self, params=None):
+        """
+        *Not yet exposed in spec*
+        list_generic_types: lists the current valid generics types
+
+        arguments:
+            none
+
+        return:
+            A list of generic types in the current environment
+        """
+        returnVal = [x['type_def'] for module in GENERICS_MODULES
+                     for x in self.wsClient.get_all_type_info(module)]
+        return returnVal
 
     def fetch_data(self, params):
         """
