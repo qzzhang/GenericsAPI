@@ -198,13 +198,13 @@ module KBaseExperiments {
 
     /*
       Represents a node in a network.
-      string name - String representation of a node
+      string label - String representation of a node
       mapping<string,string> properties - Other node properties
 
       @optional properties
     */
     typedef structure {
-      string name;
+      string label;
       mapping<string, string> properties;
     } Node;
 
