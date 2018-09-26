@@ -27,8 +27,8 @@ class GenericsAPI:
     # the latter method is running.
     ######################################### noqa
     VERSION = "0.0.1"
-    GIT_URL = "https://github.com/kbaseapps/GenericsAPI.git"
-    GIT_COMMIT_HASH = "4381310ede6e2bb25c2b6d99eaa6a9c37971c8bf"
+    GIT_URL = "git@github.com:Tianhao-Gu/GenericsAPI.git"
+    GIT_COMMIT_HASH = "70fe5623dd9da306262a2be841063662e4141cae"
 
     #BEGIN_CLASS_HEADER
     #END_CLASS_HEADER
@@ -419,6 +419,39 @@ class GenericsAPI:
         # At some point might do deeper type checking...
         if not isinstance(returnVal, dict):
             raise ValueError('Method compute_correlation_matrix return value ' +
+                             'returnVal is not type dict as required.')
+        # return the results
+        return [returnVal]
+
+    def build_network(self, ctx, params):
+        """
+        build_network: filter correlation matrix and build network
+        :param params: instance of type "BuildNetworkParams" (Input of the
+           build_network function corr_matrix_ref: CorrelationMatrix object
+           workspace_name: workspace name objects to be saved to
+           network_obj_name: Network object name filter_on_threshold: Dictory
+           holder that holds filter on thredshold params params in
+           filter_on_threshold: coefficient_threshold: correlation
+           coefficient threshold (select pairs with greater correlation
+           coefficient)) -> structure: parameter "corr_matrix_ref" of type
+           "obj_ref" (An X/Y/Z style reference), parameter "workspace_name"
+           of type "workspace_name" (workspace name of the object), parameter
+           "network_obj_name" of String, parameter "filter_on_threshold" of
+           mapping from String to String
+        :returns: instance of type "BuildNetworkOutput" -> structure:
+           parameter "report_name" of String, parameter "report_ref" of
+           String, parameter "network_obj_ref" of type "obj_ref" (An X/Y/Z
+           style reference)
+        """
+        # ctx is the context object
+        # return variables are: returnVal
+        #BEGIN build_network
+        returnVal = self.network_util.build_network(params)
+        #END build_network
+
+        # At some point might do deeper type checking...
+        if not isinstance(returnVal, dict):
+            raise ValueError('Method build_network return value ' +
                              'returnVal is not type dict as required.')
         # return the results
         return [returnVal]

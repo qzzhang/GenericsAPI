@@ -23,7 +23,7 @@ class GenericsAPI(object):
             self, url=None, timeout=30 * 60, user_id=None,
             password=None, token=None, ignore_authrc=False,
             trust_all_ssl_certificates=False,
-            auth_svc='https://ci.kbase.us/services/auth/api/legacy/KBase/Sessions/Login'):
+            auth_svc='https://kbase.us/services/authorization/Sessions/Login'):
         if url is None:
             raise ValueError('A url is required')
         self._service_ver = None
@@ -269,6 +269,30 @@ class GenericsAPI(object):
         """
         return self._client.call_method(
             'GenericsAPI.compute_correlation_matrix',
+            [params], self._service_ver, context)
+
+    def build_network(self, params, context=None):
+        """
+        build_network: filter correlation matrix and build network
+        :param params: instance of type "BuildNetworkParams" (Input of the
+           build_network function corr_matrix_ref: CorrelationMatrix object
+           workspace_name: workspace name objects to be saved to
+           network_obj_name: Network object name filter_on_threshold: Dictory
+           holder that holds filter on thredshold params params in
+           filter_on_threshold: coefficient_threshold: correlation
+           coefficient threshold (select pairs with greater correlation
+           coefficient)) -> structure: parameter "corr_matrix_ref" of type
+           "obj_ref" (An X/Y/Z style reference), parameter "workspace_name"
+           of type "workspace_name" (workspace name of the object), parameter
+           "network_obj_name" of String, parameter "filter_on_threshold" of
+           mapping from String to String
+        :returns: instance of type "BuildNetworkOutput" -> structure:
+           parameter "report_name" of String, parameter "report_ref" of
+           String, parameter "network_obj_ref" of type "obj_ref" (An X/Y/Z
+           style reference)
+        """
+        return self._client.call_method(
+            'GenericsAPI.build_network',
             [params], self._service_ver, context)
 
     def status(self, context=None):

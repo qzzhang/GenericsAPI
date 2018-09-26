@@ -28,9 +28,9 @@ parameters :
         long-hint  : |
             KBaseExperiments.CorrelationMatrix Object
 
-    threshold:
+    coefficient_threshold:
         ui-name: |
-            Threshold
+            Coefficient Threshold
         short-hint : |
             Keep only correlation over the threshold
         long-hint  : |

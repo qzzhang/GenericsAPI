@@ -3,12 +3,10 @@ import pandas as pd
 import os
 import uuid
 import errno
-import traceback
 import networkx as nx
 from matplotlib import pyplot as plt
 import json
 import shutil
-from scipy import stats
 
 from GenericsAPI.Utils.DataUtil import DataUtil
 from GenericsAPI.Utils.CorrelationUtil import CorrelationUtil
@@ -159,7 +157,19 @@ class NetworkUtil:
         else:
             ws_name_id = workspace_name
 
-        network_data = {}
+        network_data = {'description': 'Correlation Network'}
+
+        nodes_list = list(graph.nodes())
+        nodes = dict()
+        for node in nodes_list:
+            nodes.update({node: {'label': node}})
+        network_data.update({'nodes': nodes})
+
+        edges = list()
+        for edge in list(graph.edges()):
+            edges.append({'node_1_id': edge[0],
+                          'node_2_id': edge[1]})
+        network_data.update({'edges': edges})
 
         obj_type = 'KBaseExperiments.Network'
         info = self.dfu.save_objects({
@@ -252,10 +262,10 @@ class NetworkUtil:
         significance_data = corr_data.get('significance_data')
 
         if params.get('filter_on_threshold'):
-            threshold = params.get('filter_on_threshold').get('threshold')
+            coefficient_threshold = params.get('filter_on_threshold').get('coefficient_threshold')
             corr_df = self._Matrix2D_to_df(coefficient_data)
             links = self._trans_df(corr_df)
-            links_filtered = self._filter_links_threshold(links, threshold)
+            links_filtered = self._filter_links_threshold(links, coefficient_threshold)
             graph = self.df_to_graph(links_filtered, source='source', target='target')
 
             result_dir = os.path.join(self.scratch, str(uuid.uuid4()) + '_network_plots')

@@ -21,7 +21,7 @@
       }
     },
     {
-      "id": "threshold",
+      "id": "coefficient_threshold",
       "optional":false,
       "advanced":true,
       "allow_multiple":false,
@@ -48,7 +48,7 @@
     {
       "id": "filter_on_threshold",
       "parameters": [
-        "threshold"
+        "coefficient_threshold"
       ],
       "optional": true,
       "allow_multiple": false,

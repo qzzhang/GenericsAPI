@@ -265,4 +265,29 @@ module GenericsAPI {
   /* compute_correlation_matrix: create sub-matrix based on input filter_ids*/
   funcdef compute_correlation_matrix (CompCorrParams params) returns (CompCorrOutput returnVal) authentication required;
 
+
+  /* Input of the build_network function
+    corr_matrix_ref: CorrelationMatrix object
+    workspace_name: workspace name objects to be saved to
+    network_obj_name: Network object name
+    filter_on_threshold: Dictory holder that holds filter on thredshold params
+    params in filter_on_threshold:
+      coefficient_threshold: correlation coefficient threshold (select pairs with greater correlation coefficient)
+  */
+  typedef structure {
+      obj_ref corr_matrix_ref;
+      workspace_name workspace_name;
+      string network_obj_name;
+      mapping<string, string> filter_on_threshold;
+  } BuildNetworkParams;
+
+  typedef structure {
+      string report_name;
+      string report_ref;
+      obj_ref network_obj_ref;
+  } BuildNetworkOutput;
+
+  /* build_network: filter correlation matrix and build network*/
+  funcdef build_network (BuildNetworkParams params) returns (BuildNetworkOutput returnVal) authentication required;
+
 };

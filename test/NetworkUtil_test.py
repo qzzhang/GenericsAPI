@@ -4,17 +4,13 @@ import json  # noqa: F401
 import os  # noqa: F401
 import unittest
 import time
-import shutil
-
 import pandas as pd
-import numpy as np
 
 try:
     from ConfigParser import ConfigParser  # py2
 except:
     from configparser import ConfigParser  # py3
 
-from GenericsAPI.Utils.CorrelationUtil import CorrelationUtil
 from GenericsAPI.Utils.NetworkUtil import NetworkUtil
 from GenericsAPI.GenericsAPIImpl import GenericsAPI
 from GenericsAPI.GenericsAPIServer import MethodContext
@@ -56,11 +52,11 @@ class GenericsAPITest(unittest.TestCase):
         cls.callback_url = os.environ['SDK_CALLBACK_URL']
         cls.dfu = DataFileUtil(cls.callback_url)
         cls.network_util = NetworkUtil(cls.cfg)
-        # cls.corr_util = CorrelationUtil(cls.cfg)
 
         suffix = int(time.time() * 1000)
         cls.wsName = "test_network_util_" + str(suffix)
-        cls.wsClient.create_workspace({'workspace': cls.wsName})
+        ret = cls.wsClient.create_workspace({'workspace': cls.wsName})
+        cls.wsId = ret[0]
 
     @classmethod
     def tearDownClass(cls):
@@ -149,10 +145,9 @@ class GenericsAPITest(unittest.TestCase):
         print('Loaded Correlation Matrix: ' + corr_matrix_ref)
         return corr_matrix_ref
 
-    def fail_df_to_corr(self, df, error, method='pearson', dimension='col',
-                        exception=ValueError, contains=False):
+    def fail_build_network(self, params, error, exception=ValueError, contains=False):
         with self.assertRaises(exception) as context:
-            self.getCorrUtil().df_to_corr(df, method=method, dimension=dimension)
+            self.getImpl().build_network(self.ctx, params)
         if contains:
             self.assertIn(error, str(context.exception.message))
         else:
@@ -161,6 +156,33 @@ class GenericsAPITest(unittest.TestCase):
     def start_test(self):
         testname = inspect.stack()[1][3]
         print('\n*** starting test: ' + testname + ' **')
+
+    def test_build_network_fail(self):
+        self.start_test()
+
+        invalidate_params = {'missing_corr_matrix_ref': 'corr_matrix_ref',
+                             'workspace_name': 'workspace_name'}
+        error_msg = '"corr_matrix_ref" parameter is required, but missing'
+        self.fail_build_network(invalidate_params, error_msg)
+
+        invalidate_params = {'corr_matrix_ref': 'corr_matrix_ref',
+                             'missing_workspace_name': 'workspace_name'}
+        error_msg = '"workspace_name" parameter is required, but missing'
+        self.fail_build_network(invalidate_params, error_msg)
+
+    def test_build_network_ok(self):
+        self.start_test()
+
+        corr_matrix_ref = self.loadCorrMatrix()
+
+        params = {'corr_matrix_ref': corr_matrix_ref,
+                  'workspace_name': self.wsName,
+                  'network_obj_name': 'test_network_obj',
+                  'filter_on_threshold': {'coefficient_threshold': 0.8}}
+
+        ret = self.getImpl().build_network(self.ctx, params)[0]
+
+        print ret
 
     def test_init_ok(self):
         self.start_test()
