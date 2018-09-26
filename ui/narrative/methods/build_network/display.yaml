@@ -1,0 +1,53 @@
+name     : Build Correlation Network
+subtitle : Create a Network with filtered CorrelationMatrix object
+tooltip  : Create a Network with filtered CorrelationMatrix object
+
+icon: data-blue.png
+
+screenshots :
+    []
+
+suggestions :
+    apps:
+        related :
+            []
+        next :
+            []
+    methods:
+        related :
+            []
+        next :
+            []
+
+parameters :
+    corr_matrix_ref :
+        ui-name: |
+            Correlation Matrix Object
+        short-hint : |
+            KBaseExperiments.CorrelationMatrix Object
+        long-hint  : |
+            KBaseExperiments.CorrelationMatrix Object
+
+    threshold:
+        ui-name: |
+            Threshold
+        short-hint : |
+            Keep only correlation over the threshold
+        long-hint  : |
+            Keep only correlation over the threshold
+
+    network_obj_name:
+        ui-name: |
+            Network Object Name
+        short-hint : |
+            Output Network object name
+        long-hint  : |
+            Output Network object name
+
+parameter-groups :
+    filter_on_threshold :
+        ui-name : Filter On Threshold
+        short-hint : Keep only correlation over the threshold
+
+description : |
+    <p> Create a Network with filtered CorrelationMatrix object </p>

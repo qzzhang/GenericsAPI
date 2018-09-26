@@ -161,7 +161,7 @@ class NetworkUtil:
 
         network_data = {}
 
-        obj_type = 'KBaseExperiments.CorrelationMatrix'
+        obj_type = 'KBaseExperiments.Network'
         info = self.dfu.save_objects({
             "id": ws_name_id,
             "objects": [{
@@ -184,7 +184,9 @@ class NetworkUtil:
             if p not in params:
                 raise ValueError('"{}" parameter is required, but missing'.format(p))
 
-        params['filter_on_threshold'] = True
+        if not params['filter_on_threshold']:
+            raise ValueError('Must choose either filter_on_threshold or ...')
+        # params['filter_on_threshold'] = True
 
         return params
 
@@ -236,6 +238,9 @@ class NetworkUtil:
         build_network: filter correlation matrix and build network on filtered correlation matrix
         """
 
+        log('--->\nrunning NetworkUtil.build_network\n' +
+            'params:\n{}'.format(json.dumps(params, indent=1)))
+
         params = self._process_build_nx_params(params)
 
         corr_matrix_ref = params.get('corr_matrix_ref')
@@ -247,9 +252,10 @@ class NetworkUtil:
         significance_data = corr_data.get('significance_data')
 
         if params.get('filter_on_threshold'):
+            threshold = params.get('filter_on_threshold').get('threshold')
             corr_df = self._Matrix2D_to_df(coefficient_data)
             links = self._trans_df(corr_df)
-            links_filtered = self._filter_links_threshold(links, params.get('threshold'))
+            links_filtered = self._filter_links_threshold(links, threshold)
             graph = self.df_to_graph(links_filtered, source='source', target='target')
 
             result_dir = os.path.join(self.scratch, str(uuid.uuid4()) + '_network_plots')
