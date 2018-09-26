@@ -1,5 +1,8 @@
 module KBaseExperiments {
 
+    /* A boolean - 0 for false, 1 for true.
+      @range (0, 1)
+    */
     typedef int bool;
 
      /* Ref to a genome
@@ -192,4 +195,54 @@ module KBaseExperiments {
       FloatMatrix2D coefficient_data;
       FloatMatrix2D significance_data;
     } CorrelationMatrix;
+
+    /*
+      Represents a node in a network.
+      string name - String representation of a node
+      mapping<string,string> properties - Other node properties
+
+      @optional properties
+    */
+    typedef structure {
+      string name;
+      mapping<string, string> properties;
+    } Node;
+
+    /*
+      Represents an edge in a network.
+      Node node_1 - Identifier of the first node (source node, if the edge is directed) connected by a given edge 
+      Node node_2 - Identifier of the second node (target node, if the edge is directed) connected by a given edge
+      boolean directed - Specify whether the edge is directed or not. 1 if it is directed, 0 if it is not directed
+      float weight - Weight of an edge
+      string label - String representation of an edge
+      mapping<string,string> properties - Other edge properties
+
+      @optional directed weight label properties
+    */
+    typedef structure {
+      Node node_1;
+      Node node_2;
+      bool directed;
+      float weight;
+      string label;
+      mapping<string, string> properties;
+    } Edge;
+
+    /*
+      Represents a network
+      list<Edge> edges - A list of all edges in a network
+      list<Node> nodes - A list of all nodes in a network
+      mapping<string,string> network_properties - Other network properties
+
+      @optional description network_properties
+
+      @metadata ws length(nodes) as n_nodes
+      @metadata ws length(edges) as n_edges
+    */
+    typedef structure {
+      string description;
+      list<Edge> edges;
+      list<Node> nodes;
+      mapping<string, string> network_properties;
+    } Network;
 };
