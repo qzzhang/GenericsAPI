@@ -9,6 +9,12 @@ module KBaseMatrices{
     typedef string ws_genome_id;
 
     /*
+      The workspace ID for a Genome data object.
+      @id ws
+    */
+    typedef string ws_ref;
+
+    /*
       The workspace ID for a A data object
       @id ws KBaseExperiments.AttributeMapping
     */
@@ -39,7 +45,7 @@ module KBaseMatrices{
     typedef string differential_expression_matrix_ref;
 
     /*
-      A wrapper around a FloatMatrix2D designed for simple matricies of Expression
+      A wrapper around a FloatMatrix2D designed for simple matrices of Expression
       data.  Rows map to features, and columns map to conditions.  The data type
       includes some information about normalization factors and contains
       mappings from row ids to features and col ids to conditions.
@@ -53,7 +59,8 @@ module KBaseMatrices{
       row_mapping - map from row_id to a id in the row_condition_set
       col_attributemapping_ref - a reference to a AttributeMapping that relates to the columns
       row_attributemapping_ref - a reference to a AttributeMapping that relates to the rows
-
+      attributes - a mapping of additional information pertaining to the object
+      search_attributes - a mapping of object information used by search
       data - contains values for (feature,condition) pairs, where
           features correspond to rows and conditions are columns
           (ie data.values[feature][condition])
@@ -76,7 +83,7 @@ module KBaseMatrices{
 
       @optional description row_normalization col_normalization
       @optional col_mapping row_mapping col_attributemapping_ref row_attributemapping_ref
-      @optional genome_ref feature_mapping diff_expr_matrix_ref
+      @optional attributes search_attributes genome_ref feature_mapping diff_expr_matrix_ref
 
       @metadata ws scale
       @metadata ws row_normalization
@@ -96,6 +103,8 @@ module KBaseMatrices{
       ws_attributemapping_id col_attributemapping_ref;
       mapping<string, string> row_mapping;
       ws_attributemapping_id row_attributemapping_ref;
+      mapping<string, string> attributes;
+      list<string> search_attributes;
       ws_genome_id genome_ref;
       mapping<string, string> feature_mapping;
       differential_expression_matrix_ref diff_expr_matrix_ref;
@@ -103,7 +112,7 @@ module KBaseMatrices{
     } ExpressionMatrix;
 
     /*
-      A wrapper around a FloatMatrix2D designed for simple matricies of Differential
+      A wrapper around a FloatMatrix2D designed for simple matrices of Differential
       Expression data.  Rows map to features, and columns map to conditions.  The
       data type includes some information about normalization factors and contains
       mappings from row ids to features and col ids to conditions.
@@ -117,6 +126,8 @@ module KBaseMatrices{
       row_mapping - map from row_id to a id in the row_condition_set
       col_attributemapping_ref - a reference to a AttributeMapping that relates to the columns
       row_attributemapping_ref - a reference to a AttributeMapping that relates to the rows
+      attributes - a mapping of additional information pertaining to the object
+      search_attributes - a mapping of object information used by search
 
       data - contains values for (feature,condition) pairs, where
           features correspond to rows and conditions are columns
@@ -138,7 +149,7 @@ module KBaseMatrices{
 
       @optional description row_normalization col_normalization
       @optional col_mapping row_mapping col_attributemapping_ref row_attributemapping_ref
-      @optional genome_ref feature_mapping
+      @optional attributes search_attributes genome_ref feature_mapping
 
       @metadata ws scale
       @metadata ws row_normalization
@@ -158,13 +169,15 @@ module KBaseMatrices{
       ws_attributemapping_id col_attributemapping_ref;
       mapping<string, string> row_mapping;
       ws_attributemapping_id row_attributemapping_ref;
+      mapping<string, string> attributes;
+      list<string> search_attributes;
       ws_genome_id genome_ref;
       mapping<string, string> feature_mapping;
       FloatMatrix2D data;
     } DifferentialExpressionMatrix;
 
     /*
-      A wrapper around a FloatMatrix2D designed for simple matricies of Fitness data
+      A wrapper around a FloatMatrix2D designed for simple matrices of Fitness data
       for gene/feature knockouts.  Generally fitness is measured as growth rate
       for the knockout strain relative to wildtype.
 
@@ -177,6 +190,8 @@ module KBaseMatrices{
       row_mapping - map from row_id to a id in the row_condition_set
       col_attributemapping_ref - a reference to a AttributeMapping that relates to the columns
       row_attributemapping_ref - a reference to a AttributeMapping that relates to the rows
+      attributes - a mapping of additional information pertaining to the object
+      search_attributes - a mapping of object information used by search
 
       data - contains values for (feature,condition) pairs, where
           features correspond to rows and conditions are columns
@@ -198,7 +213,7 @@ module KBaseMatrices{
 
       @optional description row_normalization col_normalization
       @optional col_mapping row_mapping col_attributemapping_ref row_attributemapping_ref
-      @optional genome_ref feature_mapping
+      @optional attributes search_attributes genome_ref feature_mapping
 
       @metadata ws scale
       @metadata ws row_normalization
@@ -218,8 +233,72 @@ module KBaseMatrices{
       ws_attributemapping_id col_attributemapping_ref;
       mapping<string, string> row_mapping;
       ws_attributemapping_id row_attributemapping_ref;
+      mapping<string, string> attributes;
+      list<string> search_attributes;
       ws_genome_id genome_ref;
       mapping<string, list<string>> feature_mapping;
       FloatMatrix2D data;
     } FitnessMatrix;
+
+    /*
+      A wrapper around a FloatMatrix2D designed for matrices of chemical concentration data. The
+      columns represent experimental conditions while the rows correspond to individual
+      identified metabolites
+
+      KBaseMatrices Fields:
+      description - short optional description of the dataset
+      scale - raw, ln, log2, log10
+      col_normalization - mean_center, median_center, mode_center, zscore
+      row_normalization - mean_center, median_center, mode_center, zscore
+      col_mapping - map from col_id to an id in the col_condition_set
+      row_mapping - map from row_id to a id in the row_condition_set
+      col_attributemapping_ref - a reference to a AttributeMapping that relates to the columns
+      row_attributemapping_ref - a reference to a AttributeMapping that relates to the rows
+      attributes - a mapping of additional information pertaining to the object
+      search_attributes - a mapping of object information used by search
+
+      data - contains values for (feature,condition) pairs, where
+             compounds correspond to rows and conditions are columns
+             (ie data.values[compound][condition])
+
+      Additional Fields:
+      biochemistry_ref - a reference to a biochemistry object
+      biochemistry_mapping - map from row_id to a set compound ids in a biochemistry object
+
+      Validation:
+      @unique data.row_ids
+      @unique data.col_ids
+      @contains data.row_ids row_mapping
+      @contains data.col_ids col_mapping
+      @contains values(row_mapping) row_attributemapping_ref:instances
+      @contains values(col_mapping) col_attributemapping_ref:instances
+      @contains values(biochemistry_mapping) biochemistry_ref:compounds.[*].id
+
+      @optional description row_normalization col_normalization
+      @optional col_mapping row_mapping col_attributemapping_ref row_attributemapping_ref
+      @optional attributes search_attributes biochemistry_ref biochemistry_mapping
+
+      @metadata ws scale
+      @metadata ws row_normalization
+      @metadata ws col_normalization
+      @metadata ws col_attributemapping_ref as col_attribute_mapping
+      @metadata ws row_attributemapping_ref as row_attribute_mapping
+      @metadata ws length(data.row_ids) as compound_count
+      @metadata ws length(data.col_ids) as condition_count
+    */
+    typedef structure {
+      string description;
+      string scale;
+      string row_normalization;
+      string col_normalization;
+      mapping<string, string> col_mapping;
+      ws_attributemapping_id col_attributemapping_ref;
+      mapping<string, string> row_mapping;
+      ws_attributemapping_id row_attributemapping_ref;
+      mapping<string, string> attributes;
+      list<string> search_attributes;
+      ws_ref biochemistry_ref;
+      mapping<string, list<string>> biochemistry_mapping;
+      FloatMatrix2D data;
+    } MetaboliteMatrix;
 };
