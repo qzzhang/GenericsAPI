@@ -37,6 +37,14 @@ parameters :
       long-hint  : |
           Scale factor for the data in the matrix
 
+    description:
+      ui-name : |
+          Description
+      short-hint : |
+          Describe the matrix
+      long-hint  : |
+          Describe the matrix
+
     matrix_name :
         ui-name : |
             Matrix Object Name

@@ -15,11 +15,12 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
  * <p>Original spec-file type: ImportMatrixParams</p>
  * <pre>
  * Input of the import_matrix_from_excel function
- * obj_type: one of ExpressionMatrix, FitnessMatrix, DifferentialExpressionMatrix
+ * obj_type: a type in KBaseMatrices
  * input_shock_id: file shock id
  * input_file_path: absolute file path
  * input_staging_file_path: staging area file path
  * matrix_name: matrix object name
+ * description: optional, a description of the matrix
  * workspace_name: workspace name matrix object to be saved to
  * optional:
  * col_attributemapping_ref: column AttributeMapping reference
@@ -38,6 +39,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
     "input_staging_file_path",
     "matrix_name",
     "scale",
+    "description",
     "workspace_name",
     "genome_ref",
     "col_attributemapping_ref",
@@ -58,6 +60,8 @@ public class ImportMatrixParams {
     private String matrixName;
     @JsonProperty("scale")
     private String scale;
+    @JsonProperty("description")
+    private String description;
     @JsonProperty("workspace_name")
     private String workspaceName;
     @JsonProperty("genome_ref")
@@ -160,6 +164,21 @@ public class ImportMatrixParams {
         return this;
     }
 
+    @JsonProperty("description")
+    public String getDescription() {
+        return description;
+    }
+
+    @JsonProperty("description")
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public ImportMatrixParams withDescription(String description) {
+        this.description = description;
+        return this;
+    }
+
     @JsonProperty("workspace_name")
     public String getWorkspaceName() {
         return workspaceName;
@@ -247,7 +266,7 @@ public class ImportMatrixParams {
 
     @Override
     public String toString() {
-        return ((((((((((((((((((((((((("ImportMatrixParams"+" [objType=")+ objType)+", inputShockId=")+ inputShockId)+", inputFilePath=")+ inputFilePath)+", inputStagingFilePath=")+ inputStagingFilePath)+", matrixName=")+ matrixName)+", scale=")+ scale)+", workspaceName=")+ workspaceName)+", genomeRef=")+ genomeRef)+", colAttributemappingRef=")+ colAttributemappingRef)+", rowAttributemappingRef=")+ rowAttributemappingRef)+", diffExprMatrixRef=")+ diffExprMatrixRef)+", additionalProperties=")+ additionalProperties)+"]");
+        return ((((((((((((((((((((((((((("ImportMatrixParams"+" [objType=")+ objType)+", inputShockId=")+ inputShockId)+", inputFilePath=")+ inputFilePath)+", inputStagingFilePath=")+ inputStagingFilePath)+", matrixName=")+ matrixName)+", scale=")+ scale)+", description=")+ description)+", workspaceName=")+ workspaceName)+", genomeRef=")+ genomeRef)+", colAttributemappingRef=")+ colAttributemappingRef)+", rowAttributemappingRef=")+ rowAttributemappingRef)+", diffExprMatrixRef=")+ diffExprMatrixRef)+", additionalProperties=")+ additionalProperties)+"]");
     }
 
 }

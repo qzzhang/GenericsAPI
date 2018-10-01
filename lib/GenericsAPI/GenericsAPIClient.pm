@@ -412,6 +412,7 @@ ImportMatrixParams is a reference to a hash where the following keys are defined
 	input_staging_file_path has a value which is a string
 	matrix_name has a value which is a string
 	scale has a value which is a string
+	description has a value which is a string
 	workspace_name has a value which is a GenericsAPI.workspace_name
 	genome_ref has a value which is a GenericsAPI.obj_ref
 	col_attributemapping_ref has a value which is a GenericsAPI.obj_ref
@@ -439,6 +440,7 @@ ImportMatrixParams is a reference to a hash where the following keys are defined
 	input_staging_file_path has a value which is a string
 	matrix_name has a value which is a string
 	scale has a value which is a string
+	description has a value which is a string
 	workspace_name has a value which is a GenericsAPI.workspace_name
 	genome_ref has a value which is a GenericsAPI.obj_ref
 	col_attributemapping_ref has a value which is a GenericsAPI.obj_ref
@@ -1819,11 +1821,12 @@ failed_constraint has a value which is a reference to a hash where the key is a 
 =item Description
 
 Input of the import_matrix_from_excel function
-obj_type: one of ExpressionMatrix, FitnessMatrix, DifferentialExpressionMatrix
+obj_type: a type in KBaseMatrices
 input_shock_id: file shock id
 input_file_path: absolute file path
 input_staging_file_path: staging area file path
 matrix_name: matrix object name
+description: optional, a description of the matrix
 workspace_name: workspace name matrix object to be saved to
 
 optional:
@@ -1845,6 +1848,7 @@ input_file_path has a value which is a string
 input_staging_file_path has a value which is a string
 matrix_name has a value which is a string
 scale has a value which is a string
+description has a value which is a string
 workspace_name has a value which is a GenericsAPI.workspace_name
 genome_ref has a value which is a GenericsAPI.obj_ref
 col_attributemapping_ref has a value which is a GenericsAPI.obj_ref
@@ -1864,6 +1868,7 @@ input_file_path has a value which is a string
 input_staging_file_path has a value which is a string
 matrix_name has a value which is a string
 scale has a value which is a string
+description has a value which is a string
 workspace_name has a value which is a GenericsAPI.workspace_name
 genome_ref has a value which is a GenericsAPI.obj_ref
 col_attributemapping_ref has a value which is a GenericsAPI.obj_ref

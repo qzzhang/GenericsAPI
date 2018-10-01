@@ -49,6 +49,14 @@
       }
     },
     {
+      "id" : "description",
+      "optional" : true,
+      "advanced" : false,
+      "allow_multiple" : false,
+      "default_values" : [ "" ],
+      "field_type" : "textarea"
+    },
+    {
       "id" : "matrix_name",
       "optional" : false,
       "advanced" : false,
@@ -104,6 +112,10 @@
         {
           "input_parameter": "scale",
           "target_property": "scale"
+        },
+        {
+          "input_parameter": "description",
+          "target_property": "description"
         },
         {
           "input_parameter": "matrix_name",

@@ -94,12 +94,12 @@ class GenericsAPI(object):
         """
         import_matrix_from_excel: import matrix object from excel
         :param params: instance of type "ImportMatrixParams" (Input of the
-           import_matrix_from_excel function obj_type: one of
-           ExpressionMatrix, FitnessMatrix, DifferentialExpressionMatrix
-           input_shock_id: file shock id input_file_path: absolute file path
-           input_staging_file_path: staging area file path matrix_name:
-           matrix object name workspace_name: workspace name matrix object to
-           be saved to optional: col_attributemapping_ref: column
+           import_matrix_from_excel function obj_type: a type in
+           KBaseMatrices input_shock_id: file shock id input_file_path:
+           absolute file path input_staging_file_path: staging area file path
+           matrix_name: matrix object name description: optional, a
+           description of the matrix workspace_name: workspace name matrix
+           object to be saved to optional: col_attributemapping_ref: column
            AttributeMapping reference row_attributemapping_ref: row
            AttributeMapping reference genome_ref: genome reference
            diff_expr_matrix_ref: DifferentialExpressionMatrix reference) ->
@@ -107,11 +107,12 @@ class GenericsAPI(object):
            "input_shock_id" of String, parameter "input_file_path" of String,
            parameter "input_staging_file_path" of String, parameter
            "matrix_name" of String, parameter "scale" of String, parameter
-           "workspace_name" of type "workspace_name" (workspace name of the
-           object), parameter "genome_ref" of type "obj_ref" (An X/Y/Z style
-           reference), parameter "col_attributemapping_ref" of type "obj_ref"
-           (An X/Y/Z style reference), parameter "row_attributemapping_ref"
-           of type "obj_ref" (An X/Y/Z style reference), parameter
+           "description" of String, parameter "workspace_name" of type
+           "workspace_name" (workspace name of the object), parameter
+           "genome_ref" of type "obj_ref" (An X/Y/Z style reference),
+           parameter "col_attributemapping_ref" of type "obj_ref" (An X/Y/Z
+           style reference), parameter "row_attributemapping_ref" of type
+           "obj_ref" (An X/Y/Z style reference), parameter
            "diff_expr_matrix_ref" of type "obj_ref" (An X/Y/Z style reference)
         :returns: instance of type "ImportMatrixOutput" -> structure:
            parameter "report_name" of String, parameter "report_ref" of
