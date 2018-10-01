@@ -64,7 +64,7 @@
       "default_values" : [ "" ],
       "field_type" : "text",
       "text_options" : {
-        "valid_ws_types" : ["KBaseMatrices"],
+        "valid_ws_types" : ["KBaseMatrices.MetaboliteMatrix"],
         "is_output_name" : true
       }
     },
