@@ -62,9 +62,7 @@ class MatrixUtil:
             error_msg += "or input_staging_file_path"
             raise ValueError(error_msg)
 
-        refs_key = ['col_attributemapping_ref', 'row_attributemapping_ref', 'genome_ref',
-                    'diff_expr_matrix_ref']
-        refs = {k: v for k, v in params.items() if k in refs_key}
+        refs = {k: v for k, v in params.items() if "_ref" in k}
 
         return (obj_type, file_path, params.get('workspace_name'),
                 params.get('matrix_name'), refs, scale)
@@ -496,6 +494,8 @@ class MatrixUtil:
 
         data = self._file_to_data(file_path, refs, matrix_name, workspace_id)
         data['scale'] = scale
+        if params.get('description'):
+            data['description'] = params['description']
 
         matrix_obj_ref = self.data_util.save_object({
                                                 'obj_type': 'KBaseMatrices.{}'.format(obj_type),
