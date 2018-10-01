@@ -1,15 +1,10 @@
 # -*- coding: utf-8 -*-
 import inspect
-import json  # noqa: F401
 import os  # noqa: F401
 import unittest
 import time
 import pandas as pd
-
-try:
-    from ConfigParser import ConfigParser  # py2
-except:
-    from configparser import ConfigParser  # py3
+from configparser import ConfigParser
 
 from GenericsAPI.Utils.NetworkUtil import NetworkUtil
 from GenericsAPI.GenericsAPIImpl import GenericsAPI
@@ -149,9 +144,9 @@ class GenericsAPITest(unittest.TestCase):
         with self.assertRaises(exception) as context:
             self.getImpl().build_network(self.ctx, params)
         if contains:
-            self.assertIn(error, str(context.exception.message))
+            self.assertIn(error, str(context.exception.args))
         else:
-            self.assertEqual(error, str(context.exception.message))
+            self.assertEqual(error, str(context.exception.args[0]))
 
     def start_test(self):
         testname = inspect.stack()[1][3]
@@ -182,7 +177,7 @@ class GenericsAPITest(unittest.TestCase):
 
         ret = self.getImpl().build_network(self.ctx, params)[0]
 
-        print ret
+        print(ret)
 
     def test_init_ok(self):
         self.start_test()
@@ -198,9 +193,9 @@ class GenericsAPITest(unittest.TestCase):
 
         df = self.getNetworkUtil()._Matrix2D_to_df(corr_data)
 
-        self.assertItemsEqual(df.index.tolist(), corr_data.get('row_ids'))
-        self.assertItemsEqual(df.columns.tolist(), corr_data.get('col_ids'))
-        self.assertItemsEqual(df.values.tolist(), corr_data.get('values'))
+        self.assertCountEqual(df.index.tolist(), corr_data.get('row_ids'))
+        self.assertCountEqual(df.columns.tolist(), corr_data.get('col_ids'))
+        self.assertCountEqual(df.values.tolist(), corr_data.get('values'))
 
     def test__trans_df_ok(self):
         corr_data = self.loadCorrData()
@@ -219,7 +214,7 @@ class GenericsAPITest(unittest.TestCase):
         graph = self.getNetworkUtil().df_to_graph(graph_df, 'source', 'target')
 
         expected_nodes = ['A', 'E', 'G', 'F', 'I', 'H', 'J']
-        self.assertItemsEqual(list(graph.nodes()), expected_nodes)
+        self.assertCountEqual(list(graph.nodes()), expected_nodes)
 
     def test_draw_graph_ok(self):
 

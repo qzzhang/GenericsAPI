@@ -8,11 +8,7 @@ import unittest
 from os import environ
 
 import pandas as pd
-
-try:
-    from ConfigParser import ConfigParser  # py2
-except:
-    from configparser import ConfigParser  # py3
+from configparser import ConfigParser  # py2
 
 from GenericsAPI.GenericsAPIImpl import GenericsAPI
 from GenericsAPI.GenericsAPIServer import MethodContext
@@ -231,18 +227,18 @@ class GenericsAPITest(unittest.TestCase):
         with self.assertRaises(exception) as context:
             self.getImpl().fetch_data(self.ctx, params)
         if contains:
-            self.assertIn(error, str(context.exception.message))
+            self.assertIn(error, str(context.exception.args))
         else:
-            self.assertEqual(error, str(context.exception.message))
+            self.assertEqual(error, str(context.exception.args[0]))
 
     def check_fetch_data_output(self, returnVal):
         self.assertTrue('data_matrix' in returnVal)
         data_matrix = json.loads(returnVal.get('data_matrix'))
 
-        col_ids = data_matrix.keys()
-        self.assertItemsEqual(col_ids, self.col_ids)
+        col_ids = list(data_matrix.keys())
+        self.assertCountEqual(col_ids, self.col_ids)
         for col_id in col_ids:
-            self.assertItemsEqual(data_matrix.get(col_id).keys(), self.row_ids)
+            self.assertCountEqual(list(data_matrix.get(col_id).keys()), self.row_ids)
 
     def check_export_matrix_output(self, returnVal):
         self.assertTrue('shock_id' in returnVal)
@@ -258,7 +254,7 @@ class GenericsAPITest(unittest.TestCase):
         shock_file = self.dfu.shock_to_file(shock_to_file_params)['file_path']
         df = pd.read_excel(shock_file[:-4], None)
 
-        return df.keys()
+        return list(df.keys())
 
     def test_bad_fetch_data_params(self):
         self.start_test()
@@ -290,22 +286,22 @@ class GenericsAPITest(unittest.TestCase):
         params = {'obj_ref': self.expression_matrix_nc_ref}
         returnVal = self.getImpl().export_matrix(self.ctx, params)[0]
         sheet_names = self.check_export_matrix_output(returnVal)
-        self.assertItemsEqual(sheet_names, ['data', 'metadata'])
+        self.assertCountEqual(sheet_names, ['data', 'metadata'])
 
         params = {'obj_ref': self.expression_matrix_ref}
         returnVal = self.getImpl().export_matrix(self.ctx, params)[0]
         sheet_names = self.check_export_matrix_output(returnVal)
-        self.assertItemsEqual(sheet_names, ['data', 'col_mapping', 'row_mapping', 'metadata'])
+        self.assertCountEqual(sheet_names, ['data', 'col_mapping', 'row_mapping', 'metadata'])
 
         params = {'obj_ref': self.fitness_matrix_ref}
         returnVal = self.getImpl().export_matrix(self.ctx, params)[0]
         sheet_names = self.check_export_matrix_output(returnVal)
-        self.assertItemsEqual(sheet_names, ['data', 'row_mapping', 'metadata'])
+        self.assertCountEqual(sheet_names, ['data', 'row_mapping', 'metadata'])
 
         params = {'obj_ref': self.diff_expr_matrix_ref}
         returnVal = self.getImpl().export_matrix(self.ctx, params)[0]
         sheet_names = self.check_export_matrix_output(returnVal)
-        self.assertItemsEqual(sheet_names, ['data', 'col_mapping', 'metadata'])
+        self.assertCountEqual(sheet_names, ['data', 'col_mapping', 'metadata'])
 
     def test_validate_data(self):
         self.start_test()
@@ -320,7 +316,7 @@ class GenericsAPITest(unittest.TestCase):
         returnVal = self.getImpl().validate_data(self.ctx, params)[0]
         self.assertFalse(returnVal.get('validated'))
         expected_failed_constraints = ['data.row_ids', 'data.col_ids']
-        self.assertItemsEqual(expected_failed_constraints,
+        self.assertCountEqual(expected_failed_constraints,
                               returnVal.get('failed_constraints').get('unique'))
 
         # testing contains
@@ -342,7 +338,7 @@ class GenericsAPITest(unittest.TestCase):
                                        'values(row_mapping) row_attributemapping_ref:instances',
                                        'values(col_mapping) col_attributemapping_ref:instances',
                                        'data.row_ids genome_ref:features.[*].id genome_ref:mrnas.[*].id genome_ref:cdss.[*].id genome_ref:non_codeing_features.[*].id']
-        self.assertItemsEqual(expected_failed_constraints,
+        self.assertCountEqual(expected_failed_constraints,
                               returnVal.get('failed_constraints').get('contains'))
 
     def test_import_matrix_from_excel(self):
@@ -364,7 +360,7 @@ class GenericsAPITest(unittest.TestCase):
         obj = self.dfu.get_objects(
             {'object_refs': [returnVal['matrix_obj_ref']]}
         )['data'][0]['data']
-        self.assertItemsEqual(obj['search_attributes'],
+        self.assertCountEqual(obj['search_attributes'],
                               ["Scientist | Marie Currie", "Instrument | Old Faithful"])
         self.assertEqual(obj['description'], 'test_desc')
         self.assertEqual(obj['scale'], 'log2')
@@ -389,7 +385,7 @@ class GenericsAPITest(unittest.TestCase):
     def test_bad_import_matrix_params(self):
         self.start_test()
 
-        with self.assertRaisesRegexp(ValueError, "parameter is required, but missing"):
+        with self.assertRaisesRegex(ValueError, "parameter is required, but missing"):
             params = {'obj_type': 'ExpressionMatrix',
                       'matrix_name': 'test_ExpressionMatrix',
                       'workspace_name': self.wsName,
@@ -397,7 +393,7 @@ class GenericsAPITest(unittest.TestCase):
                       }
             returnVal = self.getImpl().import_matrix_from_excel(self.ctx, params)[0]
 
-        with self.assertRaisesRegexp(ValueError, "Unknown matrix object type"):
+        with self.assertRaisesRegex(ValueError, "Unknown matrix object type"):
             params = {'obj_type': 'foo',
                       'matrix_name': 'test_ExpressionMatrix',
                       'workspace_name': self.wsName,
@@ -406,7 +402,7 @@ class GenericsAPITest(unittest.TestCase):
                       }
             returnVal = self.getImpl().import_matrix_from_excel(self.ctx, params)[0]
 
-        with self.assertRaisesRegexp(ValueError, "Unknown scale type"):
+        with self.assertRaisesRegex(ValueError, "Unknown scale type"):
             params = {'obj_type': 'ExpressionMatrix',
                       'matrix_name': 'test_ExpressionMatrix',
                       'workspace_name': self.wsName,
@@ -415,7 +411,7 @@ class GenericsAPITest(unittest.TestCase):
                       }
             returnVal = self.getImpl().import_matrix_from_excel(self.ctx, params)[0]
 
-        with self.assertRaisesRegexp(ValueError, "input_shock_id or input_file_path"):
+        with self.assertRaisesRegex(ValueError, "input_shock_id or input_file_path"):
             params = {'obj_type': 'ExpressionMatrix',
                       'matrix_name': 'test_ExpressionMatrix',
                       'workspace_name': self.wsName,
@@ -452,9 +448,9 @@ class GenericsAPITest(unittest.TestCase):
         matrix_data = matrix_source.get('data')
 
         expected_ids = ['WRI_RS00065_CDS_1', 'WRI_RS00070_CDS_1']
-        self.assertItemsEqual(matrix_data['data']['row_ids'], expected_ids)
-        self.assertItemsEqual(matrix_data['row_mapping'].keys(), expected_ids)
-        self.assertItemsEqual(matrix_data['feature_mapping'].keys(), expected_ids)
+        self.assertCountEqual(matrix_data['data']['row_ids'], expected_ids)
+        self.assertCountEqual(list(matrix_data['row_mapping'].keys()), expected_ids)
+        self.assertCountEqual(list(matrix_data['feature_mapping'].keys()), expected_ids)
         self.assertEqual(len(matrix_data['data']['values']), len(expected_ids))
 
     def test_filter_matrix_cols(self):
@@ -475,6 +471,6 @@ class GenericsAPITest(unittest.TestCase):
         matrix_data = matrix_source.get('data')
 
         expected_ids = ['instance_1', 'instance_3']
-        self.assertItemsEqual(matrix_data['data']['col_ids'], expected_ids)
-        self.assertItemsEqual(matrix_data['col_mapping'].keys(), expected_ids)
+        self.assertCountEqual(matrix_data['data']['col_ids'], expected_ids)
+        self.assertCountEqual(list(matrix_data['col_mapping'].keys()), expected_ids)
         self.assertEqual(len(matrix_data['data']['values'][0]), len(expected_ids))

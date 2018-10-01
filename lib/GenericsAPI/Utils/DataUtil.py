@@ -100,7 +100,7 @@ class DataUtil:
             m_data_cp = m_data.copy()
             for attr in unique_list:
                 m_data_cp = getattr(m_data_cp, attr)
-            retrieve_data = m_data_cp.values()
+            retrieve_data = list(m_data_cp.values())
         elif ':' in value:
             obj_ref = getattr(m_data, value.split(':')[0])
             if obj_ref:
@@ -206,13 +206,13 @@ class DataUtil:
         _convert_data: convert data to df based on data_type
         """
 
-        data_types = generics_module.values()
+        data_types = list(generics_module.values())
 
         if not set(GENERICS_TYPE) >= set(data_types):
             raise ValueError('Found unknown generics data type in:\n{}\n'.format(data_types))
 
         if data_types == ['FloatMatrix2D']:
-            key = generics_module.keys()[generics_module.values().index('FloatMatrix2D')]
+            key = list(generics_module.keys())[list(generics_module.values()).index('FloatMatrix2D')]
             values = data[key]['values']
             index = data[key]['row_ids']
             columns = data[key]['col_ids']
@@ -359,7 +359,7 @@ class DataUtil:
                 obj_type = module_type
                 break
 
-        data = dict((k, v) for k, v in params.get('data').iteritems() if v)
+        data = dict((k, v) for k, v in params.get('data').items() if v)
         validate = self.validate_data({'obj_type': obj_type,
                                        'data': data})
 

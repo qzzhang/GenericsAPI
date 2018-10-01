@@ -1,18 +1,13 @@
 # -*- coding: utf-8 -*-
 import inspect
-import json  # noqa: F401
-import os  # noqa: F401
+import os
 import unittest
 import time
 import shutil
 
 import pandas as pd
 import numpy as np
-
-try:
-    from ConfigParser import ConfigParser  # py2
-except:
-    from configparser import ConfigParser  # py3
+from configparser import ConfigParser
 
 from GenericsAPI.Utils.CorrelationUtil import CorrelationUtil
 from GenericsAPI.GenericsAPIImpl import GenericsAPI
@@ -126,27 +121,27 @@ class GenericsAPITest(unittest.TestCase):
         with self.assertRaises(exception) as context:
             self.getCorrUtil().df_to_corr(df, method=method, dimension=dimension)
         if contains:
-            self.assertIn(error, str(context.exception.message))
+            self.assertIn(error, str(context.exception.args))
         else:
-            self.assertEqual(error, str(context.exception.message))
+            self.assertEqual(error, str(context.exception.args[0]))
 
     def fail_plot_scatter_matrix(self, df, error, alpha=0.2, dimension='col',
                                  exception=ValueError, contains=False):
         with self.assertRaises(exception) as context:
             self.getCorrUtil().plot_scatter_matrix(df, alpha=alpha, dimension=dimension)
         if contains:
-            self.assertIn(error, str(context.exception.message))
+            self.assertIn(error, str(context.exception.args))
         else:
-            self.assertEqual(error, str(context.exception.message))
+            self.assertEqual(error, str(context.exception.args[0]))
 
     def fail_compute_correlation_matrix(self, params, error, exception=ValueError,
                                         contains=False):
         with self.assertRaises(exception) as context:
             self.getImpl().compute_correlation_matrix(self.ctx, params)
         if contains:
-            self.assertIn(error, str(context.exception.message))
+            self.assertIn(error, str(context.exception.args))
         else:
-            self.assertEqual(error, str(context.exception.message))
+            self.assertEqual(error, str(context.exception.args[0]))
 
     def start_test(self):
         testname = inspect.stack()[1][3]
@@ -187,11 +182,11 @@ class GenericsAPITest(unittest.TestCase):
         self.assertEqual(obj_data.get('correlation_parameters').get('method'), 'pearson')
 
         corr_items = ['WRI_RS00010_CDS_1', 'WRI_RS00015_CDS_1', 'WRI_RS00025_CDS_1']
-        self.assertItemsEqual(obj_data.get('coefficient_data').get('row_ids'), corr_items)
-        self.assertItemsEqual(obj_data.get('coefficient_data').get('col_ids'), corr_items)
+        self.assertCountEqual(obj_data.get('coefficient_data').get('row_ids'), corr_items)
+        self.assertCountEqual(obj_data.get('coefficient_data').get('col_ids'), corr_items)
 
-        self.assertItemsEqual(obj_data.get('significance_data').get('row_ids'), corr_items)
-        self.assertItemsEqual(obj_data.get('significance_data').get('col_ids'), corr_items)
+        self.assertCountEqual(obj_data.get('significance_data').get('row_ids'), corr_items)
+        self.assertCountEqual(obj_data.get('significance_data').get('col_ids'), corr_items)
 
     def test_init_ok(self):
         self.start_test()
@@ -217,13 +212,13 @@ class GenericsAPITest(unittest.TestCase):
 
         # test default
         corr_df = self.getCorrUtil().df_to_corr(df)
-        self.assertItemsEqual(corr_df.index.tolist(), corr_df.columns.tolist())
-        self.assertItemsEqual(corr_df.index.tolist(), df.columns.tolist())
+        self.assertCountEqual(corr_df.index.tolist(), corr_df.columns.tolist())
+        self.assertCountEqual(corr_df.index.tolist(), df.columns.tolist())
 
         # test correlation on rows
         corr_df = self.getCorrUtil().df_to_corr(df, dimension='row')
-        self.assertItemsEqual(corr_df.index.tolist(), corr_df.columns.tolist())
-        self.assertItemsEqual(corr_df.index.tolist(), df.index.tolist())
+        self.assertCountEqual(corr_df.index.tolist(), corr_df.columns.tolist())
+        self.assertCountEqual(corr_df.index.tolist(), df.index.tolist())
 
     def test_plot_scatter_matrix_fail(self):
         self.start_test()
