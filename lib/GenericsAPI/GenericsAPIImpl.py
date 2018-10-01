@@ -27,8 +27,8 @@ class GenericsAPI:
     # the latter method is running.
     ######################################### noqa
     VERSION = "0.0.1"
-    GIT_URL = "git@github.com:Tianhao-Gu/GenericsAPI.git"
-    GIT_COMMIT_HASH = "70fe5623dd9da306262a2be841063662e4141cae"
+    GIT_URL = "https://github.com/kbaseapps/GenericsAPI.git"
+    GIT_COMMIT_HASH = "5e9596b97ff130005339b7e2d3462eddb1f21c6b"
 
     #BEGIN_CLASS_HEADER
     #END_CLASS_HEADER

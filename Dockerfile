@@ -1,4 +1,4 @@
-FROM kbase/kbase:sdkbase2.latest
+FROM kbase/sdkbase2:python
 MAINTAINER KBase Developer
 # -----------------------------------------
 # In this section, you can install any system dependencies required
@@ -9,21 +9,24 @@ MAINTAINER KBase Developer
 # RUN apt-get update
 
 RUN pip uninstall numpy -y \
-    && pip install numpy==1.14.5
+    && pip install numpy==1.14.5 \
+    && pip install networkx==2.1
 
 RUN pip install pandas \
     && pip install xlrd \
     && pip install openpyxl \
     && pip install xlsxwriter \
-    && pip install dotmap
+    && pip install dotmap \
+    && pip install matplotlib \
+    && pip install scipy
 
-RUN pip uninstall networkx -y \
-    && pip install networkx==2.1
+# -----------------------------------------
 
 RUN mkdir -p /kb/module/work
 RUN chmod -R a+rw /kb/module
 # install SigmaJS http://sigmajs.org/
-RUN cd /kb/module && \
+RUN apt-get install wget && \
+    cd /kb/module && \
     wget https://github.com/jacomyal/sigma.js/archive/v1.2.1.zip && \
     unzip v1.2.1.zip && \
     rm -rf v1.2.1.zip && \

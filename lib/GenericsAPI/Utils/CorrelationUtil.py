@@ -365,9 +365,9 @@ class CorrelationUtil:
             figsize = 10 if matrix_size / 5 < 10 else matrix_size / 5
             fig, ax = plt.subplots(figsize=(figsize, figsize))
             cax = ax.matshow(corr_df)
-            plt.xticks(range(len(corr_df.columns)), corr_df.columns, rotation='vertical',
+            plt.xticks(list(range(len(corr_df.columns))), corr_df.columns, rotation='vertical',
                        fontstyle='italic')
-            plt.yticks(range(len(corr_df.columns)), corr_df.columns, fontstyle='italic')
+            plt.yticks(list(range(len(corr_df.columns))), corr_df.columns, fontstyle='italic')
             plt.colorbar(cax)
 
             # ax = plt.gca()

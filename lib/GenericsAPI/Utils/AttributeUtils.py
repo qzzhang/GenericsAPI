@@ -102,7 +102,7 @@ class AttributesUtil:
         data_df = pd.read_json(data_matrix)
         clusters = data.get('clusters')
 
-        id_name_list = [cluster.get('id_to_data_position').keys() for cluster in clusters]
+        id_name_list = [list(cluster.get('id_to_data_position').keys()) for cluster in clusters]
         id_names = [item for sublist in id_name_list for item in sublist]
 
         if set(data_df.columns.tolist()) == set(id_names):  # cluster is based on columns
@@ -112,7 +112,7 @@ class AttributesUtil:
 
         cluster_id = 0
         for cluster in clusters:
-            item_ids = cluster.get('id_to_data_position').keys()
+            item_ids = list(cluster.get('id_to_data_position').keys())
             item_idx = [data_df.index.get_loc(item_id) for item_id in item_ids]
 
             for idx in item_idx:

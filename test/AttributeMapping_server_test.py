@@ -5,11 +5,7 @@ import shutil
 import time
 import unittest
 import uuid
-
-try:
-    from ConfigParser import ConfigParser  # py2
-except:
-    from configparser import ConfigParser  # py3
+from configparser import ConfigParser
 
 import pandas as pd
 
@@ -189,15 +185,15 @@ class AttributeUtilsTest(unittest.TestCase):
         self.assertEqual(with_ref.get('unit_ont_ref'), '6308/15/6')
 
     def test_missing_params(self):
-        with self.assertRaisesRegexp(ValueError, "Required keys"):
+        with self.assertRaisesRegex(ValueError, "Required keys"):
             self.getImpl().file_to_attribute_mapping(self.getContext(), {})
-        with self.assertRaisesRegexp(ValueError, "Required keys"):
+        with self.assertRaisesRegex(ValueError, "Required keys"):
             self.getImpl().attribute_mapping_to_tsv_file(self.getContext(), {})
-        with self.assertRaisesRegexp(ValueError, "Required keys"):
+        with self.assertRaisesRegex(ValueError, "Required keys"):
             self.getImpl().export_attribute_mapping_tsv(self.getContext(), {})
-        with self.assertRaisesRegexp(ValueError, "Required keys"):
+        with self.assertRaisesRegex(ValueError, "Required keys"):
             self.getImpl().export_attribute_mapping_excel(self.getContext(), {})
-        with self.assertRaisesRegexp(ValueError, "Required keys"):
+        with self.assertRaisesRegex(ValueError, "Required keys"):
             self.getImpl().export_cluster_set_excel(self.getContext(), {})
 
     def test_tsv_import(self):
@@ -221,23 +217,23 @@ class AttributeUtilsTest(unittest.TestCase):
             'object_refs': [ret['attribute_mapping_ref']]
         })['data'][0]['data']
         self.assertEqual(len(data['instances']), 18)
-        self.assertEqual(len(data['instances'].values()[0]), 18)
+        self.assertEqual(len(list(data['instances'].values())[0]), 18)
         self.assertEqual(len(data['attributes']), 18)
         self.assertEqual(data['attributes'][-1],
-                         {u'attribute': u'Factor Value[time]',
-                          u'attribute_ont_id': u'Custom:Term',
-                          u'attribute_ont_ref': u'KbaseOntologies/Custom',
-                          u'unit': u'day',
-                          u'unit_ont_id': u'Custom:Unit',
-                          u'unit_ont_ref': u'KbaseOntologies/Custom'})
+                         {'attribute': 'Factor Value[time]',
+                          'attribute_ont_id': 'Custom:Term',
+                          'attribute_ont_ref': 'KbaseOntologies/Custom',
+                          'unit': 'day',
+                          'unit_ont_id': 'Custom:Unit',
+                          'unit_ont_ref': 'KbaseOntologies/Custom'})
         self.assertEqual(data['attributes'][-2],
-                         {u'attribute': u'Factor Value[compound]',
-                          u'attribute_ont_id': u'Custom:Term',
-                          u'attribute_ont_ref': u'KbaseOntologies/Custom',
-                          u'categories': {u'orotic acid': {u'attribute_ont_id': u'CHEBI:16742',
-                                                           u'value': u'orotic acid'},
-                                          u'vehicle': {u'attribute_ont_id': u':',
-                                                       u'value': u'vehicle'}}})
+                         {'attribute': 'Factor Value[compound]',
+                          'attribute_ont_id': 'Custom:Term',
+                          'attribute_ont_ref': 'KbaseOntologies/Custom',
+                          'categories': {'orotic acid': {'attribute_ont_id': 'CHEBI:16742',
+                                                           'value': 'orotic acid'},
+                                          'vehicle': {'attribute_ont_id': ':',
+                                                       'value': 'vehicle'}}})
 
     def test_isa_import_2(self):
         params = {'output_ws_id': self.wsId,
@@ -249,15 +245,15 @@ class AttributeUtilsTest(unittest.TestCase):
             'object_refs': [ret['attribute_mapping_ref']]
         })['data'][0]['data']
         self.assertEqual(len(data['instances']), 6)
-        self.assertEqual(len(data['instances'].values()[0]), 12)
+        self.assertEqual(len(list(data['instances'].values())[0]), 12)
         self.assertEqual(len(data['attributes']), 12)
         self.assertEqual(data['attributes'][4],
-                         {u'attribute': u'Material Type',
-                          u'attribute_ont_id': u'Custom:Term',
-                          u'attribute_ont_ref': u'KbaseOntologies/Custom',
-                          u'categories': {
-                              u'deoxyribonucleic acid': {u'attribute_ont_id': u'CHEBI:16991',
-                                                         u'value': u'deoxyribonucleic acid'}}})
+                         {'attribute': 'Material Type',
+                          'attribute_ont_id': 'Custom:Term',
+                          'attribute_ont_ref': 'KbaseOntologies/Custom',
+                          'categories': {
+                              'deoxyribonucleic acid': {'attribute_ont_id': 'CHEBI:16991',
+                                                         'value': 'deoxyribonucleic acid'}}})
 
     def test_excel_import(self):
         shock_file = '/AM1.xlsx'
@@ -308,13 +304,13 @@ class AttributeUtilsTest(unittest.TestCase):
 
         xl = pd.ExcelFile(os.path.join(output_directory, xl_files[0]))
         expected_sheet_names = ['ClusterSet']
-        self.assertItemsEqual(xl.sheet_names, expected_sheet_names)
+        self.assertCountEqual(xl.sheet_names, expected_sheet_names)
 
         df = xl.parse("ClusterSet")
         expected_index = ['WRI_RS00010_CDS_1', 'WRI_RS00015_CDS_1', 'WRI_RS00025_CDS_1']
         expected_col = ['instance_1', 'instance_2', 'instance_3', 'instance_4', 'cluster']
-        self.assertItemsEqual(df.index.tolist(), expected_index)
-        self.assertItemsEqual(df.columns.tolist(), expected_col)
+        self.assertCountEqual(df.index.tolist(), expected_index)
+        self.assertCountEqual(df.columns.tolist(), expected_col)
 
     def test_export_condition_cluster_set_excel(self):
         self.loadConditionClusterSet()
@@ -335,10 +331,10 @@ class AttributeUtilsTest(unittest.TestCase):
 
         xl = pd.ExcelFile(os.path.join(output_directory, xl_files[0]))
         expected_sheet_names = ['ClusterSet']
-        self.assertItemsEqual(xl.sheet_names, expected_sheet_names)
+        self.assertCountEqual(xl.sheet_names, expected_sheet_names)
 
         df = xl.parse("ClusterSet")
         expected_index = ['instance_1', 'instance_2', 'instance_3', 'instance_4']
         expected_col = ['WRI_RS00010_CDS_1', 'WRI_RS00015_CDS_1', 'WRI_RS00025_CDS_1', 'cluster']
-        self.assertItemsEqual(df.index.tolist(), expected_index)
-        self.assertItemsEqual(df.columns.tolist(), expected_col)
+        self.assertCountEqual(df.index.tolist(), expected_index)
+        self.assertCountEqual(df.columns.tolist(), expected_col)
