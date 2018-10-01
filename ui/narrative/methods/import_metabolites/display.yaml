@@ -1,6 +1,6 @@
-name     : Import CSV or Excel File as Matrix from Staging Area
-subtitle : Import a CSV or Excel file from your staging area into your Narrative as an Matrix data object
-tooltip  : Import a CSV or Excel file from your staging area into your Narrative as an Matrix data object
+name     : Import MetaboliteMatrix from CSV/Excel File in Staging Area
+subtitle : Import a CSV or Excel file from your staging area into your Narrative as an MetaboliteMatrix data object
+tooltip  : Import a CSV or Excel file from your staging area into your Narrative as an MetaboliteMatrix data object
 
 icon: data-blue.png
 
@@ -20,13 +20,6 @@ suggestions :
             []
 
 parameters :
-    obj_type :
-        ui-name: |
-            Matrix Type
-        short-hint : |
-            One of ExpressionMatrix, FitnessMatrix, DifferentialExpressionMatrix
-        long-hint  : |
-            One of ExpressionMatrix, FitnessMatrix, DifferentialExpressionMatrix
 
     input_staging_file_path :
         ui-name : |
@@ -52,14 +45,6 @@ parameters :
         long-hint : |
             Provide a name for the Matrix that will be created by this importer
 
-    genome_ref :
-        ui-name : |
-            Genome Reference
-        short-hint : |
-            Provide a Genome associated with Matrix
-        long-hint : |
-            Provide a Genome associated with Matrix
-
     col_attributemapping_ref :
         ui-name : |
             Column AttributeMapping Reference
@@ -76,14 +61,7 @@ parameters :
         long-hint : |
             Provide a AttributeMapping associated with row in data set
 
-    diff_expr_matrix_ref :
-        ui-name : |
-            DifferentialExpressionMatrix Reference
-        short-hint : |
-            Provide a DifferentialExpressionMatrix associated with Matrix
-        long-hint : |
-            Provide a DifferentialExpressionMatrix associated with Matrix
 
 description : |
-    <p> Import a CSV or Excel file from your staging area into your Narrative as an Matrix data object.
+    <p> Import an Excel or CSV file from your staging area into your Narrative as an MetaboliteMatrix data object.
     Please see the <a href="http://kbase.us/data-upload-download-guide/">Data Upload/Download Guide</a> for more information. </p>
