@@ -89,11 +89,12 @@ module GenericsAPI {
 
 
   /* Input of the import_matrix_from_excel function
-    obj_type: one of ExpressionMatrix, FitnessMatrix, DifferentialExpressionMatrix
+    obj_type: a type in KBaseMatrices
     input_shock_id: file shock id
     input_file_path: absolute file path
     input_staging_file_path: staging area file path
     matrix_name: matrix object name
+    description: optional, a description of the matrix
     workspace_name: workspace name matrix object to be saved to
 
     optional:
@@ -110,6 +111,7 @@ module GenericsAPI {
       string input_staging_file_path;
       string matrix_name;
       string scale;
+      string description;
       workspace_name workspace_name;
 
       obj_ref genome_ref;

@@ -370,17 +370,25 @@ class GenericsAPITest(unittest.TestCase):
     def test_import_matrix_from_csv(self):
         self.start_test()
 
-        obj_type = 'ExpressionMatrix'
+        obj_type = 'MetaboliteMatrix'
         params = {'obj_type': obj_type,
-                  'matrix_name': 'test_ExpressionMatrix',
+                  'matrix_name': 'test_MetaboliteMatrix',
                   'workspace_name': self.wsName,
                   'input_file_path': os.path.join('data', 'generic_data.csv'),
                   'scale': 'log2',
+                  'biochemistry_ref': 'kbase/default',
+                  'description': "a biochem matrix",
                   }
         returnVal = self.getImpl().import_matrix_from_excel(self.ctx, params)[0]
-        self.assertTrue('matrix_obj_ref' in returnVal)
-        self.assertTrue('report_name' in returnVal)
-        self.assertTrue('report_ref' in returnVal)
+        self.assertIn('matrix_obj_ref', returnVal)
+        self.assertIn('report_name', returnVal)
+        self.assertIn('report_ref', returnVal)
+        obj = self.dfu.get_objects(
+            {'object_refs': [returnVal['matrix_obj_ref']]}
+        )['data'][0]['data']
+        self.assertIn('biochemistry_ref', obj)
+        self.assertIn('description', obj)
+        self.assertEqual(obj['description'], 'a biochem matrix')
 
     def test_bad_import_matrix_params(self):
         self.start_test()

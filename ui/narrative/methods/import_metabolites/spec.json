@@ -1,6 +1,6 @@
 {
   "ver" : "",
-  "authors" : ["tgu2"],
+  "authors" : ["jjeffryes"],
   "contact" : "http://kbase.us/contact-us/",
   "visible" : true,
   "categories" : ["upload"],
@@ -9,32 +9,6 @@
     "output" : "no-display"
   },
   "parameters" : [
-    {
-      "id" : "obj_type",
-      "optional" : false,
-      "advanced" : false,
-      "allow_multiple" : false,
-      "default_values" : ["ExpressionMatrix"],
-      "field_type" : "dropdown",
-      "dropdown_options": 
-      {
-        "options": 
-        [
-          {
-              "display": "ExpressionMatrix",
-              "value": "ExpressionMatrix"
-          },
-          {
-              "display": "FitnessMatrix",
-              "value": "FitnessMatrix"
-          },
-          {
-              "display": "DifferentialExpressionMatrix",
-              "value": "DifferentialExpressionMatrix"
-          }
-        ]
-      }
-    },
     {
       "id" : "input_staging_file_path",
       "optional" : false,
@@ -75,6 +49,14 @@
       }
     },
     {
+      "id" : "description",
+      "optional" : true,
+      "advanced" : false,
+      "allow_multiple" : false,
+      "default_values" : [ "" ],
+      "field_type" : "textarea"
+    },
+    {
       "id" : "matrix_name",
       "optional" : false,
       "advanced" : false,
@@ -82,18 +64,8 @@
       "default_values" : [ "" ],
       "field_type" : "text",
       "text_options" : {
+        "valid_ws_types" : ["KBaseMatrices.MetaboliteMatrix"],
         "is_output_name" : true
-      }
-    },
-    {
-      "id" : "genome_ref",
-      "optional" : true,
-      "advanced" : true,
-      "allow_multiple" : false,
-      "default_values" : [ "" ],
-      "field_type" : "text",
-      "text_options" : {
-        "valid_ws_types" : ["KBaseGenomes.Genome"]
       }
     },
     {
@@ -117,17 +89,6 @@
       "text_options" : {
         "valid_ws_types" : ["KBaseExperiments.AttributeMapping"]
       }
-    },
-    {
-      "id" : "diff_expr_matrix_ref",
-      "optional" : true,
-      "advanced" : true,
-      "allow_multiple" : false,
-      "default_values" : [ "" ],
-      "field_type" : "text",
-      "text_options" : {
-        "valid_ws_types" : ["KBaseMatrices.DifferentialExpressionMatrix"]
-      }
     }
   ],
   "behavior" : {
@@ -141,7 +102,7 @@
           "target_property": "workspace_name"
         },
         {
-          "input_parameter": "obj_type",
+          "constant_value": "MetaboliteMatrix",
           "target_property": "obj_type"
         },
         {
@@ -153,13 +114,12 @@
           "target_property": "scale"
         },
         {
-          "input_parameter": "matrix_name",
-          "target_property": "matrix_name"
+          "input_parameter": "description",
+          "target_property": "description"
         },
         {
-          "input_parameter" : "genome_ref",
-          "target_property" : "genome_ref",
-          "target_type_transform": "resolved-ref"
+          "input_parameter": "matrix_name",
+          "target_property": "matrix_name"
         },
         {
           "input_parameter" : "col_attributemapping_ref",
@@ -172,8 +132,8 @@
           "target_type_transform": "resolved-ref"
         },
         {
-          "input_parameter" : "diff_expr_matrix_ref",
-          "target_property" : "diff_expr_matrix_ref",
+          "constant_value" : "kbase/default",
+          "target_property" : "biochemistry_ref",
           "target_type_transform": "resolved-ref"
         }
       ],
