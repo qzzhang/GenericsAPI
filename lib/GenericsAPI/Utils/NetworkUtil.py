@@ -87,7 +87,7 @@ class NetworkUtil:
         graph_nodes_content, graph_edges_content = self._generate_visualization_content(graph)
 
         with open(result_file_path, 'w') as result_file:
-            with open(os.path.join(os.path.dirname(__file__), 'network_template.html'),
+            with open(os.path.join(os.path.dirname(__file__), 'templates', 'network_template.html'),
                       'r') as report_template_file:
                 report_template = report_template_file.read()
                 report_template = report_template.replace('//GRAPH_NODES',

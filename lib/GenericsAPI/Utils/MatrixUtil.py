@@ -287,13 +287,13 @@ class MatrixUtil:
         self._mkdir_p(output_directory)
         result_file_path = os.path.join(output_directory, 'search.html')
 
-        shutil.copy2(os.path.join(os.path.dirname(__file__), 'kbase_icon.png'),
+        shutil.copy2(os.path.join(os.path.dirname(__file__), 'templates', 'kbase_icon.png'),
                      output_directory)
-        shutil.copy2(os.path.join(os.path.dirname(__file__), 'search_icon.png'),
+        shutil.copy2(os.path.join(os.path.dirname(__file__), 'templates', 'search_icon.png'),
                      output_directory)
 
         with open(result_file_path, 'w') as result_file:
-            with open(os.path.join(os.path.dirname(__file__), 'search_template.html'),
+            with open(os.path.join(os.path.dirname(__file__), 'templates', 'search_template.html'),
                       'r') as report_template_file:
                 report_template = report_template_file.read()
                 report_template = report_template.replace('//HEADER_STR', header_str)
