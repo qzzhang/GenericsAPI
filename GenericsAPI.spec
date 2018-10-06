@@ -102,6 +102,8 @@ module GenericsAPI {
     row_attributemapping_ref: row AttributeMapping reference
     genome_ref: genome reference
     diff_expr_matrix_ref: DifferentialExpressionMatrix reference
+    biochemistry_ref: (for MetaboliteMatrix)
+    reads_set_ref: (raw data for AmpliconMatrix)
 
   */
   typedef structure {
@@ -118,6 +120,8 @@ module GenericsAPI {
       obj_ref col_attributemapping_ref;
       obj_ref row_attributemapping_ref;
       obj_ref diff_expr_matrix_ref;
+      obj_ref biochemistry_ref;
+      obj_ref reads_set_ref;
   } ImportMatrixParams;
 
   typedef structure {
@@ -128,6 +132,9 @@ module GenericsAPI {
 
   /* import_matrix_from_excel: import matrix object from excel*/
   funcdef import_matrix_from_excel (ImportMatrixParams params) returns (ImportMatrixOutput returnVal) authentication required;
+
+  /* import_matrix_from_biom: import matrix object from BIOM file format*/
+  funcdef import_matrix_from_biom (ImportMatrixParams params) returns (ImportMatrixOutput returnVal) authentication required;
 
   /* Input of the import_matrix_from_excel function
     obj_type: saving object data type

@@ -355,6 +355,10 @@ class Application(object):
                              name='GenericsAPI.import_matrix_from_excel',
                              types=[dict])
         self.method_authentication['GenericsAPI.import_matrix_from_excel'] = 'required'  # noqa
+        self.rpc_service.add(impl_GenericsAPI.import_matrix_from_biom,
+                             name='GenericsAPI.import_matrix_from_biom',
+                             types=[dict])
+        self.method_authentication['GenericsAPI.import_matrix_from_biom'] = 'required'  # noqa
         self.rpc_service.add(impl_GenericsAPI.save_object,
                              name='GenericsAPI.save_object',
                              types=[dict])
@@ -391,6 +395,10 @@ class Application(object):
                              name='GenericsAPI.compute_correlation_matrix',
                              types=[dict])
         self.method_authentication['GenericsAPI.compute_correlation_matrix'] = 'required'  # noqa
+        self.rpc_service.add(impl_GenericsAPI.build_network,
+                             name='GenericsAPI.build_network',
+                             types=[dict])
+        self.method_authentication['GenericsAPI.build_network'] = 'required'  # noqa
         self.rpc_service.add(impl_GenericsAPI.status,
                              name='GenericsAPI.status',
                              types=[dict])

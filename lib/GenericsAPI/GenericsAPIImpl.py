@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 #BEGIN_HEADER
-import os
 import logging
+import os
 
-from GenericsAPI.Utils.MatrixUtil import MatrixUtil
 from GenericsAPI.Utils.AttributeUtils import AttributesUtil
-from GenericsAPI.Utils.DataUtil import DataUtil
+from GenericsAPI.Utils.BIOMUtil import BiomUtil
 from GenericsAPI.Utils.CorrelationUtil import CorrelationUtil
+from GenericsAPI.Utils.DataUtil import DataUtil
+from GenericsAPI.Utils.MatrixUtil import MatrixUtil
 from GenericsAPI.Utils.NetworkUtil import NetworkUtil
 #END_HEADER
 
@@ -28,7 +29,7 @@ class GenericsAPI:
     ######################################### noqa
     VERSION = "0.0.1"
     GIT_URL = "https://github.com/kbaseapps/GenericsAPI.git"
-    GIT_COMMIT_HASH = "5e9596b97ff130005339b7e2d3462eddb1f21c6b"
+    GIT_COMMIT_HASH = "ea4741925fe0f279caf51668c4c44ce020be2dd7"
 
     #BEGIN_CLASS_HEADER
     #END_CLASS_HEADER
@@ -46,6 +47,7 @@ class GenericsAPI:
         self.corr_util = CorrelationUtil(self.config)
         self.data_util = DataUtil(self.config)
         self.network_util = NetworkUtil(self.config)
+        self.biom_util = BiomUtil(self.config)
         logging.basicConfig(level=logging.INFO)
         #END_CONSTRUCTOR
         pass
@@ -147,18 +149,22 @@ class GenericsAPI:
            object to be saved to optional: col_attributemapping_ref: column
            AttributeMapping reference row_attributemapping_ref: row
            AttributeMapping reference genome_ref: genome reference
-           diff_expr_matrix_ref: DifferentialExpressionMatrix reference) ->
-           structure: parameter "obj_type" of String, parameter
-           "input_shock_id" of String, parameter "input_file_path" of String,
-           parameter "input_staging_file_path" of String, parameter
-           "matrix_name" of String, parameter "scale" of String, parameter
-           "description" of String, parameter "workspace_name" of type
-           "workspace_name" (workspace name of the object), parameter
+           diff_expr_matrix_ref: DifferentialExpressionMatrix reference
+           biochemistry_ref: (for MetaboliteMatrix) reads_set_ref: (raw data
+           for AmpliconMatrix)) -> structure: parameter "obj_type" of String,
+           parameter "input_shock_id" of String, parameter "input_file_path"
+           of String, parameter "input_staging_file_path" of String,
+           parameter "matrix_name" of String, parameter "scale" of String,
+           parameter "description" of String, parameter "workspace_name" of
+           type "workspace_name" (workspace name of the object), parameter
            "genome_ref" of type "obj_ref" (An X/Y/Z style reference),
            parameter "col_attributemapping_ref" of type "obj_ref" (An X/Y/Z
            style reference), parameter "row_attributemapping_ref" of type
            "obj_ref" (An X/Y/Z style reference), parameter
-           "diff_expr_matrix_ref" of type "obj_ref" (An X/Y/Z style reference)
+           "diff_expr_matrix_ref" of type "obj_ref" (An X/Y/Z style
+           reference), parameter "biochemistry_ref" of type "obj_ref" (An
+           X/Y/Z style reference), parameter "reads_set_ref" of type
+           "obj_ref" (An X/Y/Z style reference)
         :returns: instance of type "ImportMatrixOutput" -> structure:
            parameter "report_name" of String, parameter "report_ref" of
            String, parameter "matrix_obj_ref" of type "obj_ref" (An X/Y/Z
@@ -173,6 +179,52 @@ class GenericsAPI:
         # At some point might do deeper type checking...
         if not isinstance(returnVal, dict):
             raise ValueError('Method import_matrix_from_excel return value ' +
+                             'returnVal is not type dict as required.')
+        # return the results
+        return [returnVal]
+
+    def import_matrix_from_biom(self, ctx, params):
+        """
+        import_matrix_from_biom: import matrix object from BIOM file format
+        :param params: instance of type "ImportMatrixParams" (Input of the
+           import_matrix_from_excel function obj_type: a type in
+           KBaseMatrices input_shock_id: file shock id input_file_path:
+           absolute file path input_staging_file_path: staging area file path
+           matrix_name: matrix object name description: optional, a
+           description of the matrix workspace_name: workspace name matrix
+           object to be saved to optional: col_attributemapping_ref: column
+           AttributeMapping reference row_attributemapping_ref: row
+           AttributeMapping reference genome_ref: genome reference
+           diff_expr_matrix_ref: DifferentialExpressionMatrix reference
+           biochemistry_ref: (for MetaboliteMatrix) reads_set_ref: (raw data
+           for AmpliconMatrix)) -> structure: parameter "obj_type" of String,
+           parameter "input_shock_id" of String, parameter "input_file_path"
+           of String, parameter "input_staging_file_path" of String,
+           parameter "matrix_name" of String, parameter "scale" of String,
+           parameter "description" of String, parameter "workspace_name" of
+           type "workspace_name" (workspace name of the object), parameter
+           "genome_ref" of type "obj_ref" (An X/Y/Z style reference),
+           parameter "col_attributemapping_ref" of type "obj_ref" (An X/Y/Z
+           style reference), parameter "row_attributemapping_ref" of type
+           "obj_ref" (An X/Y/Z style reference), parameter
+           "diff_expr_matrix_ref" of type "obj_ref" (An X/Y/Z style
+           reference), parameter "biochemistry_ref" of type "obj_ref" (An
+           X/Y/Z style reference), parameter "reads_set_ref" of type
+           "obj_ref" (An X/Y/Z style reference)
+        :returns: instance of type "ImportMatrixOutput" -> structure:
+           parameter "report_name" of String, parameter "report_ref" of
+           String, parameter "matrix_obj_ref" of type "obj_ref" (An X/Y/Z
+           style reference)
+        """
+        # ctx is the context object
+        # return variables are: returnVal
+        #BEGIN import_matrix_from_biom
+        returnVal = self.biom_util.import_matrix_from_biom(params)
+        #END import_matrix_from_biom
+
+        # At some point might do deeper type checking...
+        if not isinstance(returnVal, dict):
+            raise ValueError('Method import_matrix_from_biom return value ' +
                              'returnVal is not type dict as required.')
         # return the results
         return [returnVal]

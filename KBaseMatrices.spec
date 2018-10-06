@@ -358,7 +358,7 @@ module KBaseMatrices{
       ws_attributemapping_id row_attributemapping_ref;
       mapping<string, string> attributes;
       list<string> search_attributes;
-      ws_ref reads_library_ref;
+      ws_ref reads_set_ref;
       mapping<string, string> sequence_mapping;
       FloatMatrix2D data;
     } AmpliconMatrix;

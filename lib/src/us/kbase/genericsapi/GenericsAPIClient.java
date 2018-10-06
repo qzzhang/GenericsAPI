@@ -233,6 +233,24 @@ public class GenericsAPIClient {
     }
 
     /**
+     * <p>Original spec-file function name: import_matrix_from_biom</p>
+     * <pre>
+     * import_matrix_from_biom: import matrix object from BIOM file format
+     * </pre>
+     * @param   params   instance of type {@link us.kbase.genericsapi.ImportMatrixParams ImportMatrixParams}
+     * @return   parameter "returnVal" of type {@link us.kbase.genericsapi.ImportMatrixOutput ImportMatrixOutput}
+     * @throws IOException if an IO exception occurs
+     * @throws JsonClientException if a JSON RPC exception occurs
+     */
+    public ImportMatrixOutput importMatrixFromBiom(ImportMatrixParams params, RpcContext... jsonRpcContext) throws IOException, JsonClientException {
+        List<Object> args = new ArrayList<Object>();
+        args.add(params);
+        TypeReference<List<ImportMatrixOutput>> retType = new TypeReference<List<ImportMatrixOutput>>() {};
+        List<ImportMatrixOutput> res = caller.jsonrpcCall("GenericsAPI.import_matrix_from_biom", args, retType, true, true, jsonRpcContext, this.serviceVersion);
+        return res.get(0);
+    }
+
+    /**
      * <p>Original spec-file function name: save_object</p>
      * <pre>
      * save_object: validate data constraints and save matrix object
