@@ -1,0 +1,50 @@
+{
+  "ver" : "",
+  "authors" : ["jjeffryes"],
+  "contact" : "http://kbase.us/contact-us/",
+  "visible" : true,
+  "categories" : ["utilities"],
+  "widgets": {
+    "input": "kbaseNarrativeMethodInput",
+    "output" : "code-cell"
+  },
+  "parameters" : [
+    {
+      "id" : "matrix_ref",
+      "optional" : false,
+      "advanced" : false,
+      "allow_multiple" : false,
+      "default_values" : [ "" ],
+      "field_type" : "text",
+      "text_options" : {
+        "valid_ws_types" : ["KBaseMatrices"]
+      }
+    }
+  ],
+  "behavior" : {
+    "none" : {
+      "input_mapping" : [
+        {
+          "narrative_system_variable": "workspace",
+          "target_property": "workspace_name"
+        },
+        {
+          "input_parameter" : "matrix_ref",
+          "target_property" : "matrix_ref",
+          "target_type_transform": "resolved-ref"
+        }
+      ],
+      "output_mapping" : [
+        {
+          "narrative_system_variable": "workspace",
+          "target_property": "wsName"
+        },
+        {
+            "constant_value": "print('It Works')",
+            "target_property": "python_code"
+        }
+      ]
+    }
+  },
+  "job_id_output_field": "docker"
+}

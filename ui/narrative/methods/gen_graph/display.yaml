@@ -1,0 +1,32 @@
+name     : Build Code Cell
+subtitle : Generates a code cell based on app input
+tooltip  : Generates a code cell based on app input
+
+icon: data-blue.png
+
+screenshots :
+    []
+
+suggestions :
+    apps:
+        related :
+            []
+        next :
+            []
+    methods:
+        related :
+            []
+        next :
+            []
+
+parameters :
+    matrix_ref :
+        ui-name: |
+            Matrix Object
+        short-hint : |
+            none
+        long-hint  : |
+            none
+
+description : |
+    <p> Generates a code cell based on app input. </p>
