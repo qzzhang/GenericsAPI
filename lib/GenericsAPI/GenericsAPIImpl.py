@@ -27,8 +27,8 @@ class GenericsAPI:
     # the latter method is running.
     ######################################### noqa
     VERSION = "0.0.1"
-    GIT_URL = "https://github.com/kbaseapps/GenericsAPI.git"
-    GIT_COMMIT_HASH = "5e9596b97ff130005339b7e2d3462eddb1f21c6b"
+    GIT_URL = "git@github.com:Tianhao-Gu/GenericsAPI.git"
+    GIT_COMMIT_HASH = "92a6529c2209a64ac7cc1a18919f3132b94cf4a8"
 
     #BEGIN_CLASS_HEADER
     #END_CLASS_HEADER
@@ -311,9 +311,8 @@ class GenericsAPI:
 
     def export_attribute_mapping_tsv(self, ctx, params):
         """
-        :param params: instance of type "ExportAttributeMappingParams" ->
-           structure: parameter "input_ref" of type "obj_ref" (An X/Y/Z style
-           reference)
+        :param params: instance of type "ExportObjectParams" -> structure:
+           parameter "input_ref" of type "obj_ref" (An X/Y/Z style reference)
         :returns: instance of type "ExportOutput" -> structure: parameter
            "shock_id" of String
         """
@@ -336,9 +335,8 @@ class GenericsAPI:
 
     def export_attribute_mapping_excel(self, ctx, params):
         """
-        :param params: instance of type "ExportAttributeMappingParams" ->
-           structure: parameter "input_ref" of type "obj_ref" (An X/Y/Z style
-           reference)
+        :param params: instance of type "ExportObjectParams" -> structure:
+           parameter "input_ref" of type "obj_ref" (An X/Y/Z style reference)
         :returns: instance of type "ExportOutput" -> structure: parameter
            "shock_id" of String
         """
@@ -361,9 +359,8 @@ class GenericsAPI:
 
     def export_cluster_set_excel(self, ctx, params):
         """
-        :param params: instance of type "ExportClusterSetParams" ->
-           structure: parameter "input_ref" of type "obj_ref" (An X/Y/Z style
-           reference)
+        :param params: instance of type "ExportObjectParams" -> structure:
+           parameter "input_ref" of type "obj_ref" (An X/Y/Z style reference)
         :returns: instance of type "ExportOutput" -> structure: parameter
            "shock_id" of String
         """
@@ -380,6 +377,27 @@ class GenericsAPI:
         # At some point might do deeper type checking...
         if not isinstance(result, dict):
             raise ValueError('Method export_cluster_set_excel return value ' +
+                             'result is not type dict as required.')
+        # return the results
+        return [result]
+
+    def export_corr_matrix_excel(self, ctx, params):
+        """
+        :param params: instance of type "ExportObjectParams" -> structure:
+           parameter "input_ref" of type "obj_ref" (An X/Y/Z style reference)
+        :returns: instance of type "ExportOutput" -> structure: parameter
+           "shock_id" of String
+        """
+        # ctx is the context object
+        # return variables are: result
+        #BEGIN export_corr_matrix_excel
+        logging.info("Starting 'export_corr_matrix_excel' with params:{}".format(params))
+        result = self.corr_util.export_corr_matrix_excel(params)
+        #END export_corr_matrix_excel
+
+        # At some point might do deeper type checking...
+        if not isinstance(result, dict):
+            raise ValueError('Method export_corr_matrix_excel return value ' +
                              'result is not type dict as required.')
         # return the results
         return [result]

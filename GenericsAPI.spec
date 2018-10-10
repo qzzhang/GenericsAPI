@@ -221,19 +221,18 @@ module GenericsAPI {
 
     typedef structure {
         obj_ref input_ref;
-    } ExportAttributeMappingParams;
+    } ExportObjectParams;
 
-    typedef structure {
-        obj_ref input_ref;
-    } ExportClusterSetParams;
-
-    funcdef export_attribute_mapping_tsv(ExportAttributeMappingParams params)
+    funcdef export_attribute_mapping_tsv(ExportObjectParams params)
         returns (ExportOutput result) authentication required;
 
-    funcdef export_attribute_mapping_excel(ExportAttributeMappingParams params)
+    funcdef export_attribute_mapping_excel(ExportObjectParams params)
         returns (ExportOutput result) authentication required;
 
-    funcdef export_cluster_set_excel(ExportClusterSetParams params)
+    funcdef export_cluster_set_excel(ExportObjectParams params)
+        returns (ExportOutput result) authentication required;
+
+    funcdef export_corr_matrix_excel(ExportObjectParams params)
         returns (ExportOutput result) authentication required;
 
 

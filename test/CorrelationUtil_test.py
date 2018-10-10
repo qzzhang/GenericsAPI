@@ -4,6 +4,7 @@ import os
 import unittest
 import time
 import shutil
+import uuid
 
 import pandas as pd
 import numpy as np
@@ -53,7 +54,8 @@ class GenericsAPITest(unittest.TestCase):
 
         suffix = int(time.time() * 1000)
         cls.wsName = "test_corr_util_" + str(suffix)
-        cls.wsClient.create_workspace({'workspace': cls.wsName})
+        ret = cls.wsClient.create_workspace({'workspace': cls.wsName})
+        cls.wsId = ret[0]
 
     @classmethod
     def tearDownClass(cls):
@@ -116,6 +118,57 @@ class GenericsAPITest(unittest.TestCase):
         print('Loaded ExpressionMatrix: ' + expr_matrix_ref)
         return expr_matrix_ref
 
+    def loadCorrData(self):
+        if hasattr(self.__class__, 'corr_data'):
+            return self.__class__.corr_data
+
+        corr_data = {'row_ids': ['WRI_RS00010_CDS_1',
+                                 'WRI_RS00015_CDS_1',
+                                 'WRI_RS00025_CDS_1'],
+                     'values': [[1.0, 0.99, 0.91],
+                                [0.99, 1.0, 0.91],
+                                [0.91, 0.91, 1.0]],
+                     'col_ids': ['WRI_RS00010_CDS_1',
+                                 'WRI_RS00015_CDS_1',
+                                 'WRI_RS00025_CDS_1']}
+
+        self.__class__.corr_data = corr_data
+        print('Loaded Correlation Data:\n{}\n'.format(corr_data))
+        return corr_data
+
+    def loadCorrMatrix(self):
+
+        if hasattr(self.__class__, 'corr_matrix_ref'):
+            return self.__class__.corr_matrix_ref
+
+        object_type = 'KBaseExperiments.CorrelationMatrix'
+        corr_matrix_object_name = 'test_corr_matrix'
+        corr_matrix_data = {'correlation_parameters': {'method': 'pearson'},
+                            'coefficient_data': self.loadCorrData(),
+                            'significance_data': {'row_ids': ['WRI_RS00010_CDS_1',
+                                                              'WRI_RS00015_CDS_1',
+                                                              'WRI_RS00025_CDS_1'],
+                                                  'values': [[0.0, 0.0, 0.0879],
+                                                             [0.0, 0.0, 0.0879],
+                                                             [0.0879, 0.0879, 0.0]],
+                                                  'col_ids': ['WRI_RS00010_CDS_1',
+                                                              'WRI_RS00015_CDS_1',
+                                                              'WRI_RS00025_CDS_1']}}
+
+        save_object_params = {
+            'id': self.wsId,
+            'objects': [{'type': object_type,
+                         'data': corr_matrix_data,
+                         'name': corr_matrix_object_name}]
+        }
+
+        dfu_oi = self.dfu.save_objects(save_object_params)[0]
+        corr_matrix_ref = str(dfu_oi[6]) + '/' + str(dfu_oi[0]) + '/' + str(dfu_oi[4])
+
+        self.__class__.corr_matrix_ref = corr_matrix_ref
+        print('Loaded Correlation Matrix: ' + corr_matrix_ref)
+        return corr_matrix_ref
+
     def fail_df_to_corr(self, df, error, method='pearson', dimension='col',
                         exception=ValueError, contains=False):
         with self.assertRaises(exception) as context:
@@ -146,6 +199,43 @@ class GenericsAPITest(unittest.TestCase):
     def start_test(self):
         testname = inspect.stack()[1][3]
         print('\n*** starting test: ' + testname + ' **')
+
+    def test_export_corr_matrix_excel(self):
+        self.start_test()
+
+        corr_matrix_ref = self.loadCorrMatrix()
+
+        params = {'input_ref': corr_matrix_ref}
+
+        ret = self.getImpl().export_corr_matrix_excel(self.ctx, params)[0]
+
+        assert ret and ('shock_id' in ret)
+
+        output_directory = os.path.join(self.scratch, str(uuid.uuid4()))
+        os.makedirs(output_directory)
+
+        self.dfu.shock_to_file({'shock_id': ret['shock_id'],
+                                'file_path': output_directory,
+                                'unpack': 'unpack'})
+
+        xl_files = [file for file in os.listdir(output_directory) if file.endswith('.xlsx')]
+        self.assertEqual(len(xl_files), 1)
+
+        xl = pd.ExcelFile(os.path.join(output_directory, xl_files[0]))
+        expected_sheet_names = ['coefficient_data', 'significance_data']
+        self.assertCountEqual(xl.sheet_names, expected_sheet_names)
+
+        df = xl.parse("coefficient_data")
+        expected_index = ['WRI_RS00010_CDS_1', 'WRI_RS00015_CDS_1', 'WRI_RS00025_CDS_1']
+        expected_col = ['WRI_RS00010_CDS_1', 'WRI_RS00015_CDS_1', 'WRI_RS00025_CDS_1']
+        self.assertCountEqual(df.index.tolist(), expected_index)
+        self.assertCountEqual(df.columns.tolist(), expected_col)
+
+        df = xl.parse("significance_data")
+        expected_index = ['WRI_RS00010_CDS_1', 'WRI_RS00015_CDS_1', 'WRI_RS00025_CDS_1']
+        expected_col = ['WRI_RS00010_CDS_1', 'WRI_RS00015_CDS_1', 'WRI_RS00025_CDS_1']
+        self.assertCountEqual(df.index.tolist(), expected_index)
+        self.assertCountEqual(df.columns.tolist(), expected_col)
 
     def test_compute_correlation_matrix_fail(self):
         self.start_test()

@@ -302,6 +302,9 @@ class CorrelationUtil:
         if sig_df is not None:
             corr_data.update({'significance_data': self._df_to_list(sig_df)})
 
+        print('dfsafds')
+        print(corr_data)
+
         obj_type = 'KBaseExperiments.CorrelationMatrix'
         info = self.dfu.save_objects({
             "id": ws_name_id,
@@ -313,6 +316,56 @@ class CorrelationUtil:
         })[0]
 
         return "%s/%s/%s" % (info[6], info[0], info[4])
+
+    def _Matrix2D_to_df(self, Matrix2D):
+        """
+        _Matrix2D_to_df: transform a FloatMatrix2D to data frame
+        """
+
+        index = Matrix2D.get('row_ids')
+        columns = Matrix2D.get('col_ids')
+        values = Matrix2D.get('values')
+
+        df = pd.DataFrame(values, index=index, columns=columns)
+
+        return df
+
+    def _corr_to_df(self, corr_matrix_ref):
+        """
+        retrieve correlation matrix ws object to coefficient_df and significance_df
+        """
+
+        corr_data = self.dfu.get_objects({'object_refs': [corr_matrix_ref]})['data'][0]['data']
+
+        coefficient_data = corr_data.get('coefficient_data')
+        significance_data = corr_data.get('significance_data')
+
+        coefficient_df = self._Matrix2D_to_df(coefficient_data)
+
+        significance_df = None
+        if significance_data:
+            significance_df = self._Matrix2D_to_df(significance_data)
+
+        return coefficient_df, significance_df
+
+    def _corr_df_to_excel(self, coefficient_df, significance_df, result_dir, corr_matrix_ref):
+        """
+        write correlation matrix dfs into excel
+        """
+
+        corr_info = self.dfu.get_objects({'object_refs': [corr_matrix_ref]})['data'][0]['info']
+        corr_name = corr_info[1]
+
+        file_path = os.path.join(result_dir, corr_name + ".xlsx")
+
+        writer = pd.ExcelWriter(file_path)
+
+        coefficient_df.to_excel(writer, "coefficient_data", index=True)
+
+        if significance_df is not None:
+            significance_df.to_excel(writer, "significance_data", index=True)
+
+        writer.close()
 
     def __init__(self, config):
         self.ws_url = config["workspace-url"]
@@ -487,3 +540,24 @@ class CorrelationUtil:
         returnVal.update(report_output)
 
         return returnVal
+
+    def export_corr_matrix_excel(self, params):
+        """
+        export CorrelationMatrix as Excel
+        """
+
+        corr_matrix_ref = params.get('input_ref')
+
+        coefficient_df, significance_df = self._corr_to_df(corr_matrix_ref)
+
+        result_dir = os.path.join(self.scratch, str(uuid.uuid4()))
+        self._mkdir_p(result_dir)
+
+        self._corr_df_to_excel(coefficient_df, significance_df, result_dir, corr_matrix_ref)
+
+        package_details = self.dfu.package_for_download({
+            'file_path': result_dir,
+            'ws_refs': [corr_matrix_ref]
+        })
+
+        return {'shock_id': package_details['shock_id']}
