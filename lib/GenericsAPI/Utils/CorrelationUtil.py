@@ -302,9 +302,6 @@ class CorrelationUtil:
         if sig_df is not None:
             corr_data.update({'significance_data': self._df_to_list(sig_df)})
 
-        print('dfsafds')
-        print(corr_data)
-
         obj_type = 'KBaseExperiments.CorrelationMatrix'
         info = self.dfu.save_objects({
             "id": ws_name_id,
