@@ -19,29 +19,50 @@
       "text_options" : {
         "valid_ws_types" : ["KBaseMatrices"]
       }
+    },
+    {
+      "id" : "output_type",
+      "optional" : false,
+      "advanced" : false,
+      "allow_multiple" : false,
+      "default_values" : ["dataframe"],
+      "field_type" : "dropdown",
+      "dropdown_options": {
+        "options": [
+          {
+              "display": "Pandas DataFrame",
+              "value": "dataframe"
+          },
+          {
+              "display": "Clustergrammer Heatmap",
+              "value": "clustergrammer"
+          },
+          {
+              "display": "Seaborn Box Plot",
+              "value": "seaborn box"
+          },
+          {
+              "display": "Plotly Stacked Barchart",
+              "value": "plotly stackedbars"
+          }
+        ]
+      }
     }
+
   ],
   "behavior" : {
     "none" : {
-      "input_mapping" : [
-        {
-          "narrative_system_variable": "workspace",
-          "target_property": "workspace_name"
-        },
-        {
-          "input_parameter" : "matrix_ref",
-          "target_property" : "matrix_ref",
-          "target_type_transform": "resolved-ref"
-        }
-      ],
       "output_mapping" : [
         {
           "narrative_system_variable": "workspace",
           "target_property": "wsName"
-        },
-        {
-            "constant_value": "print('It Works')",
-            "target_property": "python_code"
+        }, {
+          "input_parameter" : "matrix_ref",
+          "target_property" : "matrix_ref",
+          "target_type_transform": "resolved-ref"
+        }, {
+          "input_parameter" : "output_type",
+          "target_property" : "output_type"
         }
       ]
     }

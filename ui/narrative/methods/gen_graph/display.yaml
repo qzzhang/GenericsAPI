@@ -28,5 +28,13 @@ parameters :
         long-hint  : |
             none
 
+    output_type :
+        ui-name: |
+            Display Type
+        short-hint : |
+            Select the type of Object you would like to generate
+        long-hint  : |
+            Select the type of Object you would like to generate
+
 description : |
     <p> Generates a code cell based on app input. </p>
