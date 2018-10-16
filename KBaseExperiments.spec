@@ -262,6 +262,7 @@ module KBaseExperiments {
       @optional explained_variance_ratio
 
       @metadata ws length(rotation_matrix.row_ids) as matrix_size
+      @metadata ws length(rotation_matrix.col_ids) as n_components
     */
     typedef structure {
       string description;
