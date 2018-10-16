@@ -248,4 +248,25 @@ module KBaseExperiments {
       mapping<node_id, Node> nodes;
       mapping<string, string> network_properties;
     } Network;
+
+    /*
+      A wrapper around a FloatMatrix2D designed for simple matricies of PCA data.
+
+      PCAMatrix Fields:
+      description - short optional description of the dataset
+      rotation_matrix  - result rotation matrix
+      explained_variance_ratio - Percentage of variance explained by each of the selected components
+      pca_parameters - arguments used to perform PCA analysis
+
+      @optional description pca_parameters
+      @optional explained_variance_ratio
+
+      @metadata ws length(rotation_matrix.row_ids) as matrix_size
+    */
+    typedef structure {
+      string description;
+      mapping<string, string> pca_parameters;
+      FloatMatrix2D rotation_matrix;
+      list<float> explained_variance_ratio;
+    } PCAMatrix;
 };
