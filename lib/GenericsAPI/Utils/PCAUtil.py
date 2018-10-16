@@ -128,6 +128,22 @@ class PCAUtil:
 
         return rotation_matrix_df, explained_variance_ratio
 
+    def _build_group_pca_matrix(self, plot_pca_matrix, obj_data, dimension,
+                                customize_instance_group):
+        """
+        _build_group_pca_matrix: select and append group/color/shape col to rotation_matrix
+        """
+        plot_pca_matrix = plot_pca_matrix.copy
+
+        print('fdsafdsa')
+        print(obj_data)
+
+        # if customize_instance_group:
+
+        # else:
+
+        return plot_pca_matrix
+
     def _plot_pca_matrix(self, rotation_matrix_df):
         pass
 
@@ -183,9 +199,10 @@ class PCAUtil:
                                         n_components)
 
         plot_pca_matrix = rotation_matrix_df.copy()
-        if params.get('group_by'):
+        # if params.get('customize_instance_group'):
+        if True:
             plot_pca_matrix = self._build_group_pca_matrix(plot_pca_matrix, obj_data, dimension,
-                                                           params.get('group_by').get('instance'))
+                                                           params.get('customize_instance_group'))
 
         if params.get('scale_size_by'):
             plot_pca_matrix = self._build_size_pca_matrix(plot_pca_matrix, obj_data, dimension,

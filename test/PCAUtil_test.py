@@ -109,20 +109,20 @@ class PCAUtilTest(unittest.TestCase):
         testname = inspect.stack()[1][3]
         print('\n*** starting test: ' + testname + ' **')
 
-    def test_run_pca_fail(self):
-        self.start_test()
+    # def test_run_pca_fail(self):
+    #     self.start_test()
 
-        invalidate_params = {'missing_input_obj_ref': 'input_obj_ref',
-                             'workspace_name': 'workspace_name'}
-        error_msg = '"input_obj_ref" parameter is required, but missing'
-        self.fail_run_pca(invalidate_params, error_msg)
+    #     invalidate_params = {'missing_input_obj_ref': 'input_obj_ref',
+    #                          'workspace_name': 'workspace_name'}
+    #     error_msg = '"input_obj_ref" parameter is required, but missing'
+    #     self.fail_run_pca(invalidate_params, error_msg)
 
-        invalidate_params = {'input_obj_ref': 'input_obj_ref',
-                             'missing_workspace_name': 'workspace_name'}
-        error_msg = '"workspace_name" parameter is required, but missing'
-        self.fail_run_pca(invalidate_params, error_msg)
+    #     invalidate_params = {'input_obj_ref': 'input_obj_ref',
+    #                          'missing_workspace_name': 'workspace_name'}
+    #     error_msg = '"workspace_name" parameter is required, but missing'
+    #     self.fail_run_pca(invalidate_params, error_msg)
 
-    def test_build_network_ok(self):
+    def test_run_pca_ok(self):
         self.start_test()
 
         expr_matrix_ref = self.loadExpressionMatrix()
@@ -135,13 +135,13 @@ class PCAUtilTest(unittest.TestCase):
 
         print(ret)
 
-    def test_init_ok(self):
-        self.start_test()
-        class_attri = ['scratch', 'token', 'callback_url', 'ws_url']
+    # def test_init_ok(self):
+    #     self.start_test()
+    #     class_attri = ['scratch', 'token', 'callback_url', 'ws_url']
 
-        network_util = self.getPCAUtil()
-        self.assertTrue(set(class_attri) <= set(network_util.__dict__.keys()))
-        self.assertEqual(network_util.scratch, self.cfg.get('scratch'))
+    #     network_util = self.getPCAUtil()
+    #     self.assertTrue(set(class_attri) <= set(network_util.__dict__.keys()))
+    #     self.assertEqual(network_util.scratch, self.cfg.get('scratch'))
 
     # def test__Matrix2D_to_df(self):
 

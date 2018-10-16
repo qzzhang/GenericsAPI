@@ -427,7 +427,7 @@ public class GenericsAPIClient {
     /**
      * <p>Original spec-file function name: run_pca</p>
      * <pre>
-     * build_network: filter correlation matrix and build network
+     * run_pca: PCA analysis on matrix
      * </pre>
      * @param   params   instance of type {@link us.kbase.genericsapi.PCAParams PCAParams}
      * @return   parameter "returnVal" of type {@link us.kbase.genericsapi.PCAOutput PCAOutput}

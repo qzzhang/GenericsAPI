@@ -52,6 +52,22 @@ parameters :
         long-hint  : |
             Group data by associated attribute instance
 
+    color:
+        ui-name: |
+            Marker Color
+        short-hint : |
+            Color of plot marker
+        long-hint  : |
+            Color of plot marker
+
+    shape:
+        ui-name: |
+            Marker Shape
+        short-hint : |
+            Shape of plot marker
+        long-hint  : |
+            Shape of plot marker
+
     attribute:
         ui-name: |
             Attribute
@@ -69,12 +85,13 @@ parameters :
             Output KBaseExperiments.PCAMatrix object name
 
 parameter-groups :
-    group_by :
-        ui-name : Group By
-        short-hint : Group data by associated attribute instance
     scale_size_by:
-        ui-name : Scaling Size By
+        ui-name : Scale Marker Size By
         short-hint :  Select an attribute for plot sizing
+    customize_instance_group:
+        ui-name : Select And Customize Instance Group
+        short-hint : Customize Instance Group
+
 
 description : |
     <p> Perform PCA analysis on Matrix object </p>

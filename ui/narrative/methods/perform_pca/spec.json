@@ -23,7 +23,7 @@
     {
       "id" : "dimension",
       "optional" : false,
-      "advanced" : true,
+      "advanced" : false,
       "allow_multiple" : false,
       "default_values" : ["row"],
       "field_type" : "dropdown",
@@ -45,7 +45,7 @@
     {
       "id" : "attribute_mapping_obj_ref",
       "optional" : true,
-      "advanced" : true,
+      "advanced" : false,
       "allow_multiple" : false,
       "default_values" : [ "" ],
       "field_type" : "text",
@@ -69,6 +69,62 @@
         "multiselection":false,
         "show_src_obj":false,
         "allow_custom":false
+      }
+    },
+    {
+      "id" : "color",
+      "optional" : false,
+      "advanced" : true,
+      "allow_multiple" : false,
+      "default_values" : ["random"],
+      "field_type" : "dropdown",
+      "dropdown_options": 
+      {
+        "options": 
+        [
+          {
+              "display": "random",
+              "value": "random"
+          },
+          {
+              "display": "red",
+              "value": "red"
+          },
+          {
+              "display": "blue",
+              "value": "blue"
+          },
+          {
+              "display": "green",
+              "value": "green"
+          }
+        ]
+      }
+    },
+    {
+      "id" : "shape",
+      "optional" : false,
+      "advanced" : true,
+      "allow_multiple" : false,
+      "default_values" : ["dot"],
+      "field_type" : "dropdown",
+      "dropdown_options": 
+      {
+        "options": 
+        [
+          {
+              "display": "dot",
+              "value": "dot"
+          },
+          {
+              "display": "random",
+              "value": "random"
+          },
+          {
+              "display": "star",
+              "value": "star"
+          }
+        ]
       }
     },
     {
@@ -105,14 +161,16 @@
   ],
   "parameter-groups": [
     {
-      "id": "group_by",
+      "id": "customize_instance_group",
       "parameters": [
-        "instance"
+        "instance",
+        "color",
+        "shape"
       ],
       "optional": true,
-      "allow_multiple": false,
+      "allow_multiple": true,
       "with_border": false,
-      "advanced" : true
+      "advanced" : false
     },
     {
       "id": "scale_size_by",
@@ -122,7 +180,7 @@
       "optional": true,
       "allow_multiple": false,
       "with_border": false,
-      "advanced" : true
+      "advanced" : false
     }
   ],
   "behavior" : {
@@ -150,8 +208,8 @@
           "target_property" : "dimension"
         },
         {
-          "input_parameter" : "group_by",
-          "target_property" : "group_by"
+          "input_parameter" : "customize_instance_group",
+          "target_property" : "customize_instance_group"
         },
         {
           "input_parameter" : "scale_size_by",
