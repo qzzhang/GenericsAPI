@@ -182,14 +182,16 @@ module KBaseExperiments {
 
       @optional description correlation_parameters
       @optional genome_ref feature_mapping
-      @optional significance_data
+      @optional significance_data original_data
 
       @metadata ws genome_ref as genome
+      @metadata ws original_data as Source Data
       @metadata ws length(coefficient_data.row_ids) as matrix_size
     */
     typedef structure {
       string description;
       mapping<string, string> correlation_parameters;
+      WSRef original_data;
       GenomeRef genome_ref;
       mapping<string, list<string>> feature_mapping;
       FloatMatrix2D coefficient_data;
@@ -259,15 +261,17 @@ module KBaseExperiments {
       pca_parameters - arguments used to perform PCA analysis
 
       @optional description pca_parameters
-      @optional explained_variance_ratio
+      @optional explained_variance_ratio original_data
 
       @metadata ws length(rotation_matrix.row_ids) as matrix_size
       @metadata ws length(rotation_matrix.col_ids) as n_components
+      @metadata ws original_data as Source Data
     */
     typedef structure {
       string description;
       mapping<string, string> pca_parameters;
       FloatMatrix2D rotation_matrix;
       list<float> explained_variance_ratio;
+      WSRef original_data;
     } PCAMatrix;
 };
