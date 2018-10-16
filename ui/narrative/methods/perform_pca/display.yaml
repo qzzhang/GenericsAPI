@@ -1,0 +1,80 @@
+name     : Perform PCA Analysis
+subtitle : Perform PCA analysis on Matrix object
+tooltip  : Perform PCA analysis on Matrix object
+
+icon: data-blue.png
+
+screenshots :
+    []
+
+suggestions :
+    apps:
+        related :
+            []
+        next :
+            []
+    methods:
+        related :
+            []
+        next :
+            []
+
+parameters :
+    input_obj_ref :
+        ui-name: |
+            Matrix Object
+        short-hint : |
+            One of KBaseMatrices object
+        long-hint  : |
+            One of KBaseMatrices object
+
+    dimension:
+        ui-name: |
+            Perform PCA Analysis On
+        short-hint : |
+            Perform PCA on column or row
+        long-hint  : |
+            Perform PCA on column or row
+
+    attribute_mapping_obj_ref:
+        ui-name: |
+            AttributeMapping Object
+        short-hint : |
+            Select associated KBaseExperiments.AttributeMapping object
+        long-hint  : |
+            Select associated KBaseExperiments.AttributeMapping object
+
+    instance:
+        ui-name: |
+            Instance
+        short-hint : |
+            Group data by associated attribute instance
+        long-hint  : |
+            Group data by associated attribute instance
+
+    attribute:
+        ui-name: |
+            Attribute
+        short-hint : |
+            Select an attribute for plot sizing
+        long-hint  : |
+            Select an attribute for plot sizing
+
+    pca_matrix_name:
+        ui-name: |
+            PCA Matrix Object Name
+        short-hint : |
+            Output KBaseExperiments.PCAMatrix object name
+        long-hint  : |
+            Output KBaseExperiments.PCAMatrix object name
+
+parameter-groups :
+    group_by :
+        ui-name : Group By
+        short-hint : Group data by associated attribute instance
+    scale_size_by:
+        ui-name : Scaling Size By
+        short-hint :  Select an attribute for plot sizing
+
+description : |
+    <p> Perform PCA analysis on Matrix object </p>

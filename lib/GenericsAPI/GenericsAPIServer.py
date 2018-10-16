@@ -393,6 +393,10 @@ class Application(object):
                              name='GenericsAPI.build_network',
                              types=[dict])
         self.method_authentication['GenericsAPI.build_network'] = 'required'  # noqa
+        self.rpc_service.add(impl_GenericsAPI.run_pca,
+                             name='GenericsAPI.run_pca',
+                             types=[dict])
+        self.method_authentication['GenericsAPI.run_pca'] = 'required'  # noqa
         self.rpc_service.add(impl_GenericsAPI.status,
                              name='GenericsAPI.status',
                              types=[dict])

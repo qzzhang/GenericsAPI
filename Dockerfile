@@ -20,6 +20,9 @@ RUN pip install pandas \
     && pip install matplotlib \
     && pip install scipy
 
+RUN pip install sklearn \
+    && pip install plotly
+
 # -----------------------------------------
 
 RUN mkdir -p /kb/module/work
