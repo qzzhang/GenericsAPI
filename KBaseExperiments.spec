@@ -185,7 +185,7 @@ module KBaseExperiments {
       @optional significance_data original_data
 
       @metadata ws genome_ref as genome
-      @metadata ws original_data as Source Data
+      @metadata ws original_data as source_data
       @metadata ws length(coefficient_data.row_ids) as matrix_size
     */
     typedef structure {
@@ -265,7 +265,7 @@ module KBaseExperiments {
 
       @metadata ws length(rotation_matrix.row_ids) as matrix_size
       @metadata ws length(rotation_matrix.col_ids) as n_components
-      @metadata ws original_data as Source Data
+      @metadata ws original_data as source_data
     */
     typedef structure {
       string description;
