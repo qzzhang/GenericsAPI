@@ -395,7 +395,7 @@ class PCAUtil:
         #     plot_pca_matrix = self._build_group_pca_matrix(plot_pca_matrix, obj_data, dimension,
         #                                                    params.get('customize_instance_group'))
 
-        plot_pca_matrix = self._append_instance_group(rotation_matrix_df.copy())
+        plot_pca_matrix = self._append_instance_group(rotation_matrix_df.copy(), obj_data, dimension)
 
         if params.get('scale_size_by'):
             plot_pca_matrix = self._build_size_pca_matrix(
