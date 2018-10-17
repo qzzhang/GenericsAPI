@@ -14,7 +14,7 @@ from DataFileUtil.DataFileUtilClient import DataFileUtil
 from Workspace.WorkspaceClient import Workspace as workspaceService
 
 
-class GenericsAPITest(unittest.TestCase):
+class NetworkUtilTest(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
@@ -176,8 +176,6 @@ class GenericsAPITest(unittest.TestCase):
                   'filter_on_threshold': {'coefficient_threshold': 0.8}}
 
         ret = self.getImpl().build_network(self.ctx, params)[0]
-
-        print(ret)
 
     def test_init_ok(self):
         self.start_test()

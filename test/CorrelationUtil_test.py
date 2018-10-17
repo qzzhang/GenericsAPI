@@ -18,7 +18,7 @@ from DataFileUtil.DataFileUtilClient import DataFileUtil
 from Workspace.WorkspaceClient import Workspace as workspaceService
 
 
-class GenericsAPITest(unittest.TestCase):
+class CorrUtilTest(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
