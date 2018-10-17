@@ -25,9 +25,9 @@ parameters :
         ui-name : |
             File Path
         short-hint : |
-            Recognized extensions for the input file is .xlsx
+            Recognized extensions for the input file is .xlsx or .csv
         long-hint  : |
-            Recognized extensions for the input file is .xlsx
+            Recognized extensions for the input file is .xlsx or .csv
 
     scale:
       ui-name : |
@@ -55,19 +55,19 @@ parameters :
 
     col_attributemapping_ref :
         ui-name : |
-            Column AttributeMapping Reference
+            Samples AttributeMapping Reference
         short-hint : |
-            Provide a AttributeMapping associated with column in data set
+            Provide a AttributeMapping associated with sample in data set
         long-hint : |
-            Provide a AttributeMapping associated with column in data set
+            Provide a AttributeMapping associated with sample in data set
 
     row_attributemapping_ref :
         ui-name : |
-            Row AttributeMapping Reference
+            Compounds AttributeMapping Reference
         short-hint : |
-            Provide a AttributeMapping associated with row in data set
+            Provide a AttributeMapping associated with compounds in data set
         long-hint : |
-            Provide a AttributeMapping associated with row in data set
+            Provide a AttributeMapping associated with compounds in data set
 
 
 description : |

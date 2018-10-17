@@ -418,6 +418,8 @@ ImportMatrixParams is a reference to a hash where the following keys are defined
 	col_attributemapping_ref has a value which is a GenericsAPI.obj_ref
 	row_attributemapping_ref has a value which is a GenericsAPI.obj_ref
 	diff_expr_matrix_ref has a value which is a GenericsAPI.obj_ref
+	biochemistry_ref has a value which is a GenericsAPI.obj_ref
+	reads_set_ref has a value which is a GenericsAPI.obj_ref
 workspace_name is a string
 obj_ref is a string
 ImportMatrixOutput is a reference to a hash where the following keys are defined:
@@ -446,6 +448,8 @@ ImportMatrixParams is a reference to a hash where the following keys are defined
 	col_attributemapping_ref has a value which is a GenericsAPI.obj_ref
 	row_attributemapping_ref has a value which is a GenericsAPI.obj_ref
 	diff_expr_matrix_ref has a value which is a GenericsAPI.obj_ref
+	biochemistry_ref has a value which is a GenericsAPI.obj_ref
+	reads_set_ref has a value which is a GenericsAPI.obj_ref
 workspace_name is a string
 obj_ref is a string
 ImportMatrixOutput is a reference to a hash where the following keys are defined:
@@ -506,6 +510,130 @@ import_matrix_from_excel: import matrix object from excel
         Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method import_matrix_from_excel",
 					    status_line => $self->{client}->status_line,
 					    method_name => 'import_matrix_from_excel',
+				       );
+    }
+}
+ 
+
+
+=head2 import_matrix_from_biom
+
+  $returnVal = $obj->import_matrix_from_biom($params)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$params is a GenericsAPI.ImportMatrixParams
+$returnVal is a GenericsAPI.ImportMatrixOutput
+ImportMatrixParams is a reference to a hash where the following keys are defined:
+	obj_type has a value which is a string
+	input_shock_id has a value which is a string
+	input_file_path has a value which is a string
+	input_staging_file_path has a value which is a string
+	matrix_name has a value which is a string
+	scale has a value which is a string
+	description has a value which is a string
+	workspace_name has a value which is a GenericsAPI.workspace_name
+	genome_ref has a value which is a GenericsAPI.obj_ref
+	col_attributemapping_ref has a value which is a GenericsAPI.obj_ref
+	row_attributemapping_ref has a value which is a GenericsAPI.obj_ref
+	diff_expr_matrix_ref has a value which is a GenericsAPI.obj_ref
+	biochemistry_ref has a value which is a GenericsAPI.obj_ref
+	reads_set_ref has a value which is a GenericsAPI.obj_ref
+workspace_name is a string
+obj_ref is a string
+ImportMatrixOutput is a reference to a hash where the following keys are defined:
+	report_name has a value which is a string
+	report_ref has a value which is a string
+	matrix_obj_ref has a value which is a GenericsAPI.obj_ref
+
+</pre>
+
+=end html
+
+=begin text
+
+$params is a GenericsAPI.ImportMatrixParams
+$returnVal is a GenericsAPI.ImportMatrixOutput
+ImportMatrixParams is a reference to a hash where the following keys are defined:
+	obj_type has a value which is a string
+	input_shock_id has a value which is a string
+	input_file_path has a value which is a string
+	input_staging_file_path has a value which is a string
+	matrix_name has a value which is a string
+	scale has a value which is a string
+	description has a value which is a string
+	workspace_name has a value which is a GenericsAPI.workspace_name
+	genome_ref has a value which is a GenericsAPI.obj_ref
+	col_attributemapping_ref has a value which is a GenericsAPI.obj_ref
+	row_attributemapping_ref has a value which is a GenericsAPI.obj_ref
+	diff_expr_matrix_ref has a value which is a GenericsAPI.obj_ref
+	biochemistry_ref has a value which is a GenericsAPI.obj_ref
+	reads_set_ref has a value which is a GenericsAPI.obj_ref
+workspace_name is a string
+obj_ref is a string
+ImportMatrixOutput is a reference to a hash where the following keys are defined:
+	report_name has a value which is a string
+	report_ref has a value which is a string
+	matrix_obj_ref has a value which is a GenericsAPI.obj_ref
+
+
+=end text
+
+=item Description
+
+import_matrix_from_biom: import matrix object from BIOM file format
+
+=back
+
+=cut
+
+ sub import_matrix_from_biom
+{
+    my($self, @args) = @_;
+
+# Authentication: required
+
+    if ((my $n = @args) != 1)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function import_matrix_from_biom (received $n, expecting 1)");
+    }
+    {
+	my($params) = @args;
+
+	my @_bad_arguments;
+        (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument 1 \"params\" (value was \"$params\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to import_matrix_from_biom:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'import_matrix_from_biom');
+	}
+    }
+
+    my $url = $self->{url};
+    my $result = $self->{client}->call($url, $self->{headers}, {
+	    method => "GenericsAPI.import_matrix_from_biom",
+	    params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'import_matrix_from_biom',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method import_matrix_from_biom",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'import_matrix_from_biom',
 				       );
     }
 }
@@ -2140,6 +2268,8 @@ col_attributemapping_ref: column AttributeMapping reference
 row_attributemapping_ref: row AttributeMapping reference
 genome_ref: genome reference
 diff_expr_matrix_ref: DifferentialExpressionMatrix reference
+biochemistry_ref: (for MetaboliteMatrix)
+reads_set_ref: (raw data for AmpliconMatrix)
 
 
 =item Definition
@@ -2160,6 +2290,8 @@ genome_ref has a value which is a GenericsAPI.obj_ref
 col_attributemapping_ref has a value which is a GenericsAPI.obj_ref
 row_attributemapping_ref has a value which is a GenericsAPI.obj_ref
 diff_expr_matrix_ref has a value which is a GenericsAPI.obj_ref
+biochemistry_ref has a value which is a GenericsAPI.obj_ref
+reads_set_ref has a value which is a GenericsAPI.obj_ref
 
 </pre>
 
@@ -2180,6 +2312,8 @@ genome_ref has a value which is a GenericsAPI.obj_ref
 col_attributemapping_ref has a value which is a GenericsAPI.obj_ref
 row_attributemapping_ref has a value which is a GenericsAPI.obj_ref
 diff_expr_matrix_ref has a value which is a GenericsAPI.obj_ref
+biochemistry_ref has a value which is a GenericsAPI.obj_ref
+reads_set_ref has a value which is a GenericsAPI.obj_ref
 
 
 =end text

@@ -1,0 +1,147 @@
+{
+  "ver" : "",
+  "authors" : ["jjeffryes"],
+  "contact" : "http://kbase.us/contact-us/",
+  "visible" : true,
+  "categories" : ["upload"],
+  "widgets": {
+    "input": "kbaseNarrativeMethodInput",
+    "output" : "no-display"
+  },
+  "parameters" : [
+    {
+      "id" : "input_staging_file_path",
+      "optional" : false,
+      "advanced" : false,
+      "allow_multiple" : false,
+      "default_values" : [ "" ],
+      "field_type" : "dynamic_dropdown",
+      "text_options" : {}
+    },
+    {
+      "id" : "description",
+      "optional" : true,
+      "advanced" : false,
+      "allow_multiple" : false,
+      "default_values" : [ "" ],
+      "field_type" : "textarea"
+    },
+    {
+      "id" : "matrix_name",
+      "optional" : false,
+      "advanced" : false,
+      "allow_multiple" : false,
+      "default_values" : [ "" ],
+      "field_type" : "text",
+      "text_options" : {
+        "valid_ws_types" : ["KBaseMatrices.AmpliconMatrix"],
+        "is_output_name" : true
+      }
+    },
+    {
+      "id" : "col_attributemapping_ref",
+      "optional" : true,
+      "advanced" : true,
+      "allow_multiple" : false,
+      "default_values" : [ "" ],
+      "field_type" : "text",
+      "text_options" : {
+        "valid_ws_types" : ["KBaseExperiments.AttributeMapping"]
+      }
+    },
+    {
+      "id" : "row_attributemapping_ref",
+      "optional" : true,
+      "advanced" : true,
+      "allow_multiple" : false,
+      "default_values" : [ "" ],
+      "field_type" : "text",
+      "text_options" : {
+        "valid_ws_types" : ["KBaseExperiments.AttributeMapping"]
+      }
+    },
+    {
+      "id" : "reads_set_ref",
+      "optional" : true,
+      "advanced" : false,
+      "allow_multiple" : false,
+      "default_values" : [ "" ],
+      "field_type" : "text",
+      "text_options" : {
+        "valid_ws_types" : ["KBaseSets.ReadsSet"]
+      }
+    }
+  ],
+  "behavior" : {
+    "service-mapping" : {
+      "url" : "",
+      "name" : "GenericsAPI",
+      "method" : "import_matrix_from_biom",
+      "input_mapping" : [
+        {
+          "narrative_system_variable": "workspace",
+          "target_property": "workspace_name"
+        },
+        {
+          "constant_value": "AmpliconMatrix",
+          "target_property": "obj_type"
+        },
+        {
+          "input_parameter": "input_staging_file_path",
+          "target_property": "input_staging_file_path"
+        },
+        {
+          "constant_value": "raw",
+          "target_property": "scale"
+        },
+        {
+          "input_parameter": "description",
+          "target_property": "description"
+        },
+        {
+          "input_parameter": "matrix_name",
+          "target_property": "matrix_name"
+        },
+        {
+          "input_parameter" : "col_attributemapping_ref",
+          "target_property" : "col_attributemapping_ref",
+          "target_type_transform": "resolved-ref"
+        },
+        {
+          "input_parameter" : "row_attributemapping_ref",
+          "target_property" : "row_attributemapping_ref",
+          "target_type_transform": "resolved-ref"
+        },
+        {
+          "input_parameter" : "reads_set_ref",
+          "target_property" : "reads_set_ref",
+          "target_type_transform": "resolved-ref"
+        }
+      ],
+      "output_mapping" : [
+        {
+          "narrative_system_variable": "workspace",
+          "target_property": "wsName"
+        },
+        {
+          "service_method_output_path": [0,"matrix_obj_ref"],
+          "target_property": "matrix_obj_ref",
+          "target_type_transform": "resolved-ref"
+        },
+        {
+            "service_method_output_path": [0, "report_name"],
+            "target_property": "report_name"
+        },
+        {
+            "service_method_output_path": [0, "report_ref"],
+            "target_property": "report_ref"
+        },
+        {
+            "constant_value": "16",
+            "target_property": "report_window_line_height"
+        }
+      ]
+    }
+  },
+  "job_id_output_field": "docker"
+}

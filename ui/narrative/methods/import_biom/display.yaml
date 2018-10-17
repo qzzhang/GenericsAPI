@@ -1,0 +1,75 @@
+name     : Import AmpliconMatrix from BIOM File in Staging Area
+subtitle : Import a BIOM file from your staging area into your Narrative as an AmpliconMatrix
+tooltip  : Import a BIOM file from your staging area into your Narrative as an AmpliconMatrix
+
+icon: data-blue.png
+
+screenshots :
+    []
+
+suggestions :
+    apps:
+        related :
+            []
+        next :
+            []
+    methods:
+        related :
+            []
+        next :
+            []
+
+parameters :
+
+    input_staging_file_path :
+        ui-name : |
+            File Path
+        short-hint : |
+            Recognized extensions for the input file is .biom
+        long-hint  : |
+            Recognized extensions for the input file is .biom
+
+    description:
+      ui-name : |
+          Description
+      short-hint : |
+          Describe the matrix
+      long-hint  : |
+          Describe the matrix
+
+    matrix_name :
+        ui-name : |
+            Matrix Object Name
+        short-hint : |
+            Provide a name for the Matrix that will be created by this importer
+        long-hint : |
+            Provide a name for the Matrix that will be created by this importer
+
+    col_attributemapping_ref :
+        ui-name : |
+            Samples AttributeMapping Reference
+        short-hint : |
+            Provide a AttributeMapping associated with samples in data set
+        long-hint : |
+            Provide a AttributeMapping associated with samples in data set
+
+    row_attributemapping_ref :
+        ui-name : |
+            Amplicons AttributeMapping Reference
+        short-hint : |
+            Provide a AttributeMapping associated with amplicons in data set
+        long-hint : |
+            Provide a AttributeMapping associated with amplicons in data set
+
+    reads_set_ref:
+        ui-name : |
+            Reads Set Reference
+        short-hint : |
+            The reads library set that produced the upload matrix
+        long-hint : |
+            The reads library set that produced the upload matrix
+
+
+description : |
+    <p> Import an BIOM file from your staging area into your Narrative as an AmpliconMatrix data object.
+    Please see the <a href="http://kbase.us/data-upload-download-guide/">Data Upload/Download Guide</a> for more information. </p>

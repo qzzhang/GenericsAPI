@@ -27,6 +27,8 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
  * row_attributemapping_ref: row AttributeMapping reference
  * genome_ref: genome reference
  * diff_expr_matrix_ref: DifferentialExpressionMatrix reference
+ * biochemistry_ref: (for MetaboliteMatrix)
+ * reads_set_ref: (raw data for AmpliconMatrix)
  * </pre>
  * 
  */
@@ -44,7 +46,9 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
     "genome_ref",
     "col_attributemapping_ref",
     "row_attributemapping_ref",
-    "diff_expr_matrix_ref"
+    "diff_expr_matrix_ref",
+    "biochemistry_ref",
+    "reads_set_ref"
 })
 public class ImportMatrixParams {
 
@@ -72,6 +76,10 @@ public class ImportMatrixParams {
     private String rowAttributemappingRef;
     @JsonProperty("diff_expr_matrix_ref")
     private String diffExprMatrixRef;
+    @JsonProperty("biochemistry_ref")
+    private String biochemistryRef;
+    @JsonProperty("reads_set_ref")
+    private String readsSetRef;
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     @JsonProperty("obj_type")
@@ -254,6 +262,36 @@ public class ImportMatrixParams {
         return this;
     }
 
+    @JsonProperty("biochemistry_ref")
+    public String getBiochemistryRef() {
+        return biochemistryRef;
+    }
+
+    @JsonProperty("biochemistry_ref")
+    public void setBiochemistryRef(String biochemistryRef) {
+        this.biochemistryRef = biochemistryRef;
+    }
+
+    public ImportMatrixParams withBiochemistryRef(String biochemistryRef) {
+        this.biochemistryRef = biochemistryRef;
+        return this;
+    }
+
+    @JsonProperty("reads_set_ref")
+    public String getReadsSetRef() {
+        return readsSetRef;
+    }
+
+    @JsonProperty("reads_set_ref")
+    public void setReadsSetRef(String readsSetRef) {
+        this.readsSetRef = readsSetRef;
+    }
+
+    public ImportMatrixParams withReadsSetRef(String readsSetRef) {
+        this.readsSetRef = readsSetRef;
+        return this;
+    }
+
     @JsonAnyGetter
     public Map<String, Object> getAdditionalProperties() {
         return this.additionalProperties;
@@ -266,7 +304,7 @@ public class ImportMatrixParams {
 
     @Override
     public String toString() {
-        return ((((((((((((((((((((((((((("ImportMatrixParams"+" [objType=")+ objType)+", inputShockId=")+ inputShockId)+", inputFilePath=")+ inputFilePath)+", inputStagingFilePath=")+ inputStagingFilePath)+", matrixName=")+ matrixName)+", scale=")+ scale)+", description=")+ description)+", workspaceName=")+ workspaceName)+", genomeRef=")+ genomeRef)+", colAttributemappingRef=")+ colAttributemappingRef)+", rowAttributemappingRef=")+ rowAttributemappingRef)+", diffExprMatrixRef=")+ diffExprMatrixRef)+", additionalProperties=")+ additionalProperties)+"]");
+        return ((((((((((((((((((((((((((((((("ImportMatrixParams"+" [objType=")+ objType)+", inputShockId=")+ inputShockId)+", inputFilePath=")+ inputFilePath)+", inputStagingFilePath=")+ inputStagingFilePath)+", matrixName=")+ matrixName)+", scale=")+ scale)+", description=")+ description)+", workspaceName=")+ workspaceName)+", genomeRef=")+ genomeRef)+", colAttributemappingRef=")+ colAttributemappingRef)+", rowAttributemappingRef=")+ rowAttributemappingRef)+", diffExprMatrixRef=")+ diffExprMatrixRef)+", biochemistryRef=")+ biochemistryRef)+", readsSetRef=")+ readsSetRef)+", additionalProperties=")+ additionalProperties)+"]");
     }
 
 }

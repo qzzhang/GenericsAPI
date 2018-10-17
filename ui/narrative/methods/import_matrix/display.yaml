@@ -32,9 +32,9 @@ parameters :
         ui-name : |
             File Path
         short-hint : |
-            Recognized extensions for the input file is .xlsx
+            Recognized extensions for the input file is .xlsx or .csv
         long-hint  : |
-            Recognized extensions for the input file is .xlsx
+            Recognized extensions for the input file is .xlsx or .csv
 
     scale:
       ui-name : |
