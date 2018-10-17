@@ -342,12 +342,12 @@ public class GenericsAPIClient {
      * <p>Original spec-file function name: export_attribute_mapping_tsv</p>
      * <pre>
      * </pre>
-     * @param   params   instance of type {@link us.kbase.genericsapi.ExportAttributeMappingParams ExportAttributeMappingParams}
+     * @param   params   instance of type {@link us.kbase.genericsapi.ExportObjectParams ExportObjectParams}
      * @return   parameter "result" of type {@link us.kbase.genericsapi.ExportOutput ExportOutput}
      * @throws IOException if an IO exception occurs
      * @throws JsonClientException if a JSON RPC exception occurs
      */
-    public ExportOutput exportAttributeMappingTsv(ExportAttributeMappingParams params, RpcContext... jsonRpcContext) throws IOException, JsonClientException {
+    public ExportOutput exportAttributeMappingTsv(ExportObjectParams params, RpcContext... jsonRpcContext) throws IOException, JsonClientException {
         List<Object> args = new ArrayList<Object>();
         args.add(params);
         TypeReference<List<ExportOutput>> retType = new TypeReference<List<ExportOutput>>() {};
@@ -359,12 +359,12 @@ public class GenericsAPIClient {
      * <p>Original spec-file function name: export_attribute_mapping_excel</p>
      * <pre>
      * </pre>
-     * @param   params   instance of type {@link us.kbase.genericsapi.ExportAttributeMappingParams ExportAttributeMappingParams}
+     * @param   params   instance of type {@link us.kbase.genericsapi.ExportObjectParams ExportObjectParams}
      * @return   parameter "result" of type {@link us.kbase.genericsapi.ExportOutput ExportOutput}
      * @throws IOException if an IO exception occurs
      * @throws JsonClientException if a JSON RPC exception occurs
      */
-    public ExportOutput exportAttributeMappingExcel(ExportAttributeMappingParams params, RpcContext... jsonRpcContext) throws IOException, JsonClientException {
+    public ExportOutput exportAttributeMappingExcel(ExportObjectParams params, RpcContext... jsonRpcContext) throws IOException, JsonClientException {
         List<Object> args = new ArrayList<Object>();
         args.add(params);
         TypeReference<List<ExportOutput>> retType = new TypeReference<List<ExportOutput>>() {};
@@ -376,16 +376,33 @@ public class GenericsAPIClient {
      * <p>Original spec-file function name: export_cluster_set_excel</p>
      * <pre>
      * </pre>
-     * @param   params   instance of type {@link us.kbase.genericsapi.ExportClusterSetParams ExportClusterSetParams}
+     * @param   params   instance of type {@link us.kbase.genericsapi.ExportObjectParams ExportObjectParams}
      * @return   parameter "result" of type {@link us.kbase.genericsapi.ExportOutput ExportOutput}
      * @throws IOException if an IO exception occurs
      * @throws JsonClientException if a JSON RPC exception occurs
      */
-    public ExportOutput exportClusterSetExcel(ExportClusterSetParams params, RpcContext... jsonRpcContext) throws IOException, JsonClientException {
+    public ExportOutput exportClusterSetExcel(ExportObjectParams params, RpcContext... jsonRpcContext) throws IOException, JsonClientException {
         List<Object> args = new ArrayList<Object>();
         args.add(params);
         TypeReference<List<ExportOutput>> retType = new TypeReference<List<ExportOutput>>() {};
         List<ExportOutput> res = caller.jsonrpcCall("GenericsAPI.export_cluster_set_excel", args, retType, true, true, jsonRpcContext, this.serviceVersion);
+        return res.get(0);
+    }
+
+    /**
+     * <p>Original spec-file function name: export_corr_matrix_excel</p>
+     * <pre>
+     * </pre>
+     * @param   params   instance of type {@link us.kbase.genericsapi.ExportObjectParams ExportObjectParams}
+     * @return   parameter "result" of type {@link us.kbase.genericsapi.ExportOutput ExportOutput}
+     * @throws IOException if an IO exception occurs
+     * @throws JsonClientException if a JSON RPC exception occurs
+     */
+    public ExportOutput exportCorrMatrixExcel(ExportObjectParams params, RpcContext... jsonRpcContext) throws IOException, JsonClientException {
+        List<Object> args = new ArrayList<Object>();
+        args.add(params);
+        TypeReference<List<ExportOutput>> retType = new TypeReference<List<ExportOutput>>() {};
+        List<ExportOutput> res = caller.jsonrpcCall("GenericsAPI.export_corr_matrix_excel", args, retType, true, true, jsonRpcContext, this.serviceVersion);
         return res.get(0);
     }
 
@@ -422,6 +439,24 @@ public class GenericsAPIClient {
         args.add(params);
         TypeReference<List<BuildNetworkOutput>> retType = new TypeReference<List<BuildNetworkOutput>>() {};
         List<BuildNetworkOutput> res = caller.jsonrpcCall("GenericsAPI.build_network", args, retType, true, true, jsonRpcContext, this.serviceVersion);
+        return res.get(0);
+    }
+
+    /**
+     * <p>Original spec-file function name: run_pca</p>
+     * <pre>
+     * run_pca: PCA analysis on matrix
+     * </pre>
+     * @param   params   instance of type {@link us.kbase.genericsapi.PCAParams PCAParams}
+     * @return   parameter "returnVal" of type {@link us.kbase.genericsapi.PCAOutput PCAOutput}
+     * @throws IOException if an IO exception occurs
+     * @throws JsonClientException if a JSON RPC exception occurs
+     */
+    public PCAOutput runPca(PCAParams params, RpcContext... jsonRpcContext) throws IOException, JsonClientException {
+        List<Object> args = new ArrayList<Object>();
+        args.add(params);
+        TypeReference<List<PCAOutput>> retType = new TypeReference<List<PCAOutput>>() {};
+        List<PCAOutput> res = caller.jsonrpcCall("GenericsAPI.run_pca", args, retType, true, true, jsonRpcContext, this.serviceVersion);
         return res.get(0);
     }
 

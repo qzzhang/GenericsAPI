@@ -9,6 +9,7 @@ from GenericsAPI.Utils.CorrelationUtil import CorrelationUtil
 from GenericsAPI.Utils.DataUtil import DataUtil
 from GenericsAPI.Utils.MatrixUtil import MatrixUtil
 from GenericsAPI.Utils.NetworkUtil import NetworkUtil
+from GenericsAPI.Utils.PCAUtil import PCAUtil
 #END_HEADER
 
 
@@ -48,6 +49,7 @@ class GenericsAPI:
         self.data_util = DataUtil(self.config)
         self.network_util = NetworkUtil(self.config)
         self.biom_util = BiomUtil(self.config)
+        self.pca_util = PCAUtil(self.config)
         logging.basicConfig(level=logging.INFO)
         #END_CONSTRUCTOR
         pass
@@ -363,9 +365,8 @@ class GenericsAPI:
 
     def export_attribute_mapping_tsv(self, ctx, params):
         """
-        :param params: instance of type "ExportAttributeMappingParams" ->
-           structure: parameter "input_ref" of type "obj_ref" (An X/Y/Z style
-           reference)
+        :param params: instance of type "ExportObjectParams" -> structure:
+           parameter "input_ref" of type "obj_ref" (An X/Y/Z style reference)
         :returns: instance of type "ExportOutput" -> structure: parameter
            "shock_id" of String
         """
@@ -388,9 +389,8 @@ class GenericsAPI:
 
     def export_attribute_mapping_excel(self, ctx, params):
         """
-        :param params: instance of type "ExportAttributeMappingParams" ->
-           structure: parameter "input_ref" of type "obj_ref" (An X/Y/Z style
-           reference)
+        :param params: instance of type "ExportObjectParams" -> structure:
+           parameter "input_ref" of type "obj_ref" (An X/Y/Z style reference)
         :returns: instance of type "ExportOutput" -> structure: parameter
            "shock_id" of String
         """
@@ -413,9 +413,8 @@ class GenericsAPI:
 
     def export_cluster_set_excel(self, ctx, params):
         """
-        :param params: instance of type "ExportClusterSetParams" ->
-           structure: parameter "input_ref" of type "obj_ref" (An X/Y/Z style
-           reference)
+        :param params: instance of type "ExportObjectParams" -> structure:
+           parameter "input_ref" of type "obj_ref" (An X/Y/Z style reference)
         :returns: instance of type "ExportOutput" -> structure: parameter
            "shock_id" of String
         """
@@ -432,6 +431,27 @@ class GenericsAPI:
         # At some point might do deeper type checking...
         if not isinstance(result, dict):
             raise ValueError('Method export_cluster_set_excel return value ' +
+                             'result is not type dict as required.')
+        # return the results
+        return [result]
+
+    def export_corr_matrix_excel(self, ctx, params):
+        """
+        :param params: instance of type "ExportObjectParams" -> structure:
+           parameter "input_ref" of type "obj_ref" (An X/Y/Z style reference)
+        :returns: instance of type "ExportOutput" -> structure: parameter
+           "shock_id" of String
+        """
+        # ctx is the context object
+        # return variables are: result
+        #BEGIN export_corr_matrix_excel
+        logging.info("Starting 'export_corr_matrix_excel' with params:{}".format(params))
+        result = self.corr_util.export_corr_matrix_excel(params)
+        #END export_corr_matrix_excel
+
+        # At some point might do deeper type checking...
+        if not isinstance(result, dict):
+            raise ValueError('Method export_corr_matrix_excel return value ' +
                              'result is not type dict as required.')
         # return the results
         return [result]
@@ -505,6 +525,46 @@ class GenericsAPI:
         # At some point might do deeper type checking...
         if not isinstance(returnVal, dict):
             raise ValueError('Method build_network return value ' +
+                             'returnVal is not type dict as required.')
+        # return the results
+        return [returnVal]
+
+    def run_pca(self, ctx, params):
+        """
+        run_pca: PCA analysis on matrix
+        :param params: instance of type "PCAParams" (Input of the run_pca
+           function input_obj_ref: object reference of a matrix
+           workspace_name: the name of the workspace pca_matrix_name: name of
+           PCA (KBaseExperiments.PCAMatrix) object dimension: compute PCA on
+           column or row, one of ['col', 'row'] n_components - number of
+           components (default 2) attribute_mapping_obj_ref - associated
+           attribute_mapping_obj_ref customize_instance_group - customer and
+           select which instance group to plot scale_size_by - used for PCA
+           plot to scale data size) -> structure: parameter "input_obj_ref"
+           of type "obj_ref" (An X/Y/Z style reference), parameter
+           "workspace_name" of String, parameter "pca_matrix_name" of String,
+           parameter "dimension" of String, parameter "n_components" of Long,
+           parameter "attribute_mapping_obj_ref" of type "obj_ref" (An X/Y/Z
+           style reference), parameter "customize_instance_group" of list of
+           mapping from String to String, parameter "scale_size_by" of
+           mapping from String to String
+        :returns: instance of type "PCAOutput" (Ouput of the run_pca function
+           pca_ref: PCA object reference (as KBaseExperiments.PCAMatrix data
+           type) report_name: report name generated by KBaseReport
+           report_ref: report reference generated by KBaseReport) ->
+           structure: parameter "pca_ref" of type "obj_ref" (An X/Y/Z style
+           reference), parameter "report_name" of String, parameter
+           "report_ref" of String
+        """
+        # ctx is the context object
+        # return variables are: returnVal
+        #BEGIN run_pca
+        returnVal = self.pca_util.run_pca(params)
+        #END run_pca
+
+        # At some point might do deeper type checking...
+        if not isinstance(returnVal, dict):
+            raise ValueError('Method run_pca return value ' +
                              'returnVal is not type dict as required.')
         # return the results
         return [returnVal]

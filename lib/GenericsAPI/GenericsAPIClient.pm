@@ -1145,9 +1145,9 @@ AttributeMappingToTsvFileOutput is a reference to a hash where the following key
 =begin html
 
 <pre>
-$params is a GenericsAPI.ExportAttributeMappingParams
+$params is a GenericsAPI.ExportObjectParams
 $result is a GenericsAPI.ExportOutput
-ExportAttributeMappingParams is a reference to a hash where the following keys are defined:
+ExportObjectParams is a reference to a hash where the following keys are defined:
 	input_ref has a value which is a GenericsAPI.obj_ref
 obj_ref is a string
 ExportOutput is a reference to a hash where the following keys are defined:
@@ -1159,9 +1159,9 @@ ExportOutput is a reference to a hash where the following keys are defined:
 
 =begin text
 
-$params is a GenericsAPI.ExportAttributeMappingParams
+$params is a GenericsAPI.ExportObjectParams
 $result is a GenericsAPI.ExportOutput
-ExportAttributeMappingParams is a reference to a hash where the following keys are defined:
+ExportObjectParams is a reference to a hash where the following keys are defined:
 	input_ref has a value which is a GenericsAPI.obj_ref
 obj_ref is a string
 ExportOutput is a reference to a hash where the following keys are defined:
@@ -1237,9 +1237,9 @@ ExportOutput is a reference to a hash where the following keys are defined:
 =begin html
 
 <pre>
-$params is a GenericsAPI.ExportAttributeMappingParams
+$params is a GenericsAPI.ExportObjectParams
 $result is a GenericsAPI.ExportOutput
-ExportAttributeMappingParams is a reference to a hash where the following keys are defined:
+ExportObjectParams is a reference to a hash where the following keys are defined:
 	input_ref has a value which is a GenericsAPI.obj_ref
 obj_ref is a string
 ExportOutput is a reference to a hash where the following keys are defined:
@@ -1251,9 +1251,9 @@ ExportOutput is a reference to a hash where the following keys are defined:
 
 =begin text
 
-$params is a GenericsAPI.ExportAttributeMappingParams
+$params is a GenericsAPI.ExportObjectParams
 $result is a GenericsAPI.ExportOutput
-ExportAttributeMappingParams is a reference to a hash where the following keys are defined:
+ExportObjectParams is a reference to a hash where the following keys are defined:
 	input_ref has a value which is a GenericsAPI.obj_ref
 obj_ref is a string
 ExportOutput is a reference to a hash where the following keys are defined:
@@ -1329,9 +1329,9 @@ ExportOutput is a reference to a hash where the following keys are defined:
 =begin html
 
 <pre>
-$params is a GenericsAPI.ExportClusterSetParams
+$params is a GenericsAPI.ExportObjectParams
 $result is a GenericsAPI.ExportOutput
-ExportClusterSetParams is a reference to a hash where the following keys are defined:
+ExportObjectParams is a reference to a hash where the following keys are defined:
 	input_ref has a value which is a GenericsAPI.obj_ref
 obj_ref is a string
 ExportOutput is a reference to a hash where the following keys are defined:
@@ -1343,9 +1343,9 @@ ExportOutput is a reference to a hash where the following keys are defined:
 
 =begin text
 
-$params is a GenericsAPI.ExportClusterSetParams
+$params is a GenericsAPI.ExportObjectParams
 $result is a GenericsAPI.ExportOutput
-ExportClusterSetParams is a reference to a hash where the following keys are defined:
+ExportObjectParams is a reference to a hash where the following keys are defined:
 	input_ref has a value which is a GenericsAPI.obj_ref
 obj_ref is a string
 ExportOutput is a reference to a hash where the following keys are defined:
@@ -1404,6 +1404,98 @@ ExportOutput is a reference to a hash where the following keys are defined:
         Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method export_cluster_set_excel",
 					    status_line => $self->{client}->status_line,
 					    method_name => 'export_cluster_set_excel',
+				       );
+    }
+}
+ 
+
+
+=head2 export_corr_matrix_excel
+
+  $result = $obj->export_corr_matrix_excel($params)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$params is a GenericsAPI.ExportObjectParams
+$result is a GenericsAPI.ExportOutput
+ExportObjectParams is a reference to a hash where the following keys are defined:
+	input_ref has a value which is a GenericsAPI.obj_ref
+obj_ref is a string
+ExportOutput is a reference to a hash where the following keys are defined:
+	shock_id has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$params is a GenericsAPI.ExportObjectParams
+$result is a GenericsAPI.ExportOutput
+ExportObjectParams is a reference to a hash where the following keys are defined:
+	input_ref has a value which is a GenericsAPI.obj_ref
+obj_ref is a string
+ExportOutput is a reference to a hash where the following keys are defined:
+	shock_id has a value which is a string
+
+
+=end text
+
+=item Description
+
+
+
+=back
+
+=cut
+
+ sub export_corr_matrix_excel
+{
+    my($self, @args) = @_;
+
+# Authentication: required
+
+    if ((my $n = @args) != 1)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function export_corr_matrix_excel (received $n, expecting 1)");
+    }
+    {
+	my($params) = @args;
+
+	my @_bad_arguments;
+        (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument 1 \"params\" (value was \"$params\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to export_corr_matrix_excel:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'export_corr_matrix_excel');
+	}
+    }
+
+    my $url = $self->{url};
+    my $result = $self->{client}->call($url, $self->{headers}, {
+	    method => "GenericsAPI.export_corr_matrix_excel",
+	    params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'export_corr_matrix_excel',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method export_corr_matrix_excel",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'export_corr_matrix_excel',
 				       );
     }
 }
@@ -1626,6 +1718,116 @@ build_network: filter correlation matrix and build network
     }
 }
  
+
+
+=head2 run_pca
+
+  $returnVal = $obj->run_pca($params)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$params is a GenericsAPI.PCAParams
+$returnVal is a GenericsAPI.PCAOutput
+PCAParams is a reference to a hash where the following keys are defined:
+	input_obj_ref has a value which is a GenericsAPI.obj_ref
+	workspace_name has a value which is a string
+	pca_matrix_name has a value which is a string
+	dimension has a value which is a string
+	n_components has a value which is an int
+	attribute_mapping_obj_ref has a value which is a GenericsAPI.obj_ref
+	customize_instance_group has a value which is a reference to a list where each element is a reference to a hash where the key is a string and the value is a string
+	scale_size_by has a value which is a reference to a hash where the key is a string and the value is a string
+obj_ref is a string
+PCAOutput is a reference to a hash where the following keys are defined:
+	pca_ref has a value which is a GenericsAPI.obj_ref
+	report_name has a value which is a string
+	report_ref has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$params is a GenericsAPI.PCAParams
+$returnVal is a GenericsAPI.PCAOutput
+PCAParams is a reference to a hash where the following keys are defined:
+	input_obj_ref has a value which is a GenericsAPI.obj_ref
+	workspace_name has a value which is a string
+	pca_matrix_name has a value which is a string
+	dimension has a value which is a string
+	n_components has a value which is an int
+	attribute_mapping_obj_ref has a value which is a GenericsAPI.obj_ref
+	customize_instance_group has a value which is a reference to a list where each element is a reference to a hash where the key is a string and the value is a string
+	scale_size_by has a value which is a reference to a hash where the key is a string and the value is a string
+obj_ref is a string
+PCAOutput is a reference to a hash where the following keys are defined:
+	pca_ref has a value which is a GenericsAPI.obj_ref
+	report_name has a value which is a string
+	report_ref has a value which is a string
+
+
+=end text
+
+=item Description
+
+run_pca: PCA analysis on matrix
+
+=back
+
+=cut
+
+ sub run_pca
+{
+    my($self, @args) = @_;
+
+# Authentication: required
+
+    if ((my $n = @args) != 1)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function run_pca (received $n, expecting 1)");
+    }
+    {
+	my($params) = @args;
+
+	my @_bad_arguments;
+        (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument 1 \"params\" (value was \"$params\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to run_pca:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'run_pca');
+	}
+    }
+
+    my $url = $self->{url};
+    my $result = $self->{client}->call($url, $self->{headers}, {
+	    method => "GenericsAPI.run_pca",
+	    params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'run_pca',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method run_pca",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'run_pca',
+				       );
+    }
+}
+ 
   
 sub status
 {
@@ -1669,16 +1871,16 @@ sub version {
             Bio::KBase::Exceptions::JSONRPC->throw(
                 error => $result->error_message,
                 code => $result->content->{code},
-                method_name => 'build_network',
+                method_name => 'run_pca',
             );
         } else {
             return wantarray ? @{$result->result} : $result->result->[0];
         }
     } else {
         Bio::KBase::Exceptions::HTTP->throw(
-            error => "Error invoking method build_network",
+            error => "Error invoking method run_pca",
             status_line => $self->{client}->status_line,
-            method_name => 'build_network',
+            method_name => 'run_pca',
         );
     }
 }
@@ -2512,37 +2714,7 @@ file_path has a value which is a string
 
 
 
-=head2 ExportAttributeMappingParams
-
-=over 4
-
-
-
-=item Definition
-
-=begin html
-
-<pre>
-a reference to a hash where the following keys are defined:
-input_ref has a value which is a GenericsAPI.obj_ref
-
-</pre>
-
-=end html
-
-=begin text
-
-a reference to a hash where the following keys are defined:
-input_ref has a value which is a GenericsAPI.obj_ref
-
-
-=end text
-
-=back
-
-
-
-=head2 ExportClusterSetParams
+=head2 ExportObjectParams
 
 =over 4
 
@@ -2736,6 +2908,105 @@ a reference to a hash where the following keys are defined:
 report_name has a value which is a string
 report_ref has a value which is a string
 network_obj_ref has a value which is a GenericsAPI.obj_ref
+
+
+=end text
+
+=back
+
+
+
+=head2 PCAParams
+
+=over 4
+
+
+
+=item Description
+
+Input of the run_pca function
+input_obj_ref: object reference of a matrix
+workspace_name: the name of the workspace
+pca_matrix_name: name of PCA (KBaseExperiments.PCAMatrix) object
+dimension: compute PCA on column or row, one of ['col', 'row']
+n_components - number of components (default 2)
+attribute_mapping_obj_ref - associated attribute_mapping_obj_ref
+customize_instance_group - customer and select which instance group to plot
+scale_size_by - used for PCA plot to scale data size
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+input_obj_ref has a value which is a GenericsAPI.obj_ref
+workspace_name has a value which is a string
+pca_matrix_name has a value which is a string
+dimension has a value which is a string
+n_components has a value which is an int
+attribute_mapping_obj_ref has a value which is a GenericsAPI.obj_ref
+customize_instance_group has a value which is a reference to a list where each element is a reference to a hash where the key is a string and the value is a string
+scale_size_by has a value which is a reference to a hash where the key is a string and the value is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+input_obj_ref has a value which is a GenericsAPI.obj_ref
+workspace_name has a value which is a string
+pca_matrix_name has a value which is a string
+dimension has a value which is a string
+n_components has a value which is an int
+attribute_mapping_obj_ref has a value which is a GenericsAPI.obj_ref
+customize_instance_group has a value which is a reference to a list where each element is a reference to a hash where the key is a string and the value is a string
+scale_size_by has a value which is a reference to a hash where the key is a string and the value is a string
+
+
+=end text
+
+=back
+
+
+
+=head2 PCAOutput
+
+=over 4
+
+
+
+=item Description
+
+Ouput of the run_pca function
+pca_ref: PCA object reference (as KBaseExperiments.PCAMatrix data type)
+report_name: report name generated by KBaseReport
+report_ref: report reference generated by KBaseReport
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+pca_ref has a value which is a GenericsAPI.obj_ref
+report_name has a value which is a string
+report_ref has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+pca_ref has a value which is a GenericsAPI.obj_ref
+report_name has a value which is a string
+report_ref has a value which is a string
 
 
 =end text

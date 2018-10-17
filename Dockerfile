@@ -21,6 +21,8 @@ RUN pip install pandas \
     && pip install scipy
 
 RUN conda install -yc bioconda biom-format
+RUN pip install sklearn \
+    && pip install plotly
 
 # -----------------------------------------
 
