@@ -242,6 +242,9 @@ module GenericsAPI {
     funcdef export_corr_matrix_excel(ExportObjectParams params)
         returns (ExportOutput result) authentication required;
 
+    funcdef export_pca_matrix_excel(ExportObjectParams params)
+        returns (ExportOutput result) authentication required;
+
 
   /* Input of the filter_matrix function
     input_obj_ref: object reference of a matrix

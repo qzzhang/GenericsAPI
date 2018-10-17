@@ -5,6 +5,8 @@ import unittest
 import time
 import shutil
 from configparser import ConfigParser
+import uuid
+import pandas as pd
 
 from GenericsAPI.Utils.PCAUtil import PCAUtil
 from GenericsAPI.GenericsAPIImpl import GenericsAPI
@@ -96,6 +98,41 @@ class PCAUtilTest(unittest.TestCase):
         print('Loaded ExpressionMatrix: ' + expr_matrix_ref)
         return expr_matrix_ref
 
+    def loadPCAMatrix(self):
+
+        if hasattr(self.__class__, 'pca_matrix_ref'):
+            return self.__class__.pca_matrix_ref
+
+        original_data = self.loadExpressionMatrix()
+
+        object_type = 'KBaseExperiments.PCAMatrix'
+        pca_matrix_object_name = 'test_PCA_matrix'
+        pca_matrix_data = {'explained_variance_ratio': [0.628769688409428, 0.371230311590572],
+                           'original_data': original_data,
+                           'pca_parameters': {'dimension': 'row', 'n_components': '2'},
+                           'rotation_matrix': {'col_ids': ['principal_component_1',
+                                                           'principal_component_2'],
+                                               'row_ids': ['WRI_RS00010_CDS_1',
+                                                           'WRI_RS00015_CDS_1',
+                                                           'WRI_RS00025_CDS_1'],
+                                               'values': [[-0.45, 1.06],
+                                                          [-0.69, -0.92],
+                                                          [1.14, -0.13]]}}
+
+        save_object_params = {
+            'id': self.wsId,
+            'objects': [{'type': object_type,
+                         'data': pca_matrix_data,
+                         'name': pca_matrix_object_name}]
+        }
+
+        dfu_oi = self.dfu.save_objects(save_object_params)[0]
+        pca_matrix_ref = str(dfu_oi[6]) + '/' + str(dfu_oi[0]) + '/' + str(dfu_oi[4])
+
+        self.__class__.pca_matrix_ref = pca_matrix_ref
+        print('Loaded Correlation Matrix: ' + pca_matrix_ref)
+        return pca_matrix_ref
+
     def fail_run_pca(self, params, error, exception=ValueError, contains=False):
         with self.assertRaises(exception) as context:
             self.getImpl().run_pca(self.ctx, params)
@@ -135,7 +172,55 @@ class PCAUtilTest(unittest.TestCase):
 
         ret = self.getImpl().run_pca(self.ctx, params)[0]
 
-        print(ret)
+        self.assertTrue('report_name' in ret)
+        self.assertTrue('report_ref' in ret)
+        self.assertTrue('pca_ref' in ret)
+
+        pca_matrix_ref = ret.get('pca_ref')
+
+        pca_matrix_data = self.dfu.get_objects(
+                    {"object_refs": [pca_matrix_ref]})['data'][0]['data']
+
+        self.assertTrue('explained_variance_ratio' in pca_matrix_data)
+        self.assertTrue('rotation_matrix' in pca_matrix_data)
+        self.assertEqual(len(pca_matrix_data.get('explained_variance_ratio')), 2)
+
+        expected_row_ids = ['WRI_RS00010_CDS_1', 'WRI_RS00015_CDS_1', 'WRI_RS00025_CDS_1']
+        expected_col_ids = ['principal_component_1', 'principal_component_2']
+        self.assertCountEqual(pca_matrix_data['rotation_matrix']['row_ids'], expected_row_ids)
+        self.assertCountEqual(pca_matrix_data['rotation_matrix']['col_ids'], expected_col_ids)
+
+    def test_export_pca_matrix_excel_ok(self):
+        self.start_test()
+
+        pca_ref = self.loadPCAMatrix()
+
+        params = {'input_ref': pca_ref}
+
+        ret = self.getImpl().export_pca_matrix_excel(self.ctx, params)[0]
+
+        assert ret and ('shock_id' in ret)
+
+        output_directory = os.path.join(self.scratch, str(uuid.uuid4()))
+        os.makedirs(output_directory)
+
+        self.dfu.shock_to_file({'shock_id': ret['shock_id'],
+                                'file_path': output_directory,
+                                'unpack': 'unpack'})
+
+        xl_files = [file for file in os.listdir(output_directory) if file.endswith('.xlsx')]
+        self.assertEqual(len(xl_files), 1)
+
+        xl = pd.ExcelFile(os.path.join(output_directory, xl_files[0]))
+        expected_sheet_names = ['pca_matrix']
+        self.assertCountEqual(xl.sheet_names, expected_sheet_names)
+
+        df = xl.parse("pca_matrix")
+        expected_index = ['WRI_RS00010_CDS_1', 'WRI_RS00015_CDS_1', 'WRI_RS00025_CDS_1',
+                          'explained_variance_ratio']
+        expected_col = ['principal_component_1', 'principal_component_2', 'instance_group']
+        self.assertCountEqual(df.index.tolist(), expected_index)
+        self.assertCountEqual(df.columns.tolist(), expected_col)
 
     def test_init_ok(self):
         self.start_test()

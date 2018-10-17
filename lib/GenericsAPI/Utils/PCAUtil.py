@@ -61,8 +61,70 @@ class PCAUtil:
 
         return matrix_data
 
+    def _pca_df_to_excel(self, pca_df, result_dir, pca_matrix_ref):
+        """
+        write PCA matrix df into excel
+        """
+        log('writting pca data frame to excel file')
+        pca_matrix_obj = self.dfu.get_objects({'object_refs': [pca_matrix_ref]})['data'][0]
+        pca_matrix_info = pca_matrix_obj['info']
+        pca_matrix_name = pca_matrix_info[1]
+
+        file_path = os.path.join(result_dir, pca_matrix_name + ".xlsx")
+
+        writer = pd.ExcelWriter(file_path)
+
+        pca_df.to_excel(writer, "pca_matrix", index=True)
+
+        writer.close()
+
+    def _Matrix2D_to_df(self, Matrix2D):
+        """
+        _Matrix2D_to_df: transform a FloatMatrix2D to data frame
+        """
+
+        index = Matrix2D.get('row_ids')
+        columns = Matrix2D.get('col_ids')
+        values = Matrix2D.get('values')
+
+        df = pd.DataFrame(values, index=index, columns=columns)
+
+        return df
+
+    def _pca_to_df(self, pca_matrix_ref):
+        """
+        retrieve pca matrix ws object to pca_df
+        """
+        log('converting pca matrix to data frame')
+        pca_data = self.dfu.get_objects({'object_refs': [pca_matrix_ref]})['data'][0]['data']
+
+        rotation_matrix_data = pca_data.get('rotation_matrix')
+        explained_variance_ratio = pca_data.get('explained_variance_ratio')
+        dimension = pca_data.get('pca_parameters').get('dimension')
+        original_data_ref = pca_data.get('original_data')
+
+        pca_df = self._Matrix2D_to_df(rotation_matrix_data)
+        pca_df.loc['explained_variance_ratio'] = explained_variance_ratio
+
+        if original_data_ref:
+            log('appending instance group information to pca data frame')
+            obj_data = self.dfu.get_objects({'object_refs': [original_data_ref]})['data'][0]['data']
+
+            if dimension == 'row':
+                attribute_mapping = obj_data.get('row_mapping')
+            elif dimension == 'col':
+                attribute_mapping = obj_data.get('col_mapping')
+            else:
+                attribute_mapping = None
+
+            if attribute_mapping:
+                # append instance col mapping from row/col_mapping
+                pca_df['instance_group'] = pca_df.index.map(attribute_mapping)
+
+        return pca_df
+
     def _save_pca_matrix(self, workspace_name, input_obj_ref, pca_matrix_name, rotation_matrix_df,
-                         explained_variance_ratio, n_components):
+                         explained_variance_ratio, n_components, dimension):
 
         log('saving PCAMatrix')
 
@@ -75,7 +137,8 @@ class PCAUtil:
 
         pca_data.update({'rotation_matrix': self._df_to_list(rotation_matrix_df)})
         pca_data.update({'explained_variance_ratio': explained_variance_ratio})
-        pca_data.update({'pca_parameters': {'n_components': str(n_components)}})
+        pca_data.update({'pca_parameters': {'n_components': str(n_components),
+                                            'dimension': str(dimension)}})
         pca_data.update({'original_data': input_obj_ref})
 
         obj_type = 'KBaseExperiments.PCAMatrix'
@@ -282,19 +345,14 @@ class PCAUtil:
                 mode='markers',
                 text=list(plot_pca_matrix.index),
                 textposition='bottom center',
-                marker=go.Marker(
-                    size=10,
-                    line=go.Line(
-                        color='rgba(217, 217, 217, 0.14)',
-                        width=0.5),
-                    opacity=0.8))
+                marker=go.Marker(size=10, opacity=0.8,
+                                 line=go.Line(color='rgba(217, 217, 217, 0.14)', width=0.5)))
             traces.append(trace)
         else:
             if 'attribute_value' in plot_pca_matrix.columns:
                 sizeref = 2.*float(max(plot_pca_matrix['attribute_value']))/(100**2)
 
                 for name in set(plot_pca_matrix.instance):
-
                     trace = go.Scatter(
                         x=list(plot_pca_matrix.loc[plot_pca_matrix['instance'].eq(name)].principal_component_1),
                         y=list(plot_pca_matrix.loc[plot_pca_matrix['instance'].eq(name)].principal_component_2),
@@ -302,16 +360,10 @@ class PCAUtil:
                         name=name,
                         text=list(plot_pca_matrix.loc[plot_pca_matrix['instance'].eq(name)].index),
                         textposition='bottom center',
-                        marker=go.Marker(
-                            symbol='circle',
-                            sizemode='area',
-                            sizeref=sizeref,
-                            size=list(map(float,
-                                          plot_pca_matrix.loc[plot_pca_matrix['instance'].eq(name)].attribute_value)),
-                            line=go.Line(
-                                color='rgba(217, 217, 217, 0.14)',
-                                width=0.5),
-                            opacity=0.8))
+                        marker=go.Marker(symbol='circle', sizemode='area', sizeref=sizeref,
+                                         size=list(map(float, plot_pca_matrix.loc[plot_pca_matrix['instance'].eq(name)].attribute_value)),
+                                         line=go.Line(color='rgba(217, 217, 217, 0.14)', width=0.5),
+                                         opacity=0.8))
                     traces.append(trace)
             else:
                 for name in set(plot_pca_matrix.instance):
@@ -322,12 +374,8 @@ class PCAUtil:
                         name=name,
                         text=list(plot_pca_matrix.loc[plot_pca_matrix['instance'].eq(name)].index),
                         textposition='bottom center',
-                        marker=go.Marker(
-                            size=10,
-                            line=go.Line(
-                                color='rgba(217, 217, 217, 0.14)',
-                                width=0.5),
-                            opacity=0.8))
+                        marker=go.Marker(size=10, opacity=0.8, line=go.Line(color='rgba(217, 217, 217, 0.14)',
+                                                                            width=0.5)))
                     traces.append(trace)
 
         data = go.Data(traces)
@@ -389,7 +437,7 @@ class PCAUtil:
 
         pca_ref = self._save_pca_matrix(workspace_name, input_obj_ref, pca_matrix_name,
                                         rotation_matrix_df, explained_variance_ratio,
-                                        n_components)
+                                        n_components, dimension)
 
         # if params.get('customize_instance_group'):
         #     plot_pca_matrix = self._build_group_pca_matrix(plot_pca_matrix, obj_data, dimension,
@@ -410,3 +458,24 @@ class PCAUtil:
         returnVal.update(report_output)
 
         return returnVal
+
+    def export_pca_matrix_excel(self, params):
+        """
+        export PCAMatrix as Excel
+        """
+        log('start exporting pca matrix')
+        pca_matrix_ref = params.get('input_ref')
+
+        pca_df = self._pca_to_df(pca_matrix_ref)
+
+        result_dir = os.path.join(self.scratch, str(uuid.uuid4()))
+        self._mkdir_p(result_dir)
+
+        self._pca_df_to_excel(pca_df, result_dir, pca_matrix_ref)
+
+        package_details = self.dfu.package_for_download({
+            'file_path': result_dir,
+            'ws_refs': [pca_matrix_ref]
+        })
+
+        return {'shock_id': package_details['shock_id']}
