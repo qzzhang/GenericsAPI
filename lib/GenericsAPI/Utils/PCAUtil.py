@@ -197,6 +197,26 @@ class PCAUtil:
 
         return plot_pca_matrix
 
+    def _append_instance_group(self, plot_pca_matrix, obj_data, dimension):
+        plot_pca_matrix = plot_pca_matrix.copy()
+
+        if dimension == 'row':
+            attribute_mapping = obj_data.get('row_mapping')
+        elif dimension == 'col':
+            attribute_mapping = obj_data.get('col_mapping')
+        else:
+            raise ValueError('Unexpected dimension')
+
+        if not attribute_mapping:
+            log('Matrix object does not have {}_mapping attribute'.format(dimension))
+            # build matrix with unify color and shape
+            return plot_pca_matrix
+        else:
+            # append instance col mapping from row/col_mapping
+            plot_pca_matrix['instance'] = plot_pca_matrix.index.map(attribute_mapping)
+
+        return plot_pca_matrix
+
     def _build_size_pca_matrix(self, plot_pca_matrix, obj_data, dimension, attribute_name):
         """
         _build_size_pca_matrix: append attribute value to rotation_matrix
@@ -375,9 +395,11 @@ class PCAUtil:
         #     plot_pca_matrix = self._build_group_pca_matrix(plot_pca_matrix, obj_data, dimension,
         #                                                    params.get('customize_instance_group'))
 
+        plot_pca_matrix = self._append_instance_group(rotation_matrix_df.copy())
+
         if params.get('scale_size_by'):
             plot_pca_matrix = self._build_size_pca_matrix(
-                                                    rotation_matrix_df.copy(), obj_data, dimension,
+                                                    plot_pca_matrix, obj_data, dimension,
                                                     params.get('scale_size_by').get('attribute')[0])
 
         returnVal = {'pca_ref': pca_ref}
