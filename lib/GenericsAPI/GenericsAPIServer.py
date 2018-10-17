@@ -389,6 +389,10 @@ class Application(object):
                              name='GenericsAPI.export_corr_matrix_excel',
                              types=[dict])
         self.method_authentication['GenericsAPI.export_corr_matrix_excel'] = 'required'  # noqa
+        self.rpc_service.add(impl_GenericsAPI.export_pca_matrix_excel,
+                             name='GenericsAPI.export_pca_matrix_excel',
+                             types=[dict])
+        self.method_authentication['GenericsAPI.export_pca_matrix_excel'] = 'required'  # noqa
         self.rpc_service.add(impl_GenericsAPI.compute_correlation_matrix,
                              name='GenericsAPI.compute_correlation_matrix',
                              types=[dict])
@@ -397,7 +401,6 @@ class Application(object):
                              name='GenericsAPI.build_network',
                              types=[dict])
         self.method_authentication['GenericsAPI.build_network'] = 'required'  # noqa
-
         self.rpc_service.add(impl_GenericsAPI.run_pca,
                              name='GenericsAPI.run_pca',
                              types=[dict])

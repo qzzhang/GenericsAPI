@@ -29,8 +29,8 @@ class GenericsAPI:
     # the latter method is running.
     ######################################### noqa
     VERSION = "0.0.1"
-    GIT_URL = "https://github.com/kbaseapps/GenericsAPI.git"
-    GIT_COMMIT_HASH = "ea4741925fe0f279caf51668c4c44ce020be2dd7"
+    GIT_URL = "git@github.com:Tianhao-Gu/GenericsAPI.git"
+    GIT_COMMIT_HASH = "c7b4f7bffe11fbee231b279043605f238e6c3e04"
 
     #BEGIN_CLASS_HEADER
     #END_CLASS_HEADER
@@ -452,6 +452,26 @@ class GenericsAPI:
         # At some point might do deeper type checking...
         if not isinstance(result, dict):
             raise ValueError('Method export_corr_matrix_excel return value ' +
+                             'result is not type dict as required.')
+        # return the results
+        return [result]
+
+    def export_pca_matrix_excel(self, ctx, params):
+        """
+        :param params: instance of type "ExportObjectParams" -> structure:
+           parameter "input_ref" of type "obj_ref" (An X/Y/Z style reference)
+        :returns: instance of type "ExportOutput" -> structure: parameter
+           "shock_id" of String
+        """
+        # ctx is the context object
+        # return variables are: result
+        #BEGIN export_pca_matrix_excel
+        result = self.pca_util.export_pca_matrix_excel(params)
+        #END export_pca_matrix_excel
+
+        # At some point might do deeper type checking...
+        if not isinstance(result, dict):
+            raise ValueError('Method export_pca_matrix_excel return value ' +
                              'result is not type dict as required.')
         # return the results
         return [result]
