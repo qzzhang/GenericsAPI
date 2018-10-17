@@ -44,30 +44,6 @@ parameters :
         long-hint  : |
             Select associated KBaseExperiments.AttributeMapping object
 
-    instance:
-        ui-name: |
-            Instance
-        short-hint : |
-            Group data by associated attribute instance
-        long-hint  : |
-            Group data by associated attribute instance
-
-    color:
-        ui-name: |
-            Marker Color
-        short-hint : |
-            Color of plot marker
-        long-hint  : |
-            Color of plot marker
-
-    shape:
-        ui-name: |
-            Marker Shape
-        short-hint : |
-            Shape of plot marker
-        long-hint  : |
-            Shape of plot marker
-
     attribute:
         ui-name: |
             Attribute
@@ -88,10 +64,6 @@ parameter-groups :
     scale_size_by:
         ui-name : Scale Marker Size By
         short-hint :  Select an attribute for plot sizing
-    customize_instance_group:
-        ui-name : Select And Customize Instance Group
-        short-hint : Customize Instance Group
-
 
 description : |
     <p> Perform PCA analysis on Matrix object </p>

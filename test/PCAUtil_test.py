@@ -3,7 +3,6 @@ import inspect
 import os  # noqa: F401
 import unittest
 import time
-import pandas as pd
 import shutil
 from configparser import ConfigParser
 
@@ -109,18 +108,18 @@ class PCAUtilTest(unittest.TestCase):
         testname = inspect.stack()[1][3]
         print('\n*** starting test: ' + testname + ' **')
 
-    # def test_run_pca_fail(self):
-    #     self.start_test()
+    def test_run_pca_fail(self):
+        self.start_test()
 
-    #     invalidate_params = {'missing_input_obj_ref': 'input_obj_ref',
-    #                          'workspace_name': 'workspace_name'}
-    #     error_msg = '"input_obj_ref" parameter is required, but missing'
-    #     self.fail_run_pca(invalidate_params, error_msg)
+        invalidate_params = {'missing_input_obj_ref': 'input_obj_ref',
+                             'workspace_name': 'workspace_name'}
+        error_msg = '"input_obj_ref" parameter is required, but missing'
+        self.fail_run_pca(invalidate_params, error_msg)
 
-    #     invalidate_params = {'input_obj_ref': 'input_obj_ref',
-    #                          'missing_workspace_name': 'workspace_name'}
-    #     error_msg = '"workspace_name" parameter is required, but missing'
-    #     self.fail_run_pca(invalidate_params, error_msg)
+        invalidate_params = {'input_obj_ref': 'input_obj_ref',
+                             'missing_workspace_name': 'workspace_name'}
+        error_msg = '"workspace_name" parameter is required, but missing'
+        self.fail_run_pca(invalidate_params, error_msg)
 
     def test_run_pca_ok(self):
         self.start_test()
@@ -129,58 +128,19 @@ class PCAUtilTest(unittest.TestCase):
 
         params = {'input_obj_ref': expr_matrix_ref,
                   'workspace_name': self.wsName,
-                  'pca_matrix_name': 'test_pca_matrix_obj'}
+                  'pca_matrix_name': 'test_pca_matrix_obj',
+                  "scale_size_by": {
+                        "attribute": ["test_attribute_1"]
+                    }}
 
         ret = self.getImpl().run_pca(self.ctx, params)[0]
 
         print(ret)
 
-    # def test_init_ok(self):
-    #     self.start_test()
-    #     class_attri = ['scratch', 'token', 'callback_url', 'ws_url']
+    def test_init_ok(self):
+        self.start_test()
+        class_attri = ['scratch', 'token', 'callback_url', 'ws_url']
 
-    #     network_util = self.getPCAUtil()
-    #     self.assertTrue(set(class_attri) <= set(network_util.__dict__.keys()))
-    #     self.assertEqual(network_util.scratch, self.cfg.get('scratch'))
-
-    # def test__Matrix2D_to_df(self):
-
-    #     corr_data = self.loadCorrData()
-
-    #     df = self.getNetworkUtil()._Matrix2D_to_df(corr_data)
-
-    #     self.assertCountEqual(df.index.tolist(), corr_data.get('row_ids'))
-    #     self.assertCountEqual(df.columns.tolist(), corr_data.get('col_ids'))
-    #     self.assertCountEqual(df.values.tolist(), corr_data.get('values'))
-
-    # def test__trans_df_ok(self):
-    #     corr_data = self.loadCorrData()
-
-    #     df = self.getNetworkUtil()._Matrix2D_to_df(corr_data)
-
-    #     links = self.getNetworkUtil()._trans_df(df)
-
-    #     self.assertEqual(links.index.size, len(corr_data.get('row_ids'))**2)
-    #     self.assertEqual(links.columns.size, 3)
-
-    # def test_df_to_graph_ok(self):
-
-    #     graph_df = self.loadGraphDF()
-
-    #     graph = self.getNetworkUtil().df_to_graph(graph_df, 'source', 'target')
-
-    #     expected_nodes = ['A', 'E', 'G', 'F', 'I', 'H', 'J']
-    #     self.assertCountEqual(list(graph.nodes()), expected_nodes)
-
-    # def test_draw_graph_ok(self):
-
-    #     graph_df = self.loadGraphDF()
-    #     graph = self.getNetworkUtil().df_to_graph(graph_df, 'source', 'target')
-
-    #     graph_path = os.path.join(self.scratch, 'graph.png')
-
-    #     self.getNetworkUtil().draw_graph(graph, graph_path)
-    #     self.assertGreater(os.path.getsize(graph_path), 1024)  # file size greate than 1KB
-
-    #     self.getNetworkUtil().draw_graph(graph, graph_path, graph_layout='spectral')
-    #     self.assertGreater(os.path.getsize(graph_path), 1024)  # file size greate than 1KB
+        network_util = self.getPCAUtil()
+        self.assertTrue(set(class_attri) <= set(network_util.__dict__.keys()))
+        self.assertEqual(network_util.scratch, self.cfg.get('scratch'))

@@ -52,80 +52,6 @@
       "text_options" : {
         "valid_ws_types" : ["KBaseExperiments.AttributeMapping"]
       }
-    },   
-    {
-      "id" : "instance",
-      "optional" : false,
-      "advanced" : true,
-      "allow_multiple" : false,
-      "default_values" : [ "" ],
-      "field_type" : "textsubdata",
-      "textsubdata_options" : {
-        "subdata_selection": {
-          "parameter_id" : "attribute_mapping_obj_ref",
-          "subdata_included" : ["instances"],
-          "path_to_subdata": ["instances"]
-          },
-        "multiselection":false,
-        "show_src_obj":false,
-        "allow_custom":false
-      }
-    },
-    {
-      "id" : "color",
-      "optional" : false,
-      "advanced" : true,
-      "allow_multiple" : false,
-      "default_values" : ["random"],
-      "field_type" : "dropdown",
-      "dropdown_options": 
-      {
-        "options": 
-        [
-          {
-              "display": "random",
-              "value": "random"
-          },
-          {
-              "display": "red",
-              "value": "red"
-          },
-          {
-              "display": "blue",
-              "value": "blue"
-          },
-          {
-              "display": "green",
-              "value": "green"
-          }
-        ]
-      }
-    },
-    {
-      "id" : "shape",
-      "optional" : false,
-      "advanced" : true,
-      "allow_multiple" : false,
-      "default_values" : ["dot"],
-      "field_type" : "dropdown",
-      "dropdown_options": 
-      {
-        "options": 
-        [
-          {
-              "display": "dot",
-              "value": "dot"
-          },
-          {
-              "display": "random",
-              "value": "random"
-          },
-          {
-              "display": "star",
-              "value": "star"
-          }
-        ]
-      }
     },
     {
       "id" : "attribute",
@@ -161,18 +87,6 @@
   ],
   "parameter-groups": [
     {
-      "id": "customize_instance_group",
-      "parameters": [
-        "instance",
-        "color",
-        "shape"
-      ],
-      "optional": true,
-      "allow_multiple": true,
-      "with_border": false,
-      "advanced" : false
-    },
-    {
       "id": "scale_size_by",
       "parameters": [
         "attribute"
@@ -206,10 +120,6 @@
         {
           "input_parameter" : "dimension",
           "target_property" : "dimension"
-        },
-        {
-          "input_parameter" : "customize_instance_group",
-          "target_property" : "customize_instance_group"
         },
         {
           "input_parameter" : "scale_size_by",
