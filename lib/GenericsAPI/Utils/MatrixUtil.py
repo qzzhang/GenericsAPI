@@ -8,7 +8,6 @@ from xlrd.biffh import XLRDError
 from openpyxl import load_workbook
 import collections
 import shutil
-import pprint
 
 from DataFileUtil.DataFileUtilClient import DataFileUtil
 from KBaseReport.KBaseReportClient import KBaseReport
@@ -200,7 +199,6 @@ class MatrixUtil:
                        'values': df.values.tolist()}
 
         data.update({'data': matrix_data})
-        pprint.pprint(data)
 
         # processing col/row_mapping
         col_mapping = self._process_mapping_sheet(file_path, 'col_mapping')
