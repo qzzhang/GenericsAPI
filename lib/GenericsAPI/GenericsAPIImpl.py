@@ -33,6 +33,9 @@ class GenericsAPI:
     GIT_COMMIT_HASH = "ea4741925fe0f279caf51668c4c44ce020be2dd7"
 
     #BEGIN_CLASS_HEADER
+    logging.basicConfig(format='%(asctime)s %(levelname)-8s %(message)s',
+                        level=logging.INFO,
+                        datefmt='%Y-%m-%d %H:%M:%S')
     #END_CLASS_HEADER
 
     # config contains contents of config file in a hash or None if it couldn't

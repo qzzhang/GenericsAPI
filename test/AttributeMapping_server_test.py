@@ -15,7 +15,7 @@ from GenericsAPI.GenericsAPIImpl import GenericsAPI
 from GenericsAPI.GenericsAPIServer import MethodContext
 from GenericsAPI.authclient import KBaseAuth as _KBaseAuth
 from Workspace.WorkspaceClient import Workspace as workspaceService
-
+import pprint
 
 class AttributeUtilsTest(unittest.TestCase):
 
@@ -268,7 +268,27 @@ class AttributeUtilsTest(unittest.TestCase):
             'object_refs': [ret['attribute_mapping_ref']]
         })['data'][0]['data']
 
-        self.assertEqual(data, self.attribute_mapping)
+        self.assertEqual(data['instances'], self.attribute_mapping['instances'])
+        for load_attr, expect_attr in zip(data['attributes'], self.attribute_mapping['attributes']):
+            for key in ('attribute', 'attribute_ont_id', 'unit', 'unit_ont_id'):
+                self.assertEqual(load_attr.get(key), expect_attr.get(key))
+
+    def test_excel_infer_column(self):
+        shock_file = '/gene_attributes.xlsx'
+        shutil.copy('/kb/module/test/data/' + shock_file, self.scratch + shock_file)
+        shock_id = self.dfu.file_to_shock({'file_path': self.scratch + shock_file})['shock_id']
+        params = {'output_ws_id': self.getWsId(),
+                  'input_shock_id': shock_id,
+                  'output_obj_name': 'AM1'}
+        ret = self.getImpl().file_to_attribute_mapping(self.getContext(), params)[0]
+        assert ret and ('attribute_mapping_ref' in ret)
+        data = self.dfu.get_objects({
+            'object_refs': [ret['attribute_mapping_ref']]
+        })['data'][0]['data']
+
+        self.assertEqual(len(data['attributes']), 2)
+        self.assertEqual(len(data['instances']), 13980)
+        self.assertIn('AT1G01070', data['instances'])
 
     def test_make_tsv(self):
         params = {'input_ref': self.attribute_mapping_ref, 'destination_dir': self.scratch}

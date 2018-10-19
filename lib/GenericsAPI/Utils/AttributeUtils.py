@@ -61,12 +61,10 @@ class AttributesUtil:
         except XLRDError:
             df = pd.read_csv(scratch_file_path, sep="\t", dtype='str')
         df.fillna('', inplace=True)
-        if "Sample Name" in df.columns:
-            comp_set = self._isa_df_to_am_object(df)
-        elif "Attribute" in df.columns:
+        if df.columns[1].lower() == "attribute ontology id":
             comp_set = self._df_to_am_obj(df)
         else:
-            raise ValueError("Unable to parse input file")
+            comp_set = self._isa_df_to_am_object(df)
         info = self.dfu.save_objects({
             "id": params['output_ws_id'],
             "objects": [{
@@ -172,9 +170,12 @@ class AttributesUtil:
             isa_df.set_index('Sample Name', inplace=True)
         elif 'Assay Name'in isa_df.columns and not any(isa_df['Assay Name'].duplicated()):
             isa_df.set_index('Assay Name', inplace=True)
+        elif not any(isa_df[isa_df.columns[0]].duplicated()):
+            logging.warning(f'Using {isa_df.columns[0]} as ID column')
+            isa_df.set_index(isa_df.columns[0], inplace=True)
         else:
-            raise ValueError("The supplied ISA file does not contain 'Sample Names' or "
-                             "'Assay Names' that are unique for each row.")
+            raise ValueError("Unable to detect an ID column that was unigue for each row. "
+                             f"Considered 'Sample Names', 'Assay Names' and {isa_df.columns[0]}")
         attribute_mapping = {'ontology_mapping_method': "User Curation - ISA format"}
         attribute_mapping['attributes'], new_skip_cols = self._get_attributes_from_isa(
             isa_df, skip_columns)

@@ -41,19 +41,19 @@
   "attributes": [
     {
       "attribute_ont_id": "Custom:Term",
-      "unit_ont_id": "Custom:Unit",
-      "unit_ont_ref": "KbaseOntologies/Custom",
+      "unit_ont_id": "UO:0000032",
+      "unit_ont_ref": "KbaseOntologies/unit_ontology",
       "attribute_ont_ref": "KbaseOntologies/Custom",
       "unit": "Hour",
       "attribute": "Time series design"
     },
     {
-      "attribute_ont_id": "Custom:Term",
-      "unit_ont_id": "Custom:Unit",
-      "unit_ont_ref": "KbaseOntologies/Custom",
-      "attribute_ont_ref": "KbaseOntologies/Custom",
+      "attribute": "Treatment with Sirolimus",
+      "attribute_ont_id": "CHEBI:9168",
+      "attribute_ont_ref": "KbaseOntologies/chebi_ontology",
       "unit": "nanogram per milliliter",
-      "attribute": "Treatment with Sirolimus"
+      "unit_ont_id": "UO:0000275",
+      "unit_ont_ref": "KbaseOntologies/unit_ontology"
     }
   ]
 }
