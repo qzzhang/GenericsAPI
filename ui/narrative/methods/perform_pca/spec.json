@@ -54,7 +54,7 @@
       }
     },
     {
-      "id" : "attribute_size",
+      "id" : "attribute_color",
       "optional" : false,
       "advanced" : true,
       "allow_multiple" : false,
@@ -73,7 +73,7 @@
       }
     },
     {
-      "id" : "attribute_color",
+      "id" : "attribute_size",
       "optional" : false,
       "advanced" : true,
       "allow_multiple" : false,
@@ -106,9 +106,9 @@
   ],
   "parameter-groups": [
     {
-      "id": "scale_size_by",
+      "id": "color_marker_by",
       "parameters": [
-        "attribute_size"
+        "attribute_color"
       ],
       "optional": true,
       "allow_multiple": false,
@@ -116,9 +116,9 @@
       "advanced" : false
     },
     {
-      "id": "color_marker_by",
+      "id": "scale_size_by",
       "parameters": [
-        "attribute_color"
+        "attribute_size"
       ],
       "optional": true,
       "allow_multiple": false,

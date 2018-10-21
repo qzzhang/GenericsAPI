@@ -290,6 +290,9 @@ class PCAUtil:
             plot_pca_matrix.loc[plot_pca_matrix.instance == instance_name,
                                 ['attribute_value_size']] = attri_values[attr_pos]
 
+        print('fdasfdsa')
+        print(plot_pca_matrix)
+
         return plot_pca_matrix
 
     def _build_color_pca_matrix(self, plot_pca_matrix, obj_data, dimension, attribute_name):
@@ -374,7 +377,7 @@ class PCAUtil:
                         text=list(plot_pca_matrix.loc[plot_pca_matrix['attribute_value_color'].eq(name)].index),
                         textposition='bottom center',
                         marker=go.Marker(symbol='circle', sizemode='area', sizeref=sizeref,
-                                         size=list(map(float, plot_pca_matrix.loc[plot_pca_matrix['attribute_value_color'].eq(name)].attribute_value_color)),
+                                         size=list(map(float, plot_pca_matrix.loc[plot_pca_matrix['attribute_value_color'].eq(name)].attribute_value_size)),
                                          line=go.Line(color='rgba(217, 217, 217, 0.14)', width=0.5),
                                          opacity=0.8))
                     traces.append(trace)
