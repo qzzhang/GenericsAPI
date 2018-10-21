@@ -44,13 +44,21 @@ parameters :
         long-hint  : |
             Select associated KBaseExperiments.AttributeMapping object
 
-    attribute:
+    attribute_size:
         ui-name: |
             Attribute
         short-hint : |
             Select an attribute for plot sizing
         long-hint  : |
             Select an attribute for plot sizing
+
+    attribute_color:
+        ui-name: |
+            Attribute
+        short-hint : |
+            Select an attribute for plot coloring
+        long-hint  : |
+            Select an attribute for plot coloring
 
     pca_matrix_name:
         ui-name: |
@@ -64,6 +72,10 @@ parameter-groups :
     scale_size_by:
         ui-name : Scale Marker Size By
         short-hint :  Select an attribute for plot sizing
+
+    color_marker_by:
+        ui-name : Group Marker By
+        short-hint :  Select an attribute for plot coloring
 
 description : |
     <p> Perform PCA analysis on Matrix object </p>
