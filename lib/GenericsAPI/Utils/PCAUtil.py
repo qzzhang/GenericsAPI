@@ -222,44 +222,6 @@ class PCAUtil:
 
         return report_output
 
-    def _build_group_pca_matrix(self, plot_pca_matrix, obj_data, dimension,
-                                customize_instance_group):
-        """
-        _build_group_pca_matrix: select and append group/color/shape col to rotation_matrix
-        """
-        log('appending group/color/shape info to rotation matrix')
-        plot_pca_matrix = plot_pca_matrix.copy()
-
-        if dimension == 'row':
-            attribute_mapping = obj_data.get('row_mapping')
-        elif dimension == 'col':
-            attribute_mapping = obj_data.get('col_mapping')
-        else:
-            raise ValueError('Unexpected dimension')
-
-        if not attribute_mapping:
-            log('Matrix object does not have {}_mapping attribute'.format(dimension))
-            # build matrix with unify color and shape
-            return plot_pca_matrix
-        else:
-            # append instance col mapping from row/col_mapping
-            plot_pca_matrix['instance'] = plot_pca_matrix.index.map(attribute_mapping)
-
-        if customize_instance_group:
-            plot_pca_matrix['color'] = 'random'
-            plot_pca_matrix['shape'] = 'random'
-
-            for customize_instance in customize_instance_group:
-                instance = customize_instance.get('instance')[0]
-                color = customize_instance.get('color')
-                shape = customize_instance.get('shape')
-
-                # update color and shape col
-                plot_pca_matrix.loc[plot_pca_matrix.instance == instance,
-                                    ['color', 'shape']] = color, shape
-
-        return plot_pca_matrix
-
     def _append_instance_group(self, plot_pca_matrix, obj_data, dimension):
         plot_pca_matrix = plot_pca_matrix.copy()
 
@@ -284,7 +246,7 @@ class PCAUtil:
         """
         _build_size_pca_matrix: append attribute value to rotation_matrix
         """
-        log('appending attribute value to rotation matrix')
+        log('appending attribute value for sizing to rotation matrix')
 
         plot_pca_matrix = plot_pca_matrix.copy()
 
@@ -323,10 +285,60 @@ class PCAUtil:
 
         instances = attri_data.get('instances')
 
-        plot_pca_matrix['attribute_value'] = None
+        plot_pca_matrix['attribute_value_size'] = None
         for instance_name, attri_values in instances.items():
             plot_pca_matrix.loc[plot_pca_matrix.instance == instance_name,
-                                ['attribute_value']] = attri_values[attr_pos]
+                                ['attribute_value_size']] = attri_values[attr_pos]
+
+        return plot_pca_matrix
+
+    def _build_color_pca_matrix(self, plot_pca_matrix, obj_data, dimension, attribute_name):
+        """
+        _build_color_pca_matrix: append attribute value to rotation_matrix
+        """
+        log('appending attribute value for grouping color to rotation matrix')
+
+        plot_pca_matrix = plot_pca_matrix.copy()
+
+        if dimension == 'row':
+            attribute_mapping = obj_data.get('row_mapping')
+            attribute_mapping_ref = obj_data.get('row_attributemapping_ref')
+        elif dimension == 'col':
+            attribute_mapping = obj_data.get('col_mapping')
+            attribute_mapping_ref = obj_data.get('col_attributemapping_ref')
+        else:
+            raise ValueError('Unexpected dimension')
+
+        if not attribute_mapping:
+            log('Matrix object does not have {}_mapping attribute'.format(dimension))
+            # build matrix with unify color and shape
+            return plot_pca_matrix
+        else:
+            # append instance col mapping from row/col_mapping
+            plot_pca_matrix['instance'] = plot_pca_matrix.index.map(attribute_mapping)
+
+        res = self.dfu.get_objects({'object_refs': [attribute_mapping_ref]})['data'][0]
+        attri_data = res['data']
+        attri_name = res['info'][1]
+
+        attributes = attri_data.get('attributes')
+
+        attr_pos = None
+        for idx, attribute in enumerate(attributes):
+            if attribute.get('attribute') == attribute_name:
+                attr_pos = idx
+                break
+
+        if attr_pos is None:
+            raise ValueError('Cannot find attribute [{}] in [{}]'.format(attribute_name,
+                                                                         attri_name))
+
+        instances = attri_data.get('instances')
+
+        plot_pca_matrix['attribute_value_color'] = None
+        for instance_name, attri_values in instances.items():
+            plot_pca_matrix.loc[plot_pca_matrix.instance == instance_name,
+                                ['attribute_value_color']] = attri_values[attr_pos]
 
         return plot_pca_matrix
 
@@ -349,8 +361,37 @@ class PCAUtil:
                                  line=go.Line(color='rgba(217, 217, 217, 0.14)', width=0.5)))
             traces.append(trace)
         else:
-            if 'attribute_value' in plot_pca_matrix.columns:
-                sizeref = 2.*float(max(plot_pca_matrix['attribute_value']))/(100**2)
+            if 'attribute_value_color' in plot_pca_matrix.columns and 'attribute_value_size' in plot_pca_matrix.columns:
+
+                sizeref = 2.*float(max(plot_pca_matrix['attribute_value_size']))/(100**2)
+
+                for name in set(plot_pca_matrix.attribute_value_color):
+                    trace = go.Scatter(
+                        x=list(plot_pca_matrix.loc[plot_pca_matrix['attribute_value_color'].eq(name)].principal_component_1),
+                        y=list(plot_pca_matrix.loc[plot_pca_matrix['attribute_value_color'].eq(name)].principal_component_2),
+                        mode='markers',
+                        name=name,
+                        text=list(plot_pca_matrix.loc[plot_pca_matrix['attribute_value_color'].eq(name)].index),
+                        textposition='bottom center',
+                        marker=go.Marker(symbol='circle', sizemode='area', sizeref=sizeref,
+                                         size=list(map(float, plot_pca_matrix.loc[plot_pca_matrix['attribute_value_color'].eq(name)].attribute_value_color)),
+                                         line=go.Line(color='rgba(217, 217, 217, 0.14)', width=0.5),
+                                         opacity=0.8))
+                    traces.append(trace)
+            elif 'attribute_value_color' in plot_pca_matrix.columns:
+                for name in set(plot_pca_matrix.attribute_value_color):
+                    trace = go.Scatter(
+                        x=list(plot_pca_matrix.loc[plot_pca_matrix['attribute_value_color'].eq(name)].principal_component_1),
+                        y=list(plot_pca_matrix.loc[plot_pca_matrix['attribute_value_color'].eq(name)].principal_component_2),
+                        mode='markers',
+                        name=name,
+                        text=list(plot_pca_matrix.loc[plot_pca_matrix['attribute_value_color'].eq(name)].index),
+                        textposition='bottom center',
+                        marker=go.Marker(size=10, opacity=0.8, line=go.Line(color='rgba(217, 217, 217, 0.14)',
+                                                                            width=0.5)))
+                    traces.append(trace)
+            elif 'attribute_value_size' in plot_pca_matrix.columns:
+                sizeref = 2.*float(max(plot_pca_matrix['attribute_value_size']))/(100**2)
 
                 for name in set(plot_pca_matrix.instance):
                     trace = go.Scatter(
@@ -361,7 +402,7 @@ class PCAUtil:
                         text=list(plot_pca_matrix.loc[plot_pca_matrix['instance'].eq(name)].index),
                         textposition='bottom center',
                         marker=go.Marker(symbol='circle', sizemode='area', sizeref=sizeref,
-                                         size=list(map(float, plot_pca_matrix.loc[plot_pca_matrix['instance'].eq(name)].attribute_value)),
+                                         size=list(map(float, plot_pca_matrix.loc[plot_pca_matrix['instance'].eq(name)].attribute_value_size)),
                                          line=go.Line(color='rgba(217, 217, 217, 0.14)', width=0.5),
                                          opacity=0.8))
                     traces.append(trace)
@@ -439,16 +480,18 @@ class PCAUtil:
                                         rotation_matrix_df, explained_variance_ratio,
                                         n_components, dimension)
 
-        # if params.get('customize_instance_group'):
-        #     plot_pca_matrix = self._build_group_pca_matrix(plot_pca_matrix, obj_data, dimension,
-        #                                                    params.get('customize_instance_group'))
+        plot_pca_matrix = self._append_instance_group(rotation_matrix_df.copy(), obj_data,
+                                                      dimension)
 
-        plot_pca_matrix = self._append_instance_group(rotation_matrix_df.copy(), obj_data, dimension)
+        if params.get('color_marker_by'):
+            plot_pca_matrix = self._build_color_pca_matrix(
+                                            plot_pca_matrix, obj_data, dimension,
+                                            params.get('color_marker_by').get('attribute_color')[0])
 
         if params.get('scale_size_by'):
             plot_pca_matrix = self._build_size_pca_matrix(
-                                                    plot_pca_matrix, obj_data, dimension,
-                                                    params.get('scale_size_by').get('attribute')[0])
+                                            plot_pca_matrix, obj_data, dimension,
+                                            params.get('scale_size_by').get('attribute_size')[0])
 
         returnVal = {'pca_ref': pca_ref}
 
