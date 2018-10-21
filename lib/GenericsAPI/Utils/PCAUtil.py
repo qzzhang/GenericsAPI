@@ -342,18 +342,15 @@ class PCAUtil:
 
         return plot_pca_matrix
 
-    def _plot_pca_matrix(self, plot_pca_matrix):
-        traces = []
+    def _build_2_comp_trace(self, plot_pca_matrix, components_x, components_y):
 
-        output_directory = os.path.join(self.scratch, str(uuid.uuid4()))
-        self._mkdir_p(output_directory)
-        result_file_path = os.path.join(output_directory, 'pca_plot.html')
+        traces = []
 
         if 'instance' not in plot_pca_matrix.columns:
             # no associated attribute mapping
             trace = go.Scatter(
-                x=list(plot_pca_matrix.principal_component_1),
-                y=list(plot_pca_matrix.principal_component_2),
+                x=list(plot_pca_matrix[components_x]),
+                y=list(plot_pca_matrix[components_y]),
                 mode='markers',
                 text=list(plot_pca_matrix.index),
                 textposition='bottom center',
@@ -367,8 +364,8 @@ class PCAUtil:
 
                 for name in set(plot_pca_matrix.attribute_value_color):
                     trace = go.Scatter(
-                        x=list(plot_pca_matrix.loc[plot_pca_matrix['attribute_value_color'].eq(name)].principal_component_1),
-                        y=list(plot_pca_matrix.loc[plot_pca_matrix['attribute_value_color'].eq(name)].principal_component_2),
+                        x=list(plot_pca_matrix.loc[plot_pca_matrix['attribute_value_color'].eq(name)][components_x]),
+                        y=list(plot_pca_matrix.loc[plot_pca_matrix['attribute_value_color'].eq(name)][components_y]),
                         mode='markers',
                         name=name,
                         text=list(plot_pca_matrix.loc[plot_pca_matrix['attribute_value_color'].eq(name)].index),
@@ -381,8 +378,8 @@ class PCAUtil:
             elif 'attribute_value_color' in plot_pca_matrix.columns:
                 for name in set(plot_pca_matrix.attribute_value_color):
                     trace = go.Scatter(
-                        x=list(plot_pca_matrix.loc[plot_pca_matrix['attribute_value_color'].eq(name)].principal_component_1),
-                        y=list(plot_pca_matrix.loc[plot_pca_matrix['attribute_value_color'].eq(name)].principal_component_2),
+                        x=list(plot_pca_matrix.loc[plot_pca_matrix['attribute_value_color'].eq(name)][components_x]),
+                        y=list(plot_pca_matrix.loc[plot_pca_matrix['attribute_value_color'].eq(name)][components_y]),
                         mode='markers',
                         name=name,
                         text=list(plot_pca_matrix.loc[plot_pca_matrix['attribute_value_color'].eq(name)].index),
@@ -395,8 +392,8 @@ class PCAUtil:
 
                 for name in set(plot_pca_matrix.instance):
                     trace = go.Scatter(
-                        x=list(plot_pca_matrix.loc[plot_pca_matrix['instance'].eq(name)].principal_component_1),
-                        y=list(plot_pca_matrix.loc[plot_pca_matrix['instance'].eq(name)].principal_component_2),
+                        x=list(plot_pca_matrix.loc[plot_pca_matrix['instance'].eq(name)][components_x]),
+                        y=list(plot_pca_matrix.loc[plot_pca_matrix['instance'].eq(name)][components_y]),
                         mode='markers',
                         name=name,
                         text=list(plot_pca_matrix.loc[plot_pca_matrix['instance'].eq(name)].index),
@@ -409,8 +406,8 @@ class PCAUtil:
             else:
                 for name in set(plot_pca_matrix.instance):
                     trace = go.Scatter(
-                        x=list(plot_pca_matrix.loc[plot_pca_matrix['instance'].eq(name)].principal_component_1),
-                        y=list(plot_pca_matrix.loc[plot_pca_matrix['instance'].eq(name)].principal_component_2),
+                        x=list(plot_pca_matrix.loc[plot_pca_matrix['instance'].eq(name)][components_x]),
+                        y=list(plot_pca_matrix.loc[plot_pca_matrix['instance'].eq(name)][components_y]),
                         mode='markers',
                         name=name,
                         text=list(plot_pca_matrix.loc[plot_pca_matrix['instance'].eq(name)].index),
@@ -418,6 +415,18 @@ class PCAUtil:
                         marker=go.Marker(size=10, opacity=0.8, line=go.Line(color='rgba(217, 217, 217, 0.14)',
                                                                             width=0.5)))
                     traces.append(trace)
+
+        return traces
+
+    def _plot_pca_matrix(self, plot_pca_matrix, n_components):
+
+        output_directory = os.path.join(self.scratch, str(uuid.uuid4()))
+        self._mkdir_p(output_directory)
+        result_file_path = os.path.join(output_directory, 'pca_plot.html')
+
+        traces = self._build_2_comp_trace(plot_pca_matrix,
+                                          'principal_component_1',
+                                          'principal_component_2')
 
         data = go.Data(traces)
         layout = go.Layout(xaxis=go.XAxis(title='PC1', showline=False),
@@ -495,7 +504,9 @@ class PCAUtil:
 
         returnVal = {'pca_ref': pca_ref}
 
-        report_output = self._generate_pca_report(pca_ref, self._plot_pca_matrix(plot_pca_matrix),
+        report_output = self._generate_pca_report(pca_ref,
+                                                  self._plot_pca_matrix(plot_pca_matrix,
+                                                                        n_components),
                                                   workspace_name)
 
         returnVal.update(report_output)

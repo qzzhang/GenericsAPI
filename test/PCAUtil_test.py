@@ -167,7 +167,10 @@ class PCAUtilTest(unittest.TestCase):
                   'workspace_name': self.wsName,
                   'pca_matrix_name': 'test_pca_matrix_obj',
                   "scale_size_by": {
-                        "attribute": ["test_attribute_1"]
+                        "attribute_size": ["test_attribute_1"]
+                    },
+                  "color_marker_by": {
+                        "attribute_color": ["test_attribute_2"]
                     }}
 
         ret = self.getImpl().run_pca(self.ctx, params)[0]
