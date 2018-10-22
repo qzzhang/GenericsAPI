@@ -308,8 +308,8 @@ module GenericsAPI {
     dimension: compute PCA on column or row, one of ['col', 'row']
     n_components - number of components (default 2)
     attribute_mapping_obj_ref - associated attribute_mapping_obj_ref
-    customize_instance_group - customer and select which instance group to plot
     scale_size_by - used for PCA plot to scale data size
+    color_marker_by - used for PCA plot to group data
   */
   typedef structure {
     obj_ref input_obj_ref;
@@ -318,8 +318,8 @@ module GenericsAPI {
     string dimension;
     int n_components;
     obj_ref attribute_mapping_obj_ref;
-    list<mapping<string, string>> customize_instance_group;
     mapping<string, string> scale_size_by;
+    mapping<string, string> color_marker_by;
   } PCAParams;
 
   /* Ouput of the run_pca function

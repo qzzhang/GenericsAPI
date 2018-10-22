@@ -21,6 +21,17 @@
       }
     },
     {
+      "id" : "n_components",
+      "optional" : false,
+      "advanced" : true,
+      "allow_multiple" : false,
+      "default_values" : [ "2" ],
+      "field_type" : "text",
+      "text_options" : {
+        "validate_as": "int"
+      }
+    },
+    {
       "id" : "dimension",
       "optional" : false,
       "advanced" : false,
@@ -145,6 +156,10 @@
           "input_parameter" : "attribute_mapping_obj_ref",
           "target_property" : "attribute_mapping_obj_ref",
           "target_type_transform": "resolved-ref"
+        },
+        {
+            "input_parameter" : "n_components",
+            "target_property" : "n_components"
         },
         {
           "input_parameter" : "dimension",

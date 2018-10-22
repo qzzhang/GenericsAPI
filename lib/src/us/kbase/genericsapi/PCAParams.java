@@ -2,7 +2,6 @@
 package us.kbase.genericsapi;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import javax.annotation.Generated;
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
@@ -22,8 +21,8 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
  * dimension: compute PCA on column or row, one of ['col', 'row']
  * n_components - number of components (default 2)
  * attribute_mapping_obj_ref - associated attribute_mapping_obj_ref
- * customize_instance_group - customer and select which instance group to plot
  * scale_size_by - used for PCA plot to scale data size
+ * color_marker_by - used for PCA plot to group data
  * </pre>
  * 
  */
@@ -36,8 +35,8 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
     "dimension",
     "n_components",
     "attribute_mapping_obj_ref",
-    "customize_instance_group",
-    "scale_size_by"
+    "scale_size_by",
+    "color_marker_by"
 })
 public class PCAParams {
 
@@ -53,10 +52,10 @@ public class PCAParams {
     private Long nComponents;
     @JsonProperty("attribute_mapping_obj_ref")
     private java.lang.String attributeMappingObjRef;
-    @JsonProperty("customize_instance_group")
-    private List<Map<String, String>> customizeInstanceGroup;
     @JsonProperty("scale_size_by")
     private Map<String, String> scaleSizeBy;
+    @JsonProperty("color_marker_by")
+    private Map<String, String> colorMarkerBy;
     private Map<java.lang.String, Object> additionalProperties = new HashMap<java.lang.String, Object>();
 
     @JsonProperty("input_obj_ref")
@@ -149,21 +148,6 @@ public class PCAParams {
         return this;
     }
 
-    @JsonProperty("customize_instance_group")
-    public List<Map<String, String>> getCustomizeInstanceGroup() {
-        return customizeInstanceGroup;
-    }
-
-    @JsonProperty("customize_instance_group")
-    public void setCustomizeInstanceGroup(List<Map<String, String>> customizeInstanceGroup) {
-        this.customizeInstanceGroup = customizeInstanceGroup;
-    }
-
-    public PCAParams withCustomizeInstanceGroup(List<Map<String, String>> customizeInstanceGroup) {
-        this.customizeInstanceGroup = customizeInstanceGroup;
-        return this;
-    }
-
     @JsonProperty("scale_size_by")
     public Map<String, String> getScaleSizeBy() {
         return scaleSizeBy;
@@ -179,6 +163,21 @@ public class PCAParams {
         return this;
     }
 
+    @JsonProperty("color_marker_by")
+    public Map<String, String> getColorMarkerBy() {
+        return colorMarkerBy;
+    }
+
+    @JsonProperty("color_marker_by")
+    public void setColorMarkerBy(Map<String, String> colorMarkerBy) {
+        this.colorMarkerBy = colorMarkerBy;
+    }
+
+    public PCAParams withColorMarkerBy(Map<String, String> colorMarkerBy) {
+        this.colorMarkerBy = colorMarkerBy;
+        return this;
+    }
+
     @JsonAnyGetter
     public Map<java.lang.String, Object> getAdditionalProperties() {
         return this.additionalProperties;
@@ -191,7 +190,7 @@ public class PCAParams {
 
     @Override
     public java.lang.String toString() {
-        return ((((((((((((((((((("PCAParams"+" [inputObjRef=")+ inputObjRef)+", workspaceName=")+ workspaceName)+", pcaMatrixName=")+ pcaMatrixName)+", dimension=")+ dimension)+", nComponents=")+ nComponents)+", attributeMappingObjRef=")+ attributeMappingObjRef)+", customizeInstanceGroup=")+ customizeInstanceGroup)+", scaleSizeBy=")+ scaleSizeBy)+", additionalProperties=")+ additionalProperties)+"]");
+        return ((((((((((((((((((("PCAParams"+" [inputObjRef=")+ inputObjRef)+", workspaceName=")+ workspaceName)+", pcaMatrixName=")+ pcaMatrixName)+", dimension=")+ dimension)+", nComponents=")+ nComponents)+", attributeMappingObjRef=")+ attributeMappingObjRef)+", scaleSizeBy=")+ scaleSizeBy)+", colorMarkerBy=")+ colorMarkerBy)+", additionalProperties=")+ additionalProperties)+"]");
     }
 
 }

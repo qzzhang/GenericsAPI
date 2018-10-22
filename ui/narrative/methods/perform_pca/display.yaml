@@ -28,6 +28,12 @@ parameters :
         long-hint  : |
             One of KBaseMatrices object
 
+    n_components :
+        ui-name : |
+            Number of Component
+        short-hint : |
+            Number of Component
+
     dimension:
         ui-name: |
             Perform PCA Analysis On
