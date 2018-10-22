@@ -202,9 +202,6 @@ class PCAUtil:
         self._mkdir_p(output_directory)
         result_file_path = os.path.join(output_directory, 'pca_report.html')
 
-        print('fdsafds')
-        print(result_file_path)
-
         visualization_content = ''
 
         for pca_plot in pca_plots:
