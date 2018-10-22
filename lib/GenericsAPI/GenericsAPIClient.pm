@@ -1832,8 +1832,8 @@ PCAParams is a reference to a hash where the following keys are defined:
 	dimension has a value which is a string
 	n_components has a value which is an int
 	attribute_mapping_obj_ref has a value which is a GenericsAPI.obj_ref
-	customize_instance_group has a value which is a reference to a list where each element is a reference to a hash where the key is a string and the value is a string
 	scale_size_by has a value which is a reference to a hash where the key is a string and the value is a string
+	color_marker_by has a value which is a reference to a hash where the key is a string and the value is a string
 obj_ref is a string
 PCAOutput is a reference to a hash where the following keys are defined:
 	pca_ref has a value which is a GenericsAPI.obj_ref
@@ -1855,8 +1855,8 @@ PCAParams is a reference to a hash where the following keys are defined:
 	dimension has a value which is a string
 	n_components has a value which is an int
 	attribute_mapping_obj_ref has a value which is a GenericsAPI.obj_ref
-	customize_instance_group has a value which is a reference to a list where each element is a reference to a hash where the key is a string and the value is a string
 	scale_size_by has a value which is a reference to a hash where the key is a string and the value is a string
+	color_marker_by has a value which is a reference to a hash where the key is a string and the value is a string
 obj_ref is a string
 PCAOutput is a reference to a hash where the following keys are defined:
 	pca_ref has a value which is a GenericsAPI.obj_ref
@@ -3023,8 +3023,8 @@ pca_matrix_name: name of PCA (KBaseExperiments.PCAMatrix) object
 dimension: compute PCA on column or row, one of ['col', 'row']
 n_components - number of components (default 2)
 attribute_mapping_obj_ref - associated attribute_mapping_obj_ref
-customize_instance_group - customer and select which instance group to plot
 scale_size_by - used for PCA plot to scale data size
+color_marker_by - used for PCA plot to group data
 
 
 =item Definition
@@ -3039,8 +3039,8 @@ pca_matrix_name has a value which is a string
 dimension has a value which is a string
 n_components has a value which is an int
 attribute_mapping_obj_ref has a value which is a GenericsAPI.obj_ref
-customize_instance_group has a value which is a reference to a list where each element is a reference to a hash where the key is a string and the value is a string
 scale_size_by has a value which is a reference to a hash where the key is a string and the value is a string
+color_marker_by has a value which is a reference to a hash where the key is a string and the value is a string
 
 </pre>
 
@@ -3055,8 +3055,8 @@ pca_matrix_name has a value which is a string
 dimension has a value which is a string
 n_components has a value which is an int
 attribute_mapping_obj_ref has a value which is a GenericsAPI.obj_ref
-customize_instance_group has a value which is a reference to a list where each element is a reference to a hash where the key is a string and the value is a string
 scale_size_by has a value which is a reference to a hash where the key is a string and the value is a string
+color_marker_by has a value which is a reference to a hash where the key is a string and the value is a string
 
 
 =end text

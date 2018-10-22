@@ -9,6 +9,8 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.decomposition import PCA
 import plotly.graph_objs as go
 from plotly.offline import plot
+import itertools
+import shutil
 
 from GenericsAPI.Utils.DataUtil import DataUtil
 from DataFileUtil.DataFileUtilClient import DataFileUtil
@@ -191,17 +193,48 @@ class PCAUtil:
 
         return rotation_matrix_df, explained_variance_ratio
 
-    def _generate_pca_report(self, pca_ref, pca_plot, workspace_name):
+    def _generate_pca_html_report(self, pca_plots, n_components):
+
+        log('start generating html report')
+        html_report = list()
+
+        output_directory = os.path.join(self.scratch, str(uuid.uuid4()))
+        self._mkdir_p(output_directory)
+        result_file_path = os.path.join(output_directory, 'pca_report.html')
+
+        visualization_content = ''
+
+        for pca_plot in pca_plots:
+            shutil.copy2(pca_plot,
+                         os.path.join(output_directory, os.path.basename(pca_plot)))
+            visualization_content += '<iframe height="900px" width="100%" '
+            visualization_content += 'src="{}" '.format(os.path.basename(pca_plot))
+            visualization_content += 'style="border:none;"></iframe>\n<p></p>\n'
+
+        with open(result_file_path, 'w') as result_file:
+            with open(os.path.join(os.path.dirname(__file__), 'templates', 'pca_template.html'),
+                      'r') as report_template_file:
+                report_template = report_template_file.read()
+                report_template = report_template.replace('<p>Visualization_Content</p>',
+                                                          visualization_content)
+                report_template = report_template.replace('n_components',
+                                                          '{} Components'.format(n_components))
+                result_file.write(report_template)
+
+        report_shock_id = self.dfu.file_to_shock({'file_path': output_directory,
+                                                  'pack': 'zip'})['shock_id']
+
+        html_report.append({'shock_id': report_shock_id,
+                            'name': os.path.basename(result_file_path),
+                            'label': os.path.basename(result_file_path),
+                            'description': 'HTML summary report for ExpressionMatrix Cluster App'
+                            })
+        return html_report
+
+    def _generate_pca_report(self, pca_ref, pca_plots, workspace_name, n_components):
         log('creating report')
 
-        html_report = list()
-        report_shock_id = self.dfu.file_to_shock({'file_path': os.path.dirname(pca_plot),
-                                                  'pack': 'zip'})['shock_id']
-        html_report.append({'shock_id': report_shock_id,
-                            'name': os.path.basename(pca_plot),
-                            'label': os.path.basename(pca_plot),
-                            'description': 'HTML summary report for PCA analysis app'
-                            })
+        output_html_files = self._generate_pca_html_report(pca_plots, n_components)
 
         objects_created = list()
         objects_created.append({'ref': pca_ref,
@@ -210,7 +243,7 @@ class PCAUtil:
         report_params = {'message': '',
                          'workspace_name': workspace_name,
                          'objects_created': objects_created,
-                         'html_links': html_report,
+                         'html_links': output_html_files,
                          'direct_html_link_index': 0,
                          'html_window_height': 666,
                          'report_object_name': 'kb_pca_report_' + str(uuid.uuid4())}
@@ -422,20 +455,31 @@ class PCAUtil:
 
         output_directory = os.path.join(self.scratch, str(uuid.uuid4()))
         self._mkdir_p(output_directory)
-        result_file_path = os.path.join(output_directory, 'pca_plot.html')
+        result_file_paths = []
 
-        traces = self._build_2_comp_trace(plot_pca_matrix,
-                                          'principal_component_1',
-                                          'principal_component_2')
+        all_pairs = list(itertools.combinations(range(1, n_components+1), 2))
 
-        data = go.Data(traces)
-        layout = go.Layout(xaxis=go.XAxis(title='PC1', showline=False),
-                           yaxis=go.YAxis(title='PC2', showline=False))
-        fig = go.Figure(data=data, layout=layout)
+        for pair in all_pairs:
+            first_component = pair[0]
+            second_component = pair[1]
+            result_file_path = os.path.join(output_directory, 'pca_plot_{}_{}.html'.format(
+                                                                                first_component,
+                                                                                second_component))
 
-        plot(fig, filename=result_file_path)
+            traces = self._build_2_comp_trace(plot_pca_matrix,
+                                              'principal_component_{}'.format(first_component),
+                                              'principal_component_{}'.format(second_component))
 
-        return result_file_path
+            data = go.Data(traces)
+            layout = go.Layout(xaxis=go.XAxis(title='PC{}'.format(first_component), showline=False),
+                               yaxis=go.YAxis(title='PC{}'.format(second_component), showline=False))
+            fig = go.Figure(data=data, layout=layout)
+
+            plot(fig, filename=result_file_path)
+
+            result_file_paths.append(result_file_path)
+
+        return result_file_paths
 
     def __init__(self, config):
         self.ws_url = config["workspace-url"]
@@ -507,7 +551,8 @@ class PCAUtil:
         report_output = self._generate_pca_report(pca_ref,
                                                   self._plot_pca_matrix(plot_pca_matrix,
                                                                         n_components),
-                                                  workspace_name)
+                                                  workspace_name,
+                                                  n_components)
 
         returnVal.update(report_output)
 
