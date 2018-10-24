@@ -23,7 +23,7 @@
     {
       "id" : "n_components",
       "optional" : false,
-      "advanced" : true,
+      "advanced" : false,
       "allow_multiple" : false,
       "default_values" : [ "2" ],
       "field_type" : "text",
