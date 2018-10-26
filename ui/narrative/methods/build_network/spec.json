@@ -25,7 +25,18 @@
       "optional":false,
       "advanced":true,
       "allow_multiple":false,
-      "default_values":[],
+      "default_values":["0"],
+      "field_type" : "text",
+      "text_options": {
+          "validate_as": "float"
+      }
+    },
+    {
+      "id": "significance_threshold",
+      "optional":false,
+      "advanced":true,
+      "allow_multiple":false,
+      "default_values":["0"],
       "field_type" : "text",
       "text_options": {
           "validate_as": "float"
@@ -48,7 +59,8 @@
     {
       "id": "filter_on_threshold",
       "parameters": [
-        "coefficient_threshold"
+        "coefficient_threshold",
+        "significance_threshold"
       ],
       "optional": true,
       "allow_multiple": false,
