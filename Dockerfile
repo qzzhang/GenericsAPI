@@ -22,7 +22,8 @@ RUN pip install pandas \
 
 RUN conda install -yc bioconda biom-format
 RUN pip install sklearn \
-    && pip install plotly
+    && pip install plotly \
+    && pip install colorlover
 
 # -----------------------------------------
 
