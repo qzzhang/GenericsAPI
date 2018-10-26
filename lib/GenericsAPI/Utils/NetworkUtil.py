@@ -262,7 +262,7 @@ class NetworkUtil:
 
         return links_filtered
 
-    def _build_network_object(self, graph, workspace_name, network_obj_name):
+    def _build_network_object(self, graph, workspace_name, network_obj_name, corr_matrix_ref):
         """
         _build_network_object: tansform graph to KBbase network object
         """
@@ -273,6 +273,13 @@ class NetworkUtil:
             ws_name_id = workspace_name
 
         network_data = {'description': 'Correlation Network'}
+        network_data.update({'corr_matrix_ref': corr_matrix_ref})
+
+        corr_data = self.dfu.get_objects({'object_refs': [corr_matrix_ref]})['data'][0]['data']
+        original_matrix_ref = corr_data.get('original_matrix_ref')
+
+        if original_matrix_ref:
+            network_data.update({'original_matrix_ref': original_matrix_ref})
 
         nodes_list = list(graph.nodes())
         nodes = dict()
@@ -412,7 +419,7 @@ class NetworkUtil:
 
             graph = self.df_to_graph(links_filtered, source='source', target='target')
 
-        network_obj_ref = self._build_network_object(graph, workspace_name, network_obj_name)
+        network_obj_ref = self._build_network_object(graph, workspace_name, network_obj_name, corr_matrix_ref)
 
         returnVal = {'network_obj_ref': network_obj_ref}
         report_output = self._generate_network_report(graph, network_obj_ref, workspace_name)
