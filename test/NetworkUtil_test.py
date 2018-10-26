@@ -100,7 +100,8 @@ class NetworkUtilTest(unittest.TestCase):
         d = {'source': ['A', 'E', 'F', 'F', 'F', 'F', 'G', 'G', 'G', 'H',
                         'I', 'I', 'I', 'J', 'J', 'J'],
              'target': ['E', 'A', 'G', 'H', 'I', 'J', 'F', 'I', 'J', 'F',
-                        'F', 'G', 'J', 'F', 'G', 'I']}
+                        'F', 'G', 'J', 'F', 'G', 'I'],
+             'value': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 1, 2, 3, 4, 5, 6]}
         graph_df = pd.DataFrame(data=d)
 
         self.__class__.graph_df = graph_df
