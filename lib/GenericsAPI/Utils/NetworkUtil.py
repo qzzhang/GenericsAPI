@@ -201,8 +201,7 @@ class NetworkUtil:
             node_trace['marker']['color'] += tuple([len(adjacencies[1])])
             node_info = adjacencies[0]
             connections = list(adjacencies[1].keys())
-            node_info += ', {} connections: {}'.format(len(connections),
-                                                       connections)
+            node_info += ', {} connections'.format(len(connections))
             node_trace['text'] += tuple([node_info])
 
         # create network graph
