@@ -5,9 +5,6 @@ import uuid
 import errno
 import traceback
 from matplotlib import pyplot as plt
-import plotly.graph_objs as go
-from plotly.offline import plot
-import colorlover as cl
 import json
 import shutil
 from scipy import stats
@@ -86,62 +83,7 @@ class CorrelationUtil:
 
         return table_content
 
-    def _plot_plotly_table(self, df, result_file_path, matrix_type):
-
-        col = list(df.columns)
-        col.insert(0, '')
-        header = dict(values=col, line=dict(color='white'), fill=dict(color='white'),
-                      align='center', font=dict(color='black', size=12))
-
-        if matrix_type == 'corr_matrix':
-            color = [['white']*len(col)]
-            colors = cl.scales['11']['div']['RdBu']
-            for value in df.values:
-                row_colors = []
-                for cell_value in value:
-                    row_cell_color = colors[int((100 - cell_value * 100) // 20)]
-                    row_colors.append(row_cell_color)
-                color.append(row_colors)
-        elif matrix_type == 'sig_matrix':
-            color = [['white']*len(col)]
-            colors = cl.scales['9']['seq']['Reds']
-            for value in df.values:
-                row_colors = []
-                for cell_value in value:
-                    row_cell_color = colors[int((80 - cell_value * 80) // 10)]
-                    row_colors.append(row_cell_color)
-                color.append(row_colors)
-        else:
-            raise ValueError('unsupprted matrix type: {}'.format(matrix_type))
-
-        cell_values = list(df.values)
-        cell_values.insert(0, col[1:])
-
-        cells = dict(values=cell_values, line=dict(color=color), fill=dict(color=color),
-                     align='center', font=dict(color='black', size=11))
-
-        trace = go.Table(header=header, cells=cells)
-
-        data = [trace]
-
-        plot(data, filename=result_file_path)
-
-    def _build_plotly_table_content(self, df, output_directory, matrix_type):
-
-        table_content = ''
-
-        page_name = 'plotly_{}.html'.format(str(uuid.uuid4()))
-        result_file_path = os.path.join(output_directory, page_name)
-
-        self._plot_plotly_table(df, result_file_path, matrix_type)
-
-        table_content += '<iframe height="900px" width="100%" '
-        table_content += 'src="{}" '.format(page_name)
-        table_content += 'style="border:none;"></iframe>\n<p></p>\n'
-
-        return table_content
-
-    def _generate_visualization_content(self, output_directory, corr_df, sig_df,
+    def _generate_visualization_content(self, output_directory, corr_matrix_obj_ref,
                                         corr_matrix_plot_path, scatter_plot_path):
 
         """
@@ -156,20 +98,25 @@ class CorrelationUtil:
         tab_def_content = ''
         tab_content = ''
 
+        corr_data = self.dfu.get_objects({'object_refs': [corr_matrix_obj_ref]})['data'][0]['data']
+
+        coefficient_data = corr_data.get('coefficient_data')
+        significance_data = corr_data.get('significance_data')
+
         tab_def_content += """
         <div class="tab">
             <button class="tablinks" onclick="openTab(event, 'CorrelationMatrix')" id="defaultOpen">Correlation Matrix</button>
         """
 
-        corr_table_content = self._build_plotly_table_content(corr_df, output_directory, 'corr_matrix')
+        corr_table_content = self._build_table_content(coefficient_data)
         tab_content += """
         <div id="CorrelationMatrix" class="tabcontent">{}</div>""".format(corr_table_content)
 
-        if sig_df is not None:
+        if significance_data:
             tab_def_content += """
             <button class="tablinks" onclick="openTab(event, 'SignificanceMatrix')">Significance Matrix</button>
             """
-            sig_table_content = self._build_plotly_table_content(sig_df, output_directory, 'sig_matrix')
+            sig_table_content = self._build_table_content(significance_data)
             tab_content += """
             <div id="SignificanceMatrix" class="tabcontent">{}</div>""".format(sig_table_content)
 
@@ -227,7 +174,7 @@ class CorrelationUtil:
 
         return tab_def_content + tab_content
 
-    def _generate_corr_html_report(self, corr_df, sig_df, corr_matrix_plot_path,
+    def _generate_corr_html_report(self, corr_matrix_obj_ref, corr_matrix_plot_path,
                                    scatter_plot_path):
 
         """
@@ -242,7 +189,7 @@ class CorrelationUtil:
         result_file_path = os.path.join(output_directory, 'corr_report.html')
 
         visualization_content = self._generate_visualization_content(output_directory,
-                                                                     corr_df, sig_df,
+                                                                     corr_matrix_obj_ref,
                                                                      corr_matrix_plot_path,
                                                                      scatter_plot_path)
 
@@ -264,14 +211,14 @@ class CorrelationUtil:
                             })
         return html_report
 
-    def _generate_corr_report(self, corr_matrix_obj_ref, corr_df, sig_df, workspace_name,
-                              corr_matrix_plot_path, scatter_plot_path):
+    def _generate_corr_report(self, corr_matrix_obj_ref, workspace_name, corr_matrix_plot_path,
+                              scatter_plot_path):
         """
         _generate_report: generate summary report
         """
         log('Start creating report')
 
-        output_html_files = self._generate_corr_html_report(corr_df, sig_df,
+        output_html_files = self._generate_corr_html_report(corr_matrix_obj_ref,
                                                             corr_matrix_plot_path,
                                                             scatter_plot_path)
 
@@ -584,9 +531,8 @@ class CorrelationUtil:
 
         returnVal = {'corr_matrix_obj_ref': corr_matrix_obj_ref}
 
-        report_output = self._generate_corr_report(corr_matrix_obj_ref, corr_df, sig_df,
-                                                   workspace_name, corr_matrix_plot_path,
-                                                   scatter_plot_path)
+        report_output = self._generate_corr_report(corr_matrix_obj_ref, workspace_name,
+                                                   corr_matrix_plot_path, scatter_plot_path)
 
         returnVal.update(report_output)
 
