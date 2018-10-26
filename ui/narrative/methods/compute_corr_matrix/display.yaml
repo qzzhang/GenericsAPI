@@ -46,19 +46,11 @@ parameters :
 
     plot_corr_matrix:
         ui-name: |
-            Plot Correlation Matrix
+            Plot Correlation Matrix Heatmap
         short-hint : |
             Plot correlation matrix in report
         long-hint  : |
             Plot correlation matrix in report
-
-    plot_scatter_matrix:
-        ui-name: |
-            Plot Scatter Matrix
-        short-hint : |
-            Plot scatter matrix in report
-        long-hint  : |
-            Plot scatter matrix in report
 
     compute_significance:
         ui-name: |

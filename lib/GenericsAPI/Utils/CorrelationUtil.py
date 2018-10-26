@@ -5,6 +5,8 @@ import uuid
 import errno
 import traceback
 from matplotlib import pyplot as plt
+import plotly.graph_objs as go
+from plotly.offline import plot
 import json
 import shutil
 from scipy import stats
@@ -122,25 +124,38 @@ class CorrelationUtil:
 
         if corr_matrix_plot_path:
             tab_def_content += """
-            <button class="tablinks" onclick="openTab(event, 'CorrelationMatrixPlot')">Correlation Matrix Plot</button>
+            <button class="tablinks" onclick="openTab(event, 'CorrelationMatrixPlot')">Correlation Matrix Heatmap</button>
             """
 
             tab_content += """
             <div id="CorrelationMatrixPlot" class="tabcontent">
             """
-            corr_matrix_plot_name = 'CorrelationMatrixPlot.png'
-            corr_matrix_plot_display_name = 'Correlation Matrix Plot'
+            if corr_matrix_plot_path.endswith('.png'):
+                corr_matrix_plot_name = 'CorrelationMatrixPlot.png'
+                corr_matrix_plot_display_name = 'Correlation Matrix Plot'
 
-            shutil.copy2(corr_matrix_plot_path,
-                         os.path.join(output_directory, corr_matrix_plot_name))
+                shutil.copy2(corr_matrix_plot_path,
+                             os.path.join(output_directory, corr_matrix_plot_name))
 
-            tab_content += '<div class="gallery">'
-            tab_content += '<a target="_blank" href="{}">'.format(corr_matrix_plot_name)
-            tab_content += '<img src="{}" '.format(corr_matrix_plot_name)
-            tab_content += 'alt="{}" width="600" height="400">'.format(
+                tab_content += '<div class="gallery">'
+                tab_content += '<a target="_blank" href="{}">'.format(corr_matrix_plot_name)
+                tab_content += '<img src="{}" '.format(corr_matrix_plot_name)
+                tab_content += 'alt="{}" width="600" height="400">'.format(
+                                                                    corr_matrix_plot_display_name)
+                tab_content += '</a><div class="desc">{}</div></div>'.format(
                                                                 corr_matrix_plot_display_name)
-            tab_content += '</a><div class="desc">{}</div></div>'.format(
-                                                                corr_matrix_plot_display_name)
+            elif corr_matrix_plot_path.endswith('.html'):
+                corr_matrix_plot_name = 'CorrelationMatrixPlot.html'
+
+                shutil.copy2(corr_matrix_plot_path,
+                             os.path.join(output_directory, corr_matrix_plot_name))
+
+                tab_content += '<iframe height="900px" width="100%" '
+                tab_content += 'src="{}" '.format(corr_matrix_plot_name)
+                tab_content += 'style="border:none;"></iframe>\n<p></p>\n'
+            else:
+                raise ValueError('unexpected correlation matrix plot format:\n{}'.format(
+                                                                            corr_matrix_plot_path))
 
             tab_content += """</div>"""
 
@@ -400,6 +415,28 @@ class CorrelationUtil:
 
         return corr_df
 
+    def plotly_corr_matrix(self, corr_df):
+        log('Plotting matrix of correlation')
+
+        result_dir = os.path.join(self.scratch, str(uuid.uuid4()) + '_corr_matrix_plots')
+        self._mkdir_p(result_dir)
+
+        try:
+            trace = go.Heatmap(z=corr_df.values,
+                               x=corr_df.index,
+                               y=corr_df.columns)
+            data = [trace]
+        except:
+            err_msg = 'Running plotly_corr_matrix returned an error:\n{}\n'.format(
+                                                                    traceback.format_exc())
+            raise ValueError(err_msg)
+        else:
+            corr_matrix_plot_path = os.path.join(result_dir, 'corr_matrix_plots.html')
+            log('Saving plot to:\n{}'.format(corr_matrix_plot_path))
+            plot(data, filename=corr_matrix_plot_path)
+
+        return corr_matrix_plot_path
+
     def plot_corr_matrix(self, corr_df):
         """
         plot_corr_matrix: genreate correlation matrix plot
@@ -517,7 +554,7 @@ class CorrelationUtil:
             raise ValueError("err_msg")
 
         if plot_corr_matrix:
-            corr_matrix_plot_path = self.plot_corr_matrix(corr_df)
+            corr_matrix_plot_path = self.plotly_corr_matrix(corr_df)
         else:
             corr_matrix_plot_path = None
 

@@ -23,7 +23,7 @@
     {
       "id" : "method",
       "optional" : false,
-      "advanced" : false,
+      "advanced" : true,
       "allow_multiple" : false,
       "default_values" : ["pearson"],
       "field_type" : "dropdown",
@@ -70,18 +70,6 @@
     },
     {
       "id": "plot_corr_matrix",
-      "optional":false,
-      "advanced":true,
-      "allow_multiple":false,
-      "default_values":[1],
-      "field_type" : "checkbox",
-      "checkbox_options":{
-        "checked_value": 1,
-        "unchecked_value": 0
-        }
-    },
-    {
-      "id": "plot_scatter_matrix",
       "optional":false,
       "advanced":true,
       "allow_multiple":false,
@@ -143,10 +131,6 @@
         {
           "input_parameter" : "plot_corr_matrix",
           "target_property" : "plot_corr_matrix"
-        },
-        {
-          "input_parameter" : "plot_scatter_matrix",
-          "target_property" : "plot_scatter_matrix"
         },
         {
           "input_parameter" : "compute_significance",
