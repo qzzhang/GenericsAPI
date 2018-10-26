@@ -174,14 +174,20 @@ class NetworkUtil:
                 nodes.update({node2: {'pos': (x2, y2)}})
 
         # create edges
-        edge_trace = go.Scatter(x=[], y=[], line=dict(width=0.5, color='#888'),
-                                hoverinfo='none', mode='lines')
+        edge_trace_pos = go.Scatter(x=[], y=[], line=dict(width=0.6, color='#888'),
+                                    hoverinfo='text', mode='lines', name='positive correlation')
+        edge_trace_neg = go.Scatter(x=[], y=[], line=dict(width=0.6, color='#888'),
+                                    hoverinfo='text', mode='lines', name='negative correlation')
 
-        for edge in graph.edges():
+        for edge in graph.edges(data=True):
             x0, y0 = nodes[edge[0]]['pos']
             x1, y1 = nodes[edge[1]]['pos']
-            edge_trace['x'] += tuple([x0, x1, None])
-            edge_trace['y'] += tuple([y0, y1, None])
+            if edge[2]['weight'] >= 0:
+                edge_trace_pos['x'] += tuple([x0, x1, None])
+                edge_trace_pos['y'] += tuple([y0, y1, None])
+            else:
+                edge_trace_neg['x'] += tuple([x0, x1, None])
+                edge_trace_neg['y'] += tuple([y0, y1, None])
 
         # create nodes
         node_trace = go.Scatter(x=[], y=[], text=[], mode='markers', hoverinfo='text',
@@ -205,7 +211,7 @@ class NetworkUtil:
             node_trace['text'] += tuple([node_info])
 
         # create network graph
-        fig = go.Figure(data=[edge_trace, node_trace],
+        fig = go.Figure(data=[edge_trace_pos, edge_trace_neg, node_trace],
                         layout=go.Layout(title='<br>Correlation Network', titlefont=dict(size=16),
                                          showlegend=False, hovermode='closest',
                                          margin=dict(b=20, l=5, r=5, t=40),
