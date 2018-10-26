@@ -103,12 +103,12 @@ class PCAUtilTest(unittest.TestCase):
         if hasattr(self.__class__, 'pca_matrix_ref'):
             return self.__class__.pca_matrix_ref
 
-        original_data = self.loadExpressionMatrix()
+        original_matrix_ref = self.loadExpressionMatrix()
 
         object_type = 'KBaseExperiments.PCAMatrix'
         pca_matrix_object_name = 'test_PCA_matrix'
         pca_matrix_data = {'explained_variance_ratio': [0.628769688409428, 0.371230311590572],
-                           'original_data': original_data,
+                           'original_matrix_ref': original_matrix_ref,
                            'pca_parameters': {'dimension': 'row', 'n_components': '2'},
                            'rotation_matrix': {'col_ids': ['principal_component_1',
                                                            'principal_component_2'],
