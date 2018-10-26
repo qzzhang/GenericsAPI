@@ -182,16 +182,16 @@ module KBaseExperiments {
 
       @optional description correlation_parameters
       @optional genome_ref feature_mapping
-      @optional significance_data original_data
+      @optional significance_data original_matrix_ref
 
       @metadata ws genome_ref as genome
-      @metadata ws original_data as source_data
+      @metadata ws original_matrix_ref as original_matrix_ref
       @metadata ws length(coefficient_data.row_ids) as matrix_size
     */
     typedef structure {
       string description;
       mapping<string, string> correlation_parameters;
-      WSRef original_data;
+      WSRef original_matrix_ref;
       GenomeRef genome_ref;
       mapping<string, list<string>> feature_mapping;
       FloatMatrix2D coefficient_data;
@@ -239,16 +239,20 @@ module KBaseExperiments {
       mapping<node_id, Node>> nodes - A dict of all nodes in a network
       mapping<string,string> network_properties - Other network properties
 
-      @optional description network_properties
+      @optional description network_properties original_matrix_ref corr_matrix_ref
 
       @metadata ws length(nodes) as n_nodes
       @metadata ws length(edges) as n_edges
+      @metadata ws original_matrix_ref as original_matrix_ref
+      @metadata ws corr_matrix_ref as corr_matrix_ref
     */
     typedef structure {
       string description;
       list<Edge> edges;
       mapping<node_id, Node> nodes;
       mapping<string, string> network_properties;
+      WSRef original_matrix_ref;
+      WSRef corr_matrix_ref;
     } Network;
 
     /*
@@ -261,17 +265,17 @@ module KBaseExperiments {
       pca_parameters - arguments used to perform PCA analysis
 
       @optional description pca_parameters
-      @optional explained_variance_ratio original_data
+      @optional explained_variance_ratio original_matrix_ref
 
       @metadata ws length(rotation_matrix.row_ids) as matrix_size
       @metadata ws length(rotation_matrix.col_ids) as n_components
-      @metadata ws original_data as source_data
+      @metadata ws original_matrix_ref as original_matrix_ref
     */
     typedef structure {
       string description;
       mapping<string, string> pca_parameters;
       FloatMatrix2D rotation_matrix;
       list<float> explained_variance_ratio;
-      WSRef original_data;
+      WSRef original_matrix_ref;
     } PCAMatrix;
 };

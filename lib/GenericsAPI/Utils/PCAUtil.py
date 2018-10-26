@@ -103,14 +103,14 @@ class PCAUtil:
         rotation_matrix_data = pca_data.get('rotation_matrix')
         explained_variance_ratio = pca_data.get('explained_variance_ratio')
         dimension = pca_data.get('pca_parameters').get('dimension')
-        original_data_ref = pca_data.get('original_data')
+        original_matrix_ref = pca_data.get('original_matrix_ref')
 
         pca_df = self._Matrix2D_to_df(rotation_matrix_data)
         pca_df.loc['explained_variance_ratio'] = explained_variance_ratio
 
-        if original_data_ref:
+        if original_matrix_ref:
             log('appending instance group information to pca data frame')
-            obj_data = self.dfu.get_objects({'object_refs': [original_data_ref]})['data'][0]['data']
+            obj_data = self.dfu.get_objects({'object_refs': [original_matrix_ref]})['data'][0]['data']
 
             if dimension == 'row':
                 attribute_mapping = obj_data.get('row_mapping')
@@ -141,7 +141,7 @@ class PCAUtil:
         pca_data.update({'explained_variance_ratio': explained_variance_ratio})
         pca_data.update({'pca_parameters': {'n_components': str(n_components),
                                             'dimension': str(dimension)}})
-        pca_data.update({'original_data': input_obj_ref})
+        pca_data.update({'original_matrix_ref': input_obj_ref})
 
         obj_type = 'KBaseExperiments.PCAMatrix'
         info = self.dfu.save_objects({

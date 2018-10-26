@@ -299,7 +299,8 @@ class CorrelationUtil:
 
         return matrix_data
 
-    def _save_corr_matrix(self, workspace_name, corr_matrix_name, corr_df, sig_df, method):
+    def _save_corr_matrix(self, workspace_name, corr_matrix_name, corr_df, sig_df, method,
+                          matrix_ref):
         """
         _save_corr_matrix: save KBaseExperiments.CorrelationMatrix object
         """
@@ -313,6 +314,7 @@ class CorrelationUtil:
 
         corr_data.update({'coefficient_data': self._df_to_list(corr_df)})
         corr_data.update({'correlation_parameters': {'method': method}})
+        corr_data.update({'original_matrix_ref': matrix_ref})
 
         if sig_df is not None:
             corr_data.update({'significance_data': self._df_to_list(sig_df)})
@@ -564,7 +566,7 @@ class CorrelationUtil:
             scatter_plot_path = None
 
         corr_matrix_obj_ref = self._save_corr_matrix(workspace_name, corr_matrix_name, corr_df,
-                                                     sig_df, method)
+                                                     sig_df, method, input_obj_ref)
 
         returnVal = {'corr_matrix_obj_ref': corr_matrix_obj_ref}
 
