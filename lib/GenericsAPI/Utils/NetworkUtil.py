@@ -5,8 +5,13 @@ import uuid
 import errno
 import networkx as nx
 from matplotlib import pyplot as plt
+import plotly.graph_objs as go
+from plotly.offline import plot
 import json
 import shutil
+from random import seed
+from random import randint
+import math
 
 from GenericsAPI.Utils.DataUtil import DataUtil
 from GenericsAPI.Utils.CorrelationUtil import CorrelationUtil
@@ -106,13 +111,117 @@ class NetworkUtil:
                             })
         return html_report
 
+    def _generate_plotly_network(self, graph):
+        """
+        _generate_ploty_network: generate html summary report
+        """
+
+        log('Start generating html report')
+        html_report = list()
+
+        output_directory = os.path.join(self.scratch, str(uuid.uuid4()))
+        self._mkdir_p(output_directory)
+        result_file_path = os.path.join(output_directory, 'network_report.html')
+
+        self._plotly_network(graph, result_file_path)
+
+        report_shock_id = self.dfu.file_to_shock({'file_path': output_directory,
+                                                  'pack': 'zip'})['shock_id']
+
+        html_report.append({'shock_id': report_shock_id,
+                            'name': os.path.basename(result_file_path),
+                            'label': os.path.basename(result_file_path),
+                            'description': 'HTML summary report for Build Network App'
+                            })
+        return html_report
+
+    def _plotly_network(self, graph, result_file_path):
+        log('start ploting network using plotly')
+
+        # create node position
+        seed(1)
+        nodes = dict()
+        for edge in list(graph.edges(data=True)):
+            node1 = edge[0]
+            node2 = edge[1]
+            weight = (1 - abs(edge[2]['weight'])) * 100
+
+            if node1 in nodes and node2 not in nodes:
+                x1, y1 = nodes[node1]['pos']
+
+                radians = randint(0, 10)
+                x2 = x1 + int(math.cos(radians) * weight)
+                y2 = y1 + int(math.sin(radians) * weight)
+
+                nodes.update({node2: {'pos': (x2, y2)}})
+            elif node2 in nodes and node1 not in nodes:
+                x2, y2 = nodes[node2]['pos']
+
+                radians = randint(0, 10)
+                x1 = x2 + int(math.cos(radians) * weight)
+                y1 = y2 + int(math.sin(radians) * weight)
+
+                nodes.update({node1: {'pos': (x1, y1)}})
+            else:
+                x1 = randint(0, 100)
+                y1 = randint(0, 100)
+                nodes.update({node1: {'pos': (x1, y1)}})
+
+                radians = randint(0, 10)
+                x2 = x1 + int(math.cos(radians) * weight)
+                y2 = y1 + int(math.sin(radians) * weight)
+
+                nodes.update({node2: {'pos': (x2, y2)}})
+
+        # create edges
+        edge_trace = go.Scatter(x=[], y=[], line=dict(width=0.5, color='#888'),
+                                hoverinfo='none', mode='lines')
+
+        for edge in graph.edges():
+            x0, y0 = nodes[edge[0]]['pos']
+            x1, y1 = nodes[edge[1]]['pos']
+            edge_trace['x'] += tuple([x0, x1, None])
+            edge_trace['y'] += tuple([y0, y1, None])
+
+        # create nodes
+        node_trace = go.Scatter(x=[], y=[], text=[], mode='markers', hoverinfo='text',
+                                marker=dict(showscale=True, colorscale='YlGnBu',
+                                            reversescale=True, color=[], size=10,
+                                            colorbar=dict(thickness=15, title='Node Connections',
+                                                          xanchor='left', titleside='right'),
+                                            line=dict(width=2)))
+
+        for node in nodes:
+            x, y = nodes[node]['pos']
+            node_trace['x'] += tuple([x])
+            node_trace['y'] += tuple([y])
+
+        # color and text Node points
+        for node, adjacencies in enumerate(graph.adjacency()):
+            node_trace['marker']['color'] += tuple([len(adjacencies[1])])
+            node_info = adjacencies[0]
+            connections = list(adjacencies[1].keys())
+            node_info += ', {} connections: {}'.format(len(connections),
+                                                       connections)
+            node_trace['text'] += tuple([node_info])
+
+        # create network graph
+        fig = go.Figure(data=[edge_trace, node_trace],
+                        layout=go.Layout(title='<br>Correlation Network', titlefont=dict(size=16),
+                                         showlegend=False, hovermode='closest',
+                                         margin=dict(b=20, l=5, r=5, t=40),
+                                         xaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
+                                         yaxis=dict(showgrid=False, zeroline=False, showticklabels=False)))
+
+        plot(fig, filename=result_file_path)
+
     def _generate_network_report(self, graph, network_obj_ref, workspace_name):
         """
         _generate_report: generate summary report
         """
         log('Start creating report')
 
-        output_html_files = self._generate_network_html_report(graph)
+        output_html_files = self._generate_plotly_network(graph)
 
         report_params = {'message': '',
                          'objects_created': [{'ref': network_obj_ref,
@@ -139,6 +248,15 @@ class NetworkUtil:
 
         return links_filtered
 
+    def _filter_neg_links_threshold(self, links, threshold):
+        """
+        _filter_links_threshold: filetre links df below a negative threshold and remove self correlation (cor(A,A)=1)
+        """
+
+        links_filtered = links.loc[(links['value'] <= threshold) & (links['source'] != links['target'])]
+
+        return links_filtered
+
     def _build_network_object(self, graph, workspace_name, network_obj_name):
         """
         _build_network_object: tansform graph to KBbase network object
@@ -158,9 +276,10 @@ class NetworkUtil:
         network_data.update({'nodes': nodes})
 
         edges = list()
-        for edge in list(graph.edges()):
+        for edge in list(graph.edges(data=True)):
             edges.append({'node_1_id': edge[0],
-                          'node_2_id': edge[1]})
+                          'node_2_id': edge[1],
+                          'weight': edge[2]['weight']})
         network_data.update({'edges': edges})
 
         obj_type = 'KBaseExperiments.Network'
@@ -191,6 +310,17 @@ class NetworkUtil:
         # params['filter_on_threshold'] = True
 
         return params
+
+    def _merge_links(self, corr_links_filtered_pos, corr_links_filtered_neg,
+                     sig_links_filtered):
+
+        corr_filtered_df = pd.concat([corr_links_filtered_pos, corr_links_filtered_neg])
+
+        if sig_links_filtered is not None:
+            keep_ids = set(corr_filtered_df.index).intersection(set(sig_links_filtered.index))
+            corr_filtered_df = corr_filtered_df.loc[list(keep_ids)]
+
+        return corr_filtered_df
 
     def __init__(self, config):
         self.ws_url = config["workspace-url"]
@@ -230,8 +360,10 @@ class NetworkUtil:
         """
         _df_to_graph: a graph from Pandas DataFrame containing an edge list
         """
+        graph_df.rename(columns={'value': 'weight'}, inplace=True)
 
-        graph = nx.from_pandas_edgelist(graph_df, source=source, target=target)
+        graph = nx.from_pandas_edgelist(graph_df, source=source, target=target,
+                                        edge_attr=['weight'])
 
         return graph
 
@@ -255,15 +387,25 @@ class NetworkUtil:
 
         if params.get('filter_on_threshold'):
             coefficient_threshold = params.get('filter_on_threshold').get('coefficient_threshold')
+            significance_threshold = params.get('filter_on_threshold').get('significance_threshold')
             corr_df = self._Matrix2D_to_df(coefficient_data)
-            links = self._trans_df(corr_df)
-            links_filtered = self._filter_links_threshold(links, coefficient_threshold)
-            graph = self.df_to_graph(links_filtered, source='source', target='target')
+            corr_links = self._trans_df(corr_df)
+            corr_links_filtered_pos = self._filter_links_threshold(corr_links,
+                                                                   coefficient_threshold)
+            corr_links_filtered_neg = self._filter_neg_links_threshold(corr_links,
+                                                                       -coefficient_threshold)
 
-            # result_dir = os.path.join(self.scratch, str(uuid.uuid4()) + '_network_plots')
-            # self._mkdir_p(result_dir)
-            # graph_path = os.path.join(result_dir, 'network_plot.png')
-            # self.draw_graph(graph, graph_path)
+            sig_links_filtered = None
+            if significance_data:
+                sig_df = self._Matrix2D_to_df(significance_data)
+                sig_links = self._trans_df(sig_df)
+                sig_links_filtered = self._filter_links_threshold(sig_links, significance_threshold)
+
+            links_filtered = self._merge_links(corr_links_filtered_pos,
+                                               corr_links_filtered_neg,
+                                               sig_links_filtered)
+
+            graph = self.df_to_graph(links_filtered, source='source', target='target')
 
         network_obj_ref = self._build_network_object(graph, workspace_name, network_obj_name)
 
