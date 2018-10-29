@@ -200,7 +200,7 @@ class MatrixUtil:
 
         data.update({'data': matrix_data})
 
-        if 'col_attributemapping_ref' in refs:
+        if refs.get('col_attributemapping_ref'):
             res = self.dfu.get_objects({'object_refs': [refs['col_attributemapping_ref']]})['data']
             attri_data = res[0]['data']
             instances = attri_data.get('instances')
@@ -218,7 +218,7 @@ class MatrixUtil:
                                                                         workspace_id)
             data.update({'col_attributemapping_ref': col_attributemapping_ref})
 
-        if 'row_attributemapping_ref' in refs:
+        if refs.get('row_attributemapping_ref'):
             res = self.dfu.get_objects({'object_refs': [refs['row_attributemapping_ref']]})['data']
             attri_data = res[0]['data']
             instances = attri_data.get('instances')
