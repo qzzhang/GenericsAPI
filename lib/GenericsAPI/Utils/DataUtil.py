@@ -375,9 +375,18 @@ class DataUtil:
                 for contained_value in contained_values:
                     subset_value = contained_value.split(' ')[0]
                     super_value = ' '.join(contained_value.split(' ')[1:])
+                    if 'col_mapping' in super_value:
+                        error_msg += 'Column attribute mapping instances'
+                        error_msg += 'should contain all column index from original data\n'
+
+                    if 'row_mapping' in super_value:
+                        error_msg += 'Row attribute mapping instances'
+                        error_msg += 'should contain all row index from original data\n'
+
                     error_msg += 'Object field [{}] should contain field [{}]\n'.format(
                                                                                     super_value,
                                                                                     subset_value)
+
             raise ValueError(error_msg)
 
         workspace_name = params.get('workspace_name')
