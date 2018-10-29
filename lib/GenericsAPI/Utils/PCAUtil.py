@@ -394,7 +394,8 @@ class PCAUtil:
         else:
             if 'attribute_value_color' in plot_pca_matrix.columns and 'attribute_value_size' in plot_pca_matrix.columns:
 
-                sizeref = 2.*float(max(plot_pca_matrix['attribute_value_size']))/(100**2)
+                maximum_marker_size = 10
+                sizeref = 2.*float(max(plot_pca_matrix['attribute_value_size']))/(maximum_marker_size**2)
 
                 for name in set(plot_pca_matrix.attribute_value_color):
                     attribute_value_size = plot_pca_matrix.loc[plot_pca_matrix['attribute_value_color'].eq(name)].attribute_value_size
@@ -427,7 +428,9 @@ class PCAUtil:
                                                                             width=0.5)))
                     traces.append(trace)
             elif 'attribute_value_size' in plot_pca_matrix.columns:
-                sizeref = 2.*float(max(plot_pca_matrix['attribute_value_size']))/(100**2)
+
+                maximum_marker_size = 10
+                sizeref = 2.*float(max(plot_pca_matrix['attribute_value_size']))/(maximum_marker_size**2)
 
                 for name in set(plot_pca_matrix.instance):
                     attribute_value_size = plot_pca_matrix.loc[plot_pca_matrix['instance'].eq(name)].attribute_value_size
