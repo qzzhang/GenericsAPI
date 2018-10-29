@@ -11,6 +11,7 @@ import plotly.graph_objs as go
 from plotly.offline import plot
 import itertools
 import shutil
+import sys
 
 from GenericsAPI.Utils.DataUtil import DataUtil
 from DataFileUtil.DataFileUtilClient import DataFileUtil
@@ -396,6 +397,9 @@ class PCAUtil:
                 sizeref = 2.*float(max(plot_pca_matrix['attribute_value_size']))/(100**2)
 
                 for name in set(plot_pca_matrix.attribute_value_color):
+                    attribute_value_size = plot_pca_matrix.loc[plot_pca_matrix['attribute_value_color'].eq(name)].attribute_value_size
+                    size_list = list(map(abs, list(map(float, attribute_value_size))))
+                    size_list[:] = [sys.float_info.min for x in size_list if x == 0]
                     trace = go.Scatter(
                         x=list(plot_pca_matrix.loc[plot_pca_matrix['attribute_value_color'].eq(name)][components_x]),
                         y=list(plot_pca_matrix.loc[plot_pca_matrix['attribute_value_color'].eq(name)][components_y]),
@@ -404,7 +408,7 @@ class PCAUtil:
                         text=list(plot_pca_matrix.loc[plot_pca_matrix['attribute_value_color'].eq(name)].index),
                         textposition='bottom center',
                         marker=go.Marker(symbol='circle', sizemode='area', sizeref=sizeref,
-                                         size=list(map(float, plot_pca_matrix.loc[plot_pca_matrix['attribute_value_color'].eq(name)].attribute_value_size)),
+                                         size=size_list, sizemin=2,
                                          line=go.Line(color='rgba(217, 217, 217, 0.14)', width=0.5),
                                          opacity=0.8))
                     traces.append(trace)
@@ -424,6 +428,9 @@ class PCAUtil:
                 sizeref = 2.*float(max(plot_pca_matrix['attribute_value_size']))/(100**2)
 
                 for name in set(plot_pca_matrix.instance):
+                    attribute_value_size = plot_pca_matrix.loc[plot_pca_matrix['instance'].eq(name)].attribute_value_size
+                    size_list = list(map(abs, list(map(float, attribute_value_size))))
+                    size_list[:] = [sys.float_info.min for x in size_list if x == 0]
                     trace = go.Scatter(
                         x=list(plot_pca_matrix.loc[plot_pca_matrix['instance'].eq(name)][components_x]),
                         y=list(plot_pca_matrix.loc[plot_pca_matrix['instance'].eq(name)][components_y]),
@@ -432,7 +439,7 @@ class PCAUtil:
                         text=list(plot_pca_matrix.loc[plot_pca_matrix['instance'].eq(name)].index),
                         textposition='bottom center',
                         marker=go.Marker(symbol='circle', sizemode='area', sizeref=sizeref,
-                                         size=list(map(float, plot_pca_matrix.loc[plot_pca_matrix['instance'].eq(name)].attribute_value_size)),
+                                         size=size_list, sizemin=2,
                                          line=go.Line(color='rgba(217, 217, 217, 0.14)', width=0.5),
                                          opacity=0.8))
                     traces.append(trace)
