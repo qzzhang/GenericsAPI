@@ -432,7 +432,6 @@ class PCAUtil:
                 for name in set(plot_pca_matrix.instance):
                     attribute_value_size = plot_pca_matrix.loc[plot_pca_matrix['instance'].eq(name)].attribute_value_size
                     size_list = list(map(abs, list(map(float, attribute_value_size))))
-                    size_list[:] = [sys.float_info.min for x in size_list if x == 0]
                     for idx, val in enumerate(size_list):
                         if val == 0:
                             size_list[idx] = sys.float_info.min
