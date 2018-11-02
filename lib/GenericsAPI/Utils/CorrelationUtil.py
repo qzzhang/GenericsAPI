@@ -495,8 +495,8 @@ class CorrelationUtil:
 
         try:
             trace = go.Heatmap(z=corr_df.values,
-                               x=corr_df.index,
-                               y=corr_df.columns)
+                               x=corr_df.columns,
+                               y=corr_df.index)
             data = [trace]
         except:
             err_msg = 'Running plotly_corr_matrix returned an error:\n{}\n'.format(
