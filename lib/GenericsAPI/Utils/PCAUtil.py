@@ -192,6 +192,8 @@ class PCAUtil:
                                           columns=col,
                                           index=data_df.index)
 
+        rotation_matrix_df.fillna(0, inplace=True)
+
         return rotation_matrix_df, explained_variance_ratio
 
     def _generate_pca_html_report(self, pca_plots, n_components):

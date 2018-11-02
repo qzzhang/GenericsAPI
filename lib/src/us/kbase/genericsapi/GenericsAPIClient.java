@@ -442,6 +442,24 @@ public class GenericsAPIClient {
     }
 
     /**
+     * <p>Original spec-file function name: compute_correlation_across_matrices</p>
+     * <pre>
+     * compute_correlation_across_matrices: compute correlation matrix across matrices
+     * </pre>
+     * @param   params   instance of type {@link us.kbase.genericsapi.CompCorrMetriceParams CompCorrMetriceParams}
+     * @return   parameter "returnVal" of type {@link us.kbase.genericsapi.CompCorrOutput CompCorrOutput}
+     * @throws IOException if an IO exception occurs
+     * @throws JsonClientException if a JSON RPC exception occurs
+     */
+    public CompCorrOutput computeCorrelationAcrossMatrices(CompCorrMetriceParams params, RpcContext... jsonRpcContext) throws IOException, JsonClientException {
+        List<Object> args = new ArrayList<Object>();
+        args.add(params);
+        TypeReference<List<CompCorrOutput>> retType = new TypeReference<List<CompCorrOutput>>() {};
+        List<CompCorrOutput> res = caller.jsonrpcCall("GenericsAPI.compute_correlation_across_matrices", args, retType, true, true, jsonRpcContext, this.serviceVersion);
+        return res.get(0);
+    }
+
+    /**
      * <p>Original spec-file function name: build_network</p>
      * <pre>
      * build_network: filter correlation matrix and build network

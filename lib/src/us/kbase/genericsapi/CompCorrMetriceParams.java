@@ -12,16 +12,16 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 
 /**
- * <p>Original spec-file type: CompCorrParams</p>
+ * <p>Original spec-file type: CompCorrMetriceParams</p>
  * <pre>
- * Input of the compute_correlation_matrix function
- * input_obj_ref: object reference of a matrix
+ * Input of the compute_correlation_across_matrices function
+ * matrix_ref_1: object reference of a matrix
+ * matrix_ref_2: object reference of a matrix
  * workspace_name: workspace name objects to be saved to
  * corr_matrix_name: correlation matrix object name
  * dimension: compute correlation on column or row, one of ['col', 'row']
  * method: correlation method, one of ['pearson', 'kendall', 'spearman']
  * plot_corr_matrix: plot correlation matrix in report, default False
- * plot_scatter_matrix: plot scatter matrix in report, default False
  * compute_significance: also compute Significance in addition to correlation matrix
  * </pre>
  * 
@@ -29,19 +29,21 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Generated("com.googlecode.jsonschema2pojo")
 @JsonPropertyOrder({
-    "input_obj_ref",
+    "matrix_ref_1",
+    "matrix_ref_2",
     "workspace_name",
     "corr_matrix_name",
     "dimension",
     "method",
     "plot_corr_matrix",
-    "plot_scatter_matrix",
     "compute_significance"
 })
-public class CompCorrParams {
+public class CompCorrMetriceParams {
 
-    @JsonProperty("input_obj_ref")
-    private String inputObjRef;
+    @JsonProperty("matrix_ref_1")
+    private String matrixRef1;
+    @JsonProperty("matrix_ref_2")
+    private String matrixRef2;
     @JsonProperty("workspace_name")
     private String workspaceName;
     @JsonProperty("corr_matrix_name")
@@ -52,24 +54,37 @@ public class CompCorrParams {
     private String method;
     @JsonProperty("plot_corr_matrix")
     private Long plotCorrMatrix;
-    @JsonProperty("plot_scatter_matrix")
-    private Long plotScatterMatrix;
     @JsonProperty("compute_significance")
     private Long computeSignificance;
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
-    @JsonProperty("input_obj_ref")
-    public String getInputObjRef() {
-        return inputObjRef;
+    @JsonProperty("matrix_ref_1")
+    public String getMatrixRef1() {
+        return matrixRef1;
     }
 
-    @JsonProperty("input_obj_ref")
-    public void setInputObjRef(String inputObjRef) {
-        this.inputObjRef = inputObjRef;
+    @JsonProperty("matrix_ref_1")
+    public void setMatrixRef1(String matrixRef1) {
+        this.matrixRef1 = matrixRef1;
     }
 
-    public CompCorrParams withInputObjRef(String inputObjRef) {
-        this.inputObjRef = inputObjRef;
+    public CompCorrMetriceParams withMatrixRef1(String matrixRef1) {
+        this.matrixRef1 = matrixRef1;
+        return this;
+    }
+
+    @JsonProperty("matrix_ref_2")
+    public String getMatrixRef2() {
+        return matrixRef2;
+    }
+
+    @JsonProperty("matrix_ref_2")
+    public void setMatrixRef2(String matrixRef2) {
+        this.matrixRef2 = matrixRef2;
+    }
+
+    public CompCorrMetriceParams withMatrixRef2(String matrixRef2) {
+        this.matrixRef2 = matrixRef2;
         return this;
     }
 
@@ -83,7 +98,7 @@ public class CompCorrParams {
         this.workspaceName = workspaceName;
     }
 
-    public CompCorrParams withWorkspaceName(String workspaceName) {
+    public CompCorrMetriceParams withWorkspaceName(String workspaceName) {
         this.workspaceName = workspaceName;
         return this;
     }
@@ -98,7 +113,7 @@ public class CompCorrParams {
         this.corrMatrixName = corrMatrixName;
     }
 
-    public CompCorrParams withCorrMatrixName(String corrMatrixName) {
+    public CompCorrMetriceParams withCorrMatrixName(String corrMatrixName) {
         this.corrMatrixName = corrMatrixName;
         return this;
     }
@@ -113,7 +128,7 @@ public class CompCorrParams {
         this.dimension = dimension;
     }
 
-    public CompCorrParams withDimension(String dimension) {
+    public CompCorrMetriceParams withDimension(String dimension) {
         this.dimension = dimension;
         return this;
     }
@@ -128,7 +143,7 @@ public class CompCorrParams {
         this.method = method;
     }
 
-    public CompCorrParams withMethod(String method) {
+    public CompCorrMetriceParams withMethod(String method) {
         this.method = method;
         return this;
     }
@@ -143,23 +158,8 @@ public class CompCorrParams {
         this.plotCorrMatrix = plotCorrMatrix;
     }
 
-    public CompCorrParams withPlotCorrMatrix(Long plotCorrMatrix) {
+    public CompCorrMetriceParams withPlotCorrMatrix(Long plotCorrMatrix) {
         this.plotCorrMatrix = plotCorrMatrix;
-        return this;
-    }
-
-    @JsonProperty("plot_scatter_matrix")
-    public Long getPlotScatterMatrix() {
-        return plotScatterMatrix;
-    }
-
-    @JsonProperty("plot_scatter_matrix")
-    public void setPlotScatterMatrix(Long plotScatterMatrix) {
-        this.plotScatterMatrix = plotScatterMatrix;
-    }
-
-    public CompCorrParams withPlotScatterMatrix(Long plotScatterMatrix) {
-        this.plotScatterMatrix = plotScatterMatrix;
         return this;
     }
 
@@ -173,7 +173,7 @@ public class CompCorrParams {
         this.computeSignificance = computeSignificance;
     }
 
-    public CompCorrParams withComputeSignificance(Long computeSignificance) {
+    public CompCorrMetriceParams withComputeSignificance(Long computeSignificance) {
         this.computeSignificance = computeSignificance;
         return this;
     }
@@ -190,7 +190,7 @@ public class CompCorrParams {
 
     @Override
     public String toString() {
-        return ((((((((((((((((((("CompCorrParams"+" [inputObjRef=")+ inputObjRef)+", workspaceName=")+ workspaceName)+", corrMatrixName=")+ corrMatrixName)+", dimension=")+ dimension)+", method=")+ method)+", plotCorrMatrix=")+ plotCorrMatrix)+", plotScatterMatrix=")+ plotScatterMatrix)+", computeSignificance=")+ computeSignificance)+", additionalProperties=")+ additionalProperties)+"]");
+        return ((((((((((((((((((("CompCorrMetriceParams"+" [matrixRef1=")+ matrixRef1)+", matrixRef2=")+ matrixRef2)+", workspaceName=")+ workspaceName)+", corrMatrixName=")+ corrMatrixName)+", dimension=")+ dimension)+", method=")+ method)+", plotCorrMatrix=")+ plotCorrMatrix)+", computeSignificance=")+ computeSignificance)+", additionalProperties=")+ additionalProperties)+"]");
     }
 
 }

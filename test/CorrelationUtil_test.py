@@ -118,6 +118,28 @@ class CorrUtilTest(unittest.TestCase):
         print('Loaded ExpressionMatrix: ' + expr_matrix_ref)
         return expr_matrix_ref
 
+    def loadExpressionMatrix2(self):
+        if hasattr(self.__class__, 'expr_matrix_ref_2'):
+            return self.__class__.expr_matrix_ref_2
+
+        matrix_file_name = 'test_import_2.xlsx'
+        matrix_file_path = os.path.join(self.scratch, matrix_file_name)
+        shutil.copy(os.path.join('data', matrix_file_name), matrix_file_path)
+
+        obj_type = 'ExpressionMatrix'
+        params = {'obj_type': obj_type,
+                  'matrix_name': 'test_ExpressionMatrix_2',
+                  'workspace_name': self.wsName,
+                  'input_file_path': matrix_file_path,
+                  'scale': "log2",
+                  }
+        expr_matrix_ref_2 = self.serviceImpl.import_matrix_from_excel(
+            self.ctx, params)[0].get('matrix_obj_ref')
+
+        self.__class__.expr_matrix_ref_2 = expr_matrix_ref_2
+        print('Loaded ExpressionMatrix: ' + expr_matrix_ref_2)
+        return expr_matrix_ref_2
+
     def loadCorrData(self):
         if hasattr(self.__class__, 'corr_data'):
             return self.__class__.corr_data
@@ -192,7 +214,16 @@ class CorrUtilTest(unittest.TestCase):
         with self.assertRaises(exception) as context:
             self.getImpl().compute_correlation_matrix(self.ctx, params)
         if contains:
-            self.assertIn(error, str(context.exception.args))
+            self.assertIn(error, str(context.exception.args[0]))
+        else:
+            self.assertEqual(error, str(context.exception.args[0]))
+
+    def fail_compute_correlation_across_matrices(self, params, error, exception=ValueError,
+                                                 contains=False):
+        with self.assertRaises(exception) as context:
+            self.getImpl().compute_correlation_across_matrices(self.ctx, params)
+        if contains:
+            self.assertIn(error, str(context.exception.args[0]))
         else:
             self.assertEqual(error, str(context.exception.args[0]))
 
@@ -236,6 +267,53 @@ class CorrUtilTest(unittest.TestCase):
         expected_col = ['WRI_RS00010_CDS_1', 'WRI_RS00015_CDS_1', 'WRI_RS00025_CDS_1']
         self.assertCountEqual(df.index.tolist(), expected_index)
         self.assertCountEqual(df.columns.tolist(), expected_col)
+
+    def test_compute_correlation_across_matrices_fail(self):
+        self.start_test()
+
+        invalidate_params = {'missing_matrix_ref_1': 'matrix_ref_1',
+                             'matrix_ref_2': 'matrix_ref_2',
+                             'workspace_name': 'workspace_name',
+                             'corr_matrix_name': 'corr_matrix_name'}
+        error_msg = '"matrix_ref_1" parameter is required, but missing'
+        self.fail_compute_correlation_across_matrices(invalidate_params, error_msg)
+
+        invalidate_params = {'matrix_ref_1': 'matrix_ref_1',
+                             'matrix_ref_2': 'matrix_ref_2',
+                             'missing_workspace_name': 'workspace_name',
+                             'corr_matrix_name': 'corr_matrix_name'}
+        error_msg = '"workspace_name" parameter is required, but missing'
+        self.fail_compute_correlation_across_matrices(invalidate_params, error_msg)
+
+    def test_compute_correlation_across_matrices_ok(self):
+        self.start_test()
+        expr_matrix_ref = self.loadExpressionMatrix()
+        expr_matrix_ref_2 = self.loadExpressionMatrix2()
+
+        params = {'matrix_ref_1': expr_matrix_ref,
+                  'matrix_ref_2': expr_matrix_ref_2,
+                  'workspace_name': self.wsName,
+                  'corr_matrix_name': 'test_corr_matrix',
+                  'plot_corr_matrix': True,
+                  'compute_significance': True}
+
+        ret = self.getImpl().compute_correlation_across_matrices(self.ctx, params)[0]
+
+        self.assertIn('corr_matrix_obj_ref', ret)
+        corr_matrix_obj_ref = ret.get('corr_matrix_obj_ref')
+
+        res = self.dfu.get_objects({'object_refs': [corr_matrix_obj_ref]})['data'][0]
+        obj_data = res['data']
+
+        self.assertEqual(obj_data.get('correlation_parameters').get('method'), 'pearson')
+
+        expected_index = ['WRI_RS00010_CDS_1', 'WRI_RS00015_CDS_1', 'WRI_RS00025_CDS_1']
+        expected_col = ['gene_1', 'gene_2', 'gene_3']
+        self.assertCountEqual(obj_data.get('coefficient_data').get('row_ids'), expected_index)
+        self.assertCountEqual(obj_data.get('coefficient_data').get('col_ids'), expected_col)
+
+        self.assertCountEqual(obj_data.get('significance_data').get('row_ids'), expected_index)
+        self.assertCountEqual(obj_data.get('significance_data').get('col_ids'), expected_col)
 
     def test_compute_correlation_matrix_fail(self):
         self.start_test()

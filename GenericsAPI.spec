@@ -5,7 +5,6 @@ A KBase module: GenericsAPI
 
 module GenericsAPI {
   /* A boolean - 0 for false, 1 for true.
-    @range (0, 1)
   */
   typedef int boolean;
 
@@ -246,7 +245,7 @@ module GenericsAPI {
         returns (ExportOutput result) authentication required;
 
 
-  /* Input of the filter_matrix function
+  /* Input of the compute_correlation_matrix function
     input_obj_ref: object reference of a matrix
     workspace_name: workspace name objects to be saved to
     corr_matrix_name: correlation matrix object name
@@ -276,6 +275,29 @@ module GenericsAPI {
   /* compute_correlation_matrix: create sub-matrix based on input filter_ids*/
   funcdef compute_correlation_matrix (CompCorrParams params) returns (CompCorrOutput returnVal) authentication required;
 
+  /* Input of the compute_correlation_across_matrices function
+    matrix_ref_1: object reference of a matrix
+    matrix_ref_2: object reference of a matrix
+    workspace_name: workspace name objects to be saved to
+    corr_matrix_name: correlation matrix object name
+    dimension: compute correlation on column or row, one of ['col', 'row']
+    method: correlation method, one of ['pearson', 'kendall', 'spearman']
+    plot_corr_matrix: plot correlation matrix in report, default False
+    compute_significance: also compute Significance in addition to correlation matrix
+  */
+  typedef structure {
+      obj_ref matrix_ref_1;
+      obj_ref matrix_ref_2;
+      workspace_name workspace_name;
+      string corr_matrix_name;
+      string dimension;
+      string method;
+      boolean plot_corr_matrix;
+      boolean compute_significance;
+  } CompCorrMetriceParams;
+
+  /* compute_correlation_across_matrices: compute correlation matrix across matrices*/
+  funcdef compute_correlation_across_matrices (CompCorrMetriceParams params) returns (CompCorrOutput returnVal) authentication required;
 
   /* Input of the build_network function
     corr_matrix_ref: CorrelationMatrix object

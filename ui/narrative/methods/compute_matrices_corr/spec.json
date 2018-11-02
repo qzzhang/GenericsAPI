@@ -1,0 +1,159 @@
+{
+  "ver" : "",
+  "authors" : ["tgu2"],
+  "contact" : "http://kbase.us/contact-us/",
+  "visible" : true,
+  "categories" : ["active","util"],
+  "widgets": {
+    "input": "kbaseNarrativeMethodInput",
+    "output" : "no-display"
+  },
+  "parameters" : [
+    {
+      "id" : "matrix_ref_1",
+      "optional" : false,
+      "advanced" : false,
+      "allow_multiple" : false,
+      "default_values" : [ "" ],
+      "field_type" : "text",
+      "text_options" : {
+        "valid_ws_types" : ["KBaseMatrices"]
+      }
+    },
+    {
+      "id" : "matrix_ref_2",
+      "optional" : false,
+      "advanced" : false,
+      "allow_multiple" : false,
+      "default_values" : [ "" ],
+      "field_type" : "text",
+      "text_options" : {
+        "valid_ws_types" : ["KBaseMatrices"]
+      }
+    },
+    {
+      "id" : "method",
+      "optional" : false,
+      "advanced" : true,
+      "allow_multiple" : false,
+      "default_values" : ["pearson"],
+      "field_type" : "dropdown",
+      "dropdown_options": 
+      {
+        "options": 
+        [
+          {
+              "display": "Pearson",
+              "value": "pearson"
+          },
+          {
+              "display": "Kendall Tau",
+              "value": "kendall"
+          },
+          {
+              "display": "Spearman Rank",
+              "value": "spearman"
+          }
+        ]
+      }
+    },
+    {
+      "id": "plot_corr_matrix",
+      "optional":false,
+      "advanced":true,
+      "allow_multiple":false,
+      "default_values":[1],
+      "field_type" : "checkbox",
+      "checkbox_options":{
+        "checked_value": 1,
+        "unchecked_value": 0
+        }
+    },
+    {
+      "id": "compute_significance",
+      "optional":false,
+      "advanced":true,
+      "allow_multiple":false,
+      "default_values":[1],
+      "field_type" : "checkbox",
+      "checkbox_options":{
+        "checked_value": 1,
+        "unchecked_value": 0
+        }
+    },
+    {
+      "id" : "corr_matrix_name",
+      "optional" : false,
+      "advanced" : false,
+      "allow_multiple" : false,
+      "default_values" : [ "" ],
+      "field_type" : "text",
+      "text_options" : {
+          "valid_ws_types" : ["KBaseExperiments.CorrelationMatrix"],
+          "is_output_name" : true
+        }
+    }
+  ],
+  "behavior" : {
+    "service-mapping" : {
+      "url" : "",
+      "name" : "GenericsAPI",
+      "method" : "compute_correlation_across_matrices",
+      "input_mapping" : [
+        {
+          "narrative_system_variable": "workspace",
+          "target_property": "workspace_name"
+        },
+        {
+          "input_parameter" : "matrix_ref_1",
+          "target_property" : "matrix_ref_1",
+          "target_type_transform": "resolved-ref"
+        },
+        {
+          "input_parameter" : "matrix_ref_2",
+          "target_property" : "matrix_ref_2",
+          "target_type_transform": "resolved-ref"
+        },
+        {
+          "input_parameter" : "method",
+          "target_property" : "method"
+        },
+        {
+          "input_parameter" : "plot_corr_matrix",
+          "target_property" : "plot_corr_matrix"
+        },
+        {
+          "input_parameter" : "compute_significance",
+          "target_property" : "compute_significance"
+        },
+        {
+          "input_parameter" : "corr_matrix_name",
+          "target_property" : "corr_matrix_name"
+        }
+      ],
+      "output_mapping" : [
+        {
+          "narrative_system_variable": "workspace",
+          "target_property": "wsName"
+        },
+        {
+            "service_method_output_path": [0, "corr_matrix_obj_ref"],
+            "target_property": "corr_matrix_obj_ref"
+        },
+        {
+            "service_method_output_path": [0, "report_name"],
+            "target_property": "report_name"
+        },
+        {
+            "service_method_output_path": [0, "report_ref"],
+            "target_property": "report_ref"
+        },
+        {
+            "constant_value": "16",
+            "target_property": "report_window_line_height"
+        }
+      ]
+    }
+  },
+  "job_id_output_field": "docker"
+}
