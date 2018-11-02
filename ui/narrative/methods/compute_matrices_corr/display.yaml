@@ -1,0 +1,72 @@
+name     : Compute Correlation Matrix Between Two Matrices
+subtitle : Compute Correlation Matrix Between Two Matrices
+tooltip  : Compute Correlation Matrix Between Two Matrices
+
+icon: data-blue.png
+
+screenshots :
+    []
+
+suggestions :
+    apps:
+        related :
+            []
+        next :
+            []
+    methods:
+        related :
+            []
+        next :
+            []
+
+parameters :
+    matrix_ref_1 :
+        ui-name: |
+            Matrix Object One
+        short-hint : |
+            One of KBaseMatrices object
+        long-hint  : |
+            One of KBaseMatrices object
+
+    matrix_ref_2 :
+        ui-name: |
+            Matrix Object Two
+        short-hint : |
+            One of KBaseMatrices object
+        long-hint  : |
+            One of KBaseMatrices object
+
+    method:
+        ui-name: |
+            Correlation Method
+        short-hint : |
+            Correlation method, one of ['pearson', 'kendall', 'spearman']
+        long-hint  : |
+            Correlation method, one of ['pearson', 'kendall', 'spearman']
+
+    plot_corr_matrix:
+        ui-name: |
+            Plot Correlation Matrix Heatmap
+        short-hint : |
+            Plot correlation matrix in report
+        long-hint  : |
+            Plot correlation matrix in report
+
+    compute_significance:
+        ui-name: |
+            Compute Significance
+        short-hint : |
+            Also compute Significance in addition to correlation matrix
+        long-hint  : |
+            Also compute Significance in addition to correlation matrix
+
+    corr_matrix_name:
+        ui-name: |
+            Correlation Matrix Name
+        short-hint : |
+            Correlation Matrix Name
+        long-hint  : |
+            Correlation Matrix Name
+
+description : |
+    <p> Compute Correlation Matrix Between Two Matrices </p>

@@ -20,7 +20,8 @@ def log(message, prefix_newline=False):
     time_str = time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime(time.time()))
     print(('\n' if prefix_newline else '') + time_str + ': ' + message)
 
-CORR_METHOD = ['pearson', 'kendall', 'spearman']   # correlation method
+
+CORR_METHOD = ['pearson', 'kendall', 'spearman']  # correlation method
 
 
 class CorrelationUtil:
@@ -52,6 +53,19 @@ class CorrelationUtil:
             if p not in params:
                 raise ValueError('"{}" parameter is required, but missing'.format(p))
 
+    def _validate_compute_correlation_across_matrices_params(self, params):
+        """
+        _validate_compute_correlation_across_matrices_params:
+            validates params passed to compute_correlation_across_matrices method
+        """
+
+        log('start validating compute_correlation_across_matrices params')
+
+        # check for required parameters
+        for p in ['workspace_name', 'corr_matrix_name', 'matrix_ref_1', 'matrix_ref_2']:
+            if p not in params:
+                raise ValueError('"{}" parameter is required, but missing'.format(p))
+
     def _build_table_content(self, matrix_2D):
         """
         _build_table_content: generate HTML table content for FloatMatrix2D object
@@ -66,8 +80,8 @@ class CorrelationUtil:
         # build header row
         table_content += """\n<tr>\n"""
         table_content += """\n <td></td>\n"""
-        for row_id in row_ids:
-            table_content += """\n <td>{}</td>\n""".format(row_id)
+        for col_id in col_ids:
+            table_content += """\n <td>{}</td>\n""".format(col_id)
         table_content += """\n</tr>\n"""
 
         # build body rows
@@ -227,7 +241,7 @@ class CorrelationUtil:
         return html_report
 
     def _generate_corr_report(self, corr_matrix_obj_ref, workspace_name, corr_matrix_plot_path,
-                              scatter_plot_path):
+                              scatter_plot_path=None):
         """
         _generate_report: generate summary report
         """
@@ -300,7 +314,7 @@ class CorrelationUtil:
         return matrix_data
 
     def _save_corr_matrix(self, workspace_name, corr_matrix_name, corr_df, sig_df, method,
-                          matrix_ref):
+                          matrix_ref=None):
         """
         _save_corr_matrix: save KBaseExperiments.CorrelationMatrix object
         """
@@ -314,7 +328,8 @@ class CorrelationUtil:
 
         corr_data.update({'coefficient_data': self._df_to_list(corr_df)})
         corr_data.update({'correlation_parameters': {'method': method}})
-        corr_data.update({'original_matrix_ref': matrix_ref})
+        if matrix_ref:
+            corr_data.update({'original_matrix_ref': matrix_ref})
 
         if sig_df is not None:
             corr_data.update({'significance_data': self._df_to_list(sig_df)})
@@ -380,6 +395,61 @@ class CorrelationUtil:
             significance_df.to_excel(writer, "significance_data", index=True)
 
         writer.close()
+
+    def _fetch_matrix_data(self, matrix_ref):
+
+        res = self.dfu.get_objects({'object_refs': [matrix_ref]})['data'][0]
+        obj_type = res['info'][2]
+
+        if "KBaseMatrices" in obj_type:
+            data_matrix = self.data_util.fetch_data({'obj_ref': matrix_ref}).get('data_matrix')
+            data_df = pd.read_json(data_matrix)
+            return data_df
+        else:
+            err_msg = 'Ooops! [{}] is not supported.\n'.format(obj_type)
+            err_msg += 'Please supply KBaseMatrices object'
+            raise ValueError("err_msg")
+
+    def _compute_metrices_corr(self, df1, df2, method, compute_significance):
+
+        col_1 = df1.columns
+        col_2 = df2.columns
+        idx_1 = df1.index
+        idx_2 = df2.index
+
+        common_col = col_1.intersection(col_2)
+
+        if common_col.empty:
+            raise ValueError('Matrices share no common columns')
+
+        corr_df = pd.DataFrame(index=idx_1, columns=idx_2)
+        sig_df = pd.DataFrame(index=idx_1, columns=idx_2)
+
+        for idx_value in idx_1:
+            for col_value in idx_2:
+
+                value_array_1 = df1.loc[[idx_value]][common_col].values[0]
+                value_array_2 = df2.loc[[col_value]][common_col].values[0]
+
+                if method == 'pearson':
+                    corr_value, p_value = stats.pearsonr(value_array_1, value_array_2)
+                elif method == 'spearman':
+                    corr_value, p_value = stats.spearmanr(value_array_1, value_array_2)
+                elif method == 'kendall':
+                    corr_value, p_value = stats.kendalltau(value_array_1, value_array_2)
+                else:
+                    err_msg = 'Input correlation method [{}] is not available.\n'.format(method)
+                    err_msg += 'Please choose one of {}'.format(CORR_METHOD)
+                    raise ValueError(err_msg)
+
+                corr_df.at[idx_value, col_value] = round(corr_value, 4)
+                if compute_significance:
+                    sig_df.at[idx_value, col_value] = round(p_value, 4)
+
+        if not compute_significance:
+            sig_df = None
+
+        return corr_df, sig_df
 
     def __init__(self, config):
         self.ws_url = config["workspace-url"]
@@ -514,6 +584,59 @@ class CorrelationUtil:
             plt.savefig(scatter_plot_path)
 
         return scatter_plot_path
+
+    def compute_correlation_across_matrices(self, params):
+        """
+        matrix_ref_1: object reference of a matrix
+        matrix_ref_2: object reference of a matrix
+        workspace_name: workspace name objects to be saved to
+        corr_matrix_name: correlation matrix object name
+        dimension: compute correlation on column or row, one of ['col', 'row']
+        method: correlation method, one of ['pearson', 'kendall', 'spearman']
+        plot_corr_matrix: plot correlation matrix in report, default False
+        compute_significance: also compute Significance in addition to correlation matrix
+        """
+
+        log('--->\nrunning CorrelationUtil.compute_correlation_across_matrices\n' +
+            'params:\n{}'.format(json.dumps(params, indent=1)))
+
+        self._validate_compute_correlation_across_matrices_params(params)
+
+        matrix_ref_1 = params.get('matrix_ref_1')
+        matrix_ref_2 = params.get('matrix_ref_2')
+        workspace_name = params.get('workspace_name')
+        corr_matrix_name = params.get('corr_matrix_name')
+
+        method = params.get('method', 'pearson')
+        if method not in CORR_METHOD:
+            err_msg = 'Input correlation method [{}] is not available.\n'.format(method)
+            err_msg += 'Please choose one of {}'.format(CORR_METHOD)
+            raise ValueError(err_msg)
+        dimension = params.get('dimension', 'row')
+        plot_corr_matrix = params.get('plot_corr_matrix', False)
+        compute_significance = params.get('compute_significance', False)
+
+        df1 = self._fetch_matrix_data(matrix_ref_1)
+        df2 = self._fetch_matrix_data(matrix_ref_2)
+
+        corr_df, sig_df = self._compute_metrices_corr(df1, df2, method, compute_significance)
+
+        if plot_corr_matrix:
+            corr_matrix_plot_path = self.plotly_corr_matrix(corr_df)
+        else:
+            corr_matrix_plot_path = None
+
+        corr_matrix_obj_ref = self._save_corr_matrix(workspace_name, corr_matrix_name, corr_df,
+                                                     sig_df, method)
+
+        returnVal = {'corr_matrix_obj_ref': corr_matrix_obj_ref}
+
+        report_output = self._generate_corr_report(corr_matrix_obj_ref, workspace_name,
+                                                   corr_matrix_plot_path)
+
+        returnVal.update(report_output)
+
+        return returnVal
 
     def compute_correlation_matrix(self, params):
         """

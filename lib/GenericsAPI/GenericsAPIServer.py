@@ -397,6 +397,10 @@ class Application(object):
                              name='GenericsAPI.compute_correlation_matrix',
                              types=[dict])
         self.method_authentication['GenericsAPI.compute_correlation_matrix'] = 'required'  # noqa
+        self.rpc_service.add(impl_GenericsAPI.compute_correlation_across_matrices,
+                             name='GenericsAPI.compute_correlation_across_matrices',
+                             types=[dict])
+        self.method_authentication['GenericsAPI.compute_correlation_across_matrices'] = 'required'  # noqa
         self.rpc_service.add(impl_GenericsAPI.build_network,
                              name='GenericsAPI.build_network',
                              types=[dict])
