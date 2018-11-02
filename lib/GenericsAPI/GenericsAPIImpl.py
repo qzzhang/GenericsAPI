@@ -30,7 +30,7 @@ class GenericsAPI:
     ######################################### noqa
     VERSION = "0.0.1"
     GIT_URL = "git@github.com:Tianhao-Gu/GenericsAPI.git"
-    GIT_COMMIT_HASH = "dfc9ee7df3dc7a2675f225a05b4d71d784e24b90"
+    GIT_COMMIT_HASH = "6ad706b2d4720eb69756375e438811a7f472314c"
 
     #BEGIN_CLASS_HEADER
     logging.basicConfig(format='%(asctime)s %(levelname)-8s %(message)s',
