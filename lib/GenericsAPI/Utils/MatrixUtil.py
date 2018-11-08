@@ -200,40 +200,27 @@ class MatrixUtil:
 
         data.update({'data': matrix_data})
 
-        if refs.get('col_attributemapping_ref'):
-            res = self.dfu.get_objects({'object_refs': [refs['col_attributemapping_ref']]})['data']
-            attri_data = res[0]['data']
-            instances = attri_data.get('instances')
-            key_values = instances.keys()
-            if key_values:
-                col_mapping = {key: value for (key, value) in zip(key_values, key_values)}
-                data.update({'col_mapping': col_mapping})
-        else:
-            col_mapping = self._process_mapping_sheet(file_path, 'col_mapping')
+        # Column and row mappings are optional
+        col_mapping = self._process_mapping_sheet(file_path, 'col_mapping')
+        if col_mapping:
             data.update({'col_mapping': col_mapping})
-            col_attributemapping_ref = self._process_attribute_mapping_sheet(
-                                                                        file_path,
-                                                                        'col_attribute_mapping',
-                                                                        matrix_name,
-                                                                        workspace_id)
+
+        row_mapping = self._process_mapping_sheet(file_path, 'row_mapping')
+        if row_mapping:
+            data.update({'row_mapping': row_mapping})
+
+        col_attributemapping_ref = self._process_attribute_mapping_sheet(
+            file_path, 'col_attribute_mapping', matrix_name, workspace_id)
+
+        # Parameter specified mappings should take precedence over tabs in excel
+        if col_attributemapping_ref and not refs.get('col_attributemapping_ref'):
             data.update({'col_attributemapping_ref': col_attributemapping_ref})
 
-        if refs.get('row_attributemapping_ref'):
-            res = self.dfu.get_objects({'object_refs': [refs['row_attributemapping_ref']]})['data']
-            attri_data = res[0]['data']
-            instances = attri_data.get('instances')
-            key_values = instances.keys()
-            if key_values:
-                row_mapping = {key: value for (key, value) in zip(key_values, key_values)}
-                data.update({'row_mapping': row_mapping})
-        else:
-            row_mapping = self._process_mapping_sheet(file_path, 'row_mapping')
-            row_attributemapping_ref = self._process_attribute_mapping_sheet(
-                                                                        file_path,
-                                                                        'row_attribute_mapping',
-                                                                        matrix_name,
-                                                                        workspace_id)
-            data.update({'row_mapping': row_mapping})
+        row_attributemapping_ref = self._process_attribute_mapping_sheet(
+            file_path, 'row_attribute_mapping', matrix_name, workspace_id)
+
+        # Parameter specified mappings should take precedence over tabs in excel
+        if row_attributemapping_ref and not refs.get('row_attributemapping_ref'):
             data.update({'row_attributemapping_ref': row_attributemapping_ref})
 
         # processing metadata
