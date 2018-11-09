@@ -1,4 +1,4 @@
-name     : Import MetaboliteMatrix from CSV/Excel File in Staging Area
+name     : Import Metabolite Matrix from CSV/Excel File in Staging Area
 subtitle : Import a CSV or Excel file from your staging area into your Narrative as an MetaboliteMatrix data object
 tooltip  : Import a CSV or Excel file from your staging area into your Narrative as an MetaboliteMatrix data object
 
