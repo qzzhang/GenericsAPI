@@ -196,7 +196,7 @@ class MatrixUtil:
                     inferred_sep = reader._engine.data.dialect.delimiter
                     df = pd.read_csv(file_path, sep=inferred_sep, index_col=0)
                 except Exception:
-                    raise ValueError('Cannot parse file. Please provide valide excel or csv file')
+                    raise ValueError('Cannot parse file. Please provide valide tsv, excel or csv file')
 
         df.fillna(0, inplace=True)
 
