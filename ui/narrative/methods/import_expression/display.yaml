@@ -1,6 +1,6 @@
-name     : Import Matrix from Staging Area
-subtitle : Import a CSV or Excel file from your staging area into your Narrative as an Matrix data object
-tooltip  : Import a CSV or Excel file from your staging area into your Narrative as an Matrix data object
+name     : Import Expression Matrix from CSV/Excel/TSV File in Staging Area
+subtitle : Import a CSV, Excel or TSV file from your staging area into your Narrative as an ExpressionMatrix data object
+tooltip  : Import a CSV, Excel or TSV file from your staging area into your Narrative as an ExpressionMatrix data object
 
 icon: data-blue.png
 
@@ -20,13 +20,6 @@ suggestions :
             []
 
 parameters :
-    obj_type :
-        ui-name: |
-            Matrix Type
-        short-hint : |
-            One of ExpressionMatrix, FitnessMatrix, DifferentialExpressionMatrix
-        long-hint  : |
-            One of ExpressionMatrix, FitnessMatrix, DifferentialExpressionMatrix
 
     input_staging_file_path :
         ui-name : |
@@ -44,6 +37,14 @@ parameters :
       long-hint  : |
           Scale factor for the data in the matrix
 
+    description:
+      ui-name : |
+          Description
+      short-hint : |
+          Describe the matrix
+      long-hint  : |
+          Describe the matrix
+
     matrix_name :
         ui-name : |
             Matrix Object Name
@@ -51,14 +52,6 @@ parameters :
             Provide a name for the Matrix that will be created by this importer
         long-hint : |
             Provide a name for the Matrix that will be created by this importer
-
-    genome_ref :
-        ui-name : |
-            Genome Reference
-        short-hint : |
-            Provide a Genome associated with Matrix
-        long-hint : |
-            Provide a Genome associated with Matrix
 
     col_attributemapping_ref :
         ui-name : |
@@ -76,6 +69,14 @@ parameters :
         long-hint : |
             Provide a AttributeMapping associated with row in data set
 
+    genome_ref :
+        ui-name : |
+            Genome Reference
+        short-hint : |
+            Provide a Genome associated with Matrix
+        long-hint : |
+            Provide a Genome associated with Matrix
+
     diff_expr_matrix_ref :
         ui-name : |
             DifferentialExpressionMatrix Reference
@@ -84,6 +85,7 @@ parameters :
         long-hint : |
             Provide a DifferentialExpressionMatrix associated with Matrix
 
+
 description : |
-    <p> Import a CSV or Excel file from your staging area into your Narrative as an Matrix data object.
+    <p> Import a CSV, Excel or TSV file from your staging area into your Narrative as an MetaboliteMatrix data object.
     Please see the <a href="http://kbase.us/data-upload-download-guide/">Data Upload/Download Guide</a> for more information. </p>

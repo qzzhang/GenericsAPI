@@ -177,23 +177,37 @@ class MatrixUtil:
 
             return ref.get('attribute_mapping_ref')
 
-    def _file_to_data(self, file_path, refs, matrix_name, workspace_id):
-        log('Start reading and converting excel file data')
-        data = refs
+    def _file_to_df(self, file_path):
+        log('start parsing file content to data frame')
 
         try:
-            df = pd.read_excel(file_path, sheet_name='data')
+            df = pd.read_excel(file_path, sheet_name='data', index_col=0)
 
         except XLRDError:
             try:
-                df = pd.read_excel(file_path)
+                df = pd.read_excel(file_path, index_col=0)
                 print('WARNING: A sheet named "data" was not found in the attached file, '
                       'proceeding with the first sheet as the data sheet.')
 
             except XLRDError:
-                df = pd.read_csv(file_path, index_col=0)
+
+                try:
+                    reader = pd.read_csv(file_path, sep=None, iterator=True)
+                    inferred_sep = reader._engine.data.dialect.delimiter
+                    df = pd.read_csv(file_path, sep=inferred_sep, index_col=0)
+                except Exception:
+                    raise ValueError('Cannot parse file. Please provide valide tsv, excel or csv file')
 
         df.fillna(0, inplace=True)
+
+        return df
+
+    def _file_to_data(self, file_path, refs, matrix_name, workspace_id):
+        log('Start reading and converting excel file data')
+        data = refs
+
+        df = self._file_to_df(file_path)
+
         matrix_data = {'row_ids': df.index.tolist(),
                        'col_ids': df.columns.tolist(),
                        'values': df.values.tolist()}
