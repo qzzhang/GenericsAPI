@@ -427,7 +427,17 @@ class GenericsAPITest(unittest.TestCase):
                       }
             returnVal = self.getImpl().import_matrix_from_excel(self.ctx, params)[0]
 
-
+        with self.assertRaisesRegex(ValueError, "Row IDs from the uploaded matrix do not match"):
+            params = {'obj_type': 'MetaboliteMatrix',
+                      'matrix_name': 'test_MetaboliteMatrix',
+                      'workspace_name': self.wsName,
+                      'input_file_path': os.path.join('data', 'generic_data.csv'),
+                      'scale': 'log2',
+                      'biochemistry_ref': 'kbase/default',
+                      'description': "a biochem matrix",
+                      'row_attributemapping_ref': self.attribute_mapping_ref
+                      }
+            returnVal = self.getImpl().import_matrix_from_excel(self.ctx, params)[0]
 
     def test_search_matrix(self):
         self.start_test()
