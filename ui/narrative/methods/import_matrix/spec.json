@@ -31,6 +31,10 @@
           {
               "display": "DifferentialExpressionMatrix",
               "value": "DifferentialExpressionMatrix"
+          },
+          {
+              "display": "MetaboliteMatrix",
+              "value": "MetaboliteMatrix"
           }
         ]
       }
