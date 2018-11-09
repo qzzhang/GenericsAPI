@@ -1,0 +1,83 @@
+name     : Import Fitness Matrix from CSV/Excel File in Staging Area
+subtitle : Import a CSV or Excel file from your staging area into your Narrative as an FitnessMatrix data object
+tooltip  : Import a CSV or Excel file from your staging area into your Narrative as an FitnessMatrix data object
+
+icon: data-blue.png
+
+screenshots :
+    []
+
+suggestions :
+    apps:
+        related :
+            []
+        next :
+            []
+    methods:
+        related :
+            []
+        next :
+            []
+
+parameters :
+
+    input_staging_file_path :
+        ui-name : |
+            File Path
+        short-hint : |
+            Recognized extensions for the input file is .xlsx or .csv
+        long-hint  : |
+            Recognized extensions for the input file is .xlsx or .csv
+
+    scale:
+      ui-name : |
+          Data Scale
+      short-hint : |
+          Scale factor for the data in the matrix
+      long-hint  : |
+          Scale factor for the data in the matrix
+
+    description:
+      ui-name : |
+          Description
+      short-hint : |
+          Describe the matrix
+      long-hint  : |
+          Describe the matrix
+
+    matrix_name :
+        ui-name : |
+            Matrix Object Name
+        short-hint : |
+            Provide a name for the Matrix that will be created by this importer
+        long-hint : |
+            Provide a name for the Matrix that will be created by this importer
+
+    col_attributemapping_ref :
+        ui-name : |
+            Column AttributeMapping Reference
+        short-hint : |
+            Provide a AttributeMapping associated with column in data set
+        long-hint : |
+            Provide a AttributeMapping associated with column in data set
+
+    row_attributemapping_ref :
+        ui-name : |
+            Row AttributeMapping Reference
+        short-hint : |
+            Provide a AttributeMapping associated with row in data set
+        long-hint : |
+            Provide a AttributeMapping associated with row in data set
+
+    genome_ref :
+        ui-name : |
+            Genome Reference
+        short-hint : |
+            Provide a Genome associated with Matrix
+        long-hint : |
+            Provide a Genome associated with Matrix
+
+
+description : |
+    <p> Import an Excel or CSV file from your staging area into your Narrative as an FitnessMatrix data object.
+    Please see the <a href="http://kbase.us/data-upload-download-guide/">Data Upload/Download Guide</a> for more information. </p>
