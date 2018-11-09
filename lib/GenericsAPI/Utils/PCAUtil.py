@@ -497,6 +497,21 @@ class PCAUtil:
 
         return result_file_paths
 
+    def _validate_pca_matrix(self, obj_data, dimension,
+                             color_marker_by, scale_size_by):
+
+        if dimension == 'row':
+            attribute_mapping = obj_data.get('row_mapping')
+        elif dimension == 'col':
+            attribute_mapping = obj_data.get('col_mapping')
+        else:
+            raise ValueError('Unexpected dimension')
+
+        if not attribute_mapping:
+            if (color_marker_by and color_marker_by.get('attribute_color')[0]) or \
+               (scale_size_by and scale_size_by.get('attribute_size')[0]):
+                raise ValueError('Matrix object is not associated with any {} attribute mapping'.format(dimension))
+
     def __init__(self, config):
         self.ws_url = config["workspace-url"]
         self.callback_url = config['SDK_CALLBACK_URL']
@@ -535,6 +550,9 @@ class PCAUtil:
         res = self.dfu.get_objects({'object_refs': [input_obj_ref]})['data'][0]
         obj_data = res['data']
         obj_type = res['info'][2]
+
+        self._validate_pca_matrix(obj_data, dimension,
+                                  params.get('color_marker_by'), params.get('scale_size_by'))
 
         if "KBaseMatrices" in obj_type:
             (rotation_matrix_df,
