@@ -35,10 +35,12 @@ class BiomUtil:
             name = matrix_name + "_row_attributes"
             data['row_attributemapping_ref'] = self._metadata_to_attribute_mapping(
                 table._observation_ids, table._observation_metadata, name, workspace_id)
+            data['row_mapping'] = {x: x for x in matrix_data['row_ids']}
         if table._sample_metadata:
             name = matrix_name + "_col_attributes"
             data['col_attributemapping_ref'] = self._metadata_to_attribute_mapping(
                 table._sample_ids, table._sample_metadata, name, workspace_id)
+            data['col_mapping'] = {x: x for x in matrix_data['col_ids']}
 
         return data
 

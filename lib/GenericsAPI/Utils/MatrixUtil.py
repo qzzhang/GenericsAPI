@@ -232,7 +232,7 @@ class MatrixUtil:
         if attributemapping_ref:
             attr_data[f'{axis}_attributemapping_ref'] = attributemapping_ref
 
-        # col/row_mappings are optional
+        # col/row_mappings may not be supplied
         id_mapping = self._process_mapping_sheet(file_path, f'{axis}_mapping')
         if id_mapping:
             attr_data[f'{axis}_mapping'] = id_mapping
@@ -241,13 +241,18 @@ class MatrixUtil:
             am_data = self.dfu.get_objects(
                 {'object_refs': [attributemapping_ref]}
             )['data'][0]['data']
-            unmatched_ids = set(matrix_data[f'{axis}_ids']) - set(am_data['instances'].keys())
+            axis_ids = matrix_data[f'{axis}_ids']
+            unmatched_ids = set(axis_ids) - set(am_data['instances'].keys())
             if unmatched_ids:
                 name = "Column" if axis == 'col' else "Row"
                 raise ValueError(f"The following {name} IDs from the uploaded matrix do not match "
                                  f"the supplied {name} attribute mapping: {', '.join(unmatched_ids)}"
                                  f"\nPlease verify the input data or upload an excel file with a"
                                  f"{name} mapping tab.")
+            else:
+                # just gen the IDs in this matrix
+                attr_data[f'{axis}_mapping'] = {x: x for x in axis_ids}
+
         return attr_data
 
     def _build_header_str(self, attribute_names):
