@@ -4,6 +4,7 @@ import json
 import traceback
 import re
 import pandas as pd
+from collections import defaultdict
 from dotmap import DotMap
 
 from Workspace.WorkspaceClient import Workspace as workspaceService
@@ -135,7 +136,10 @@ class DataUtil:
         """
 
         validated = True
-        failed_constraints = {'contains': [], 'rowsum': [], 'unique': []}
+        # TODO: add @conditionally_required to type specs
+        conditionally_required = {'row_attributemapping_ref': ['row_mapping'],
+                                  'col_attributemapping_ref': ['col_mapping']}
+        failed_constraints = defaultdict(list)
 
         unique_constraints = constraints.get('unique')
         for unique_constraint in unique_constraints:
@@ -154,6 +158,14 @@ class DataUtil:
             if not (set(self._retrieve_value(data, value)) <= set(retrieved_in_values)):
                 validated = False
                 failed_constraints['contains'].append(contains_constraint)
+
+        for trigger, required_keys in conditionally_required.items():
+            if trigger in data:
+                missing_keys = [key for key in required_keys if key not in data]
+                if missing_keys:
+                    validated = False
+                    failed_constraints['conditionally_required'].append(
+                        (trigger, required_keys, missing_keys))
 
         return validated, failed_constraints
 
@@ -366,28 +378,31 @@ class DataUtil:
         if not validate.get('validated'):
             log('Data failed type checking')
             failed_constraints = validate.get('failed_constraints')
-            error_msg = 'Object {} failed type checking:\n'.format(params.get('obj_name'))
+            error_msg = ['Object {} failed type checking:'.format(params.get('obj_name'))]
             if failed_constraints.get('unique'):
                 unique_values = failed_constraints.get('unique')
-                error_msg += 'Object should have unique field: {}\n'.format(unique_values)
+                error_msg.append('Object should have unique field: {}'.format(unique_values))
             if failed_constraints.get('contains'):
                 contained_values = failed_constraints.get('contains')
                 for contained_value in contained_values:
                     subset_value = contained_value.split(' ')[0]
                     super_value = ' '.join(contained_value.split(' ')[1:])
                     if 'col_mapping' in super_value:
-                        error_msg += 'Column attribute mapping instances '
-                        error_msg += 'should contain all column index from original data\n'
+                        error_msg.append('Column attribute mapping instances should contain all '
+                                         'column index from original data')
 
                     if 'row_mapping' in super_value:
-                        error_msg += 'Row attribute mapping instances '
-                        error_msg += 'should contain all row index from original data\n'
+                        error_msg.append('Row attribute mapping instances should contain all row '
+                                         'index from original data')
 
-                    error_msg += 'Object field [{}] should contain field [{}]\n'.format(
+                    error_msg.append('Object field [{}] should contain field [{}]'.format(
                                                                                     super_value,
-                                                                                    subset_value)
+                                                                                    subset_value))
+            for failure in failed_constraints.get('conditionally_required', []):
+                error_msg.append('If object field "{}" is present than object field(s) {} should '
+                                 'also be present. Object is missing {}'.format(*failure))
 
-            raise ValueError(error_msg)
+            raise ValueError('\n'.join(error_msg))
 
         workspace_name = params.get('workspace_name')
         if not isinstance(workspace_name, int):

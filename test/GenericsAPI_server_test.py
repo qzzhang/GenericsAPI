@@ -306,11 +306,11 @@ class GenericsAPITest(unittest.TestCase):
     def test_validate_data(self):
         self.start_test()
 
+        obj_type = 'KBaseMatrices.ExpressionMatrix-3.0'
+
         # testing unique
         data = {'data': {'row_ids': ['same_row_id', 'same_row_id'],
                          'col_ids': ['same_col_id', 'same_col_id']}}
-        obj_type = 'KBaseMatrices.ExpressionMatrix-3.0'
-
         params = {'obj_type': obj_type,
                   'data': data}
         returnVal = self.getImpl().validate_data(self.ctx, params)[0]
@@ -327,7 +327,7 @@ class GenericsAPITest(unittest.TestCase):
                 'row_attributemapping_ref': self.attribute_mapping_ref,
                 'col_attributemapping_ref': self.attribute_mapping_ref,
                 'genome_ref': self.genome_ref}
-        obj_type = 'KBaseMatrices.ExpressionMatrix-3.0'
+
         params = {'obj_type': obj_type,
                   'data': data}
         returnVal = self.getImpl().validate_data(self.ctx, params)[0]
@@ -340,6 +340,24 @@ class GenericsAPITest(unittest.TestCase):
                                        'data.row_ids genome_ref:features.[*].id genome_ref:mrnas.[*].id genome_ref:cdss.[*].id genome_ref:non_codeing_features.[*].id']
         self.assertCountEqual(expected_failed_constraints,
                               returnVal.get('failed_constraints').get('contains'))
+
+        # testing conditionally_required
+        data = {'data': {'row_ids': ['same_row_id', 'unknown_row_id'],
+                         'col_ids': ['same_col_id', 'unknown_col_id']},
+                'row_attributemapping_ref': self.attribute_mapping_ref,
+                'col_attributemapping_ref': self.attribute_mapping_ref,
+                'genome_ref': self.genome_ref}
+
+        params = {'obj_type': obj_type,
+                  'data': data}
+        returnVal = self.getImpl().validate_data(self.ctx, params)[0]
+        self.assertFalse(returnVal.get('validated'))
+
+        expected_failed_constraints = [('row_attributemapping_ref', ['row_mapping'], ['row_mapping']),
+                                       ('col_attributemapping_ref', ['col_mapping'], ['col_mapping'])]
+        self.assertCountEqual(expected_failed_constraints,
+                              returnVal.get('failed_constraints').get('conditionally_required'))
+
 
     def test_import_matrix_from_excel(self):
         self.start_test()
