@@ -1,4 +1,4 @@
-name     : Import CSV or Excel File as Matrix from Staging Area
+name     : Import Matrix from Staging Area
 subtitle : Import a CSV or Excel file from your staging area into your Narrative as an Matrix data object
 tooltip  : Import a CSV or Excel file from your staging area into your Narrative as an Matrix data object
 
