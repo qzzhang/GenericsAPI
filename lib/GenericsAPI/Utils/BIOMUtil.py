@@ -20,6 +20,11 @@ class BiomUtil:
                        'values': table.matrix_data.toarray().tolist()}
 
         data.update({'data': matrix_data})
+        data.update(self.get_attribute_mapping("row", table._observation_metadata,
+                                               matrix_data, matrix_name, refs, workspace_id))
+        data.update(self.get_attribute_mapping("col", table._sample_metadata,
+                                               matrix_data, matrix_name, refs, workspace_id))
+
         data['attributes'] = {}
         for k in ('create_date', 'generated_by'):
             val = getattr(table, k)
@@ -31,18 +36,32 @@ class BiomUtil:
                 data['attributes'][k] = str(val)
         data['search_attributes'] = [f'{k}|{v}' for k, v in data['attributes'].items()]
 
-        if table._observation_metadata:
-            name = matrix_name + "_row_attributes"
-            data['row_attributemapping_ref'] = self._metadata_to_attribute_mapping(
-                table._observation_ids, table._observation_metadata, name, workspace_id)
-            data['row_mapping'] = {x: x for x in matrix_data['row_ids']}
-        if table._sample_metadata:
-            name = matrix_name + "_col_attributes"
-            data['col_attributemapping_ref'] = self._metadata_to_attribute_mapping(
-                table._sample_ids, table._sample_metadata, name, workspace_id)
-            data['col_mapping'] = {x: x for x in matrix_data['col_ids']}
-
         return data
+
+    def get_attribute_mapping(self, axis, metadata, matrix_data, matrix_name, refs,  workspace_id):
+        mapping_data = {}
+        axis_ids = matrix_data[f'{axis}_ids']
+        if refs.get(f'{axis}_attributemapping_ref'):
+            am_data = self.dfu.get_objects(
+                {'object_refs': [refs[f'{axis}_attributemapping_ref']]}
+            )['data'][0]['data']
+            unmatched_ids = set(axis_ids) - set(am_data['instances'].keys())
+            if unmatched_ids:
+                name = "Column" if axis == 'col' else "Row"
+                raise ValueError(f"The following {name} IDs from the uploaded matrix do not match "
+                                 f"the supplied {name} attribute mapping: {', '.join(unmatched_ids)}"
+                                 f"\nPlease verify the input data or upload an excel file with a"
+                                 f"{name} mapping tab.")
+            else:
+                mapping_data[f'{axis}_mapping'] = {x: x for x in axis_ids}
+
+        elif metadata:
+            name = matrix_name + "_row_attributes"
+            mapping_data[f'{axis}_attributemapping_ref'] = self._metadata_to_attribute_mapping(
+                axis_ids, metadata, name, workspace_id)
+            # if coming from biom file, metadata and axis IDs are guaranteed to match
+            mapping_data[f'{axis}_mapping'] = {x: x for x in axis_ids}
+        return mapping_data
 
     def _metadata_to_attribute_mapping(self, instances, metadata, obj_name, ws_id):
         data = {'ontology_mapping_method': "BIOM file", 'instances': {}}

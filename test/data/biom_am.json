@@ -1,0 +1,63 @@
+{
+  "attributes": [
+    {
+      "attribute": "BODY_SITE",
+      "attribute_ont_id": "Custom:Term",
+      "attribute_ont_ref": "KbaseOntologies/Custom"
+    },
+    {
+      "attribute": "BarcodeSequence",
+      "attribute_ont_id": "Custom:Term",
+      "attribute_ont_ref": "KbaseOntologies/Custom"
+    },
+    {
+      "attribute": "Description",
+      "attribute_ont_id": "Custom:Term",
+      "attribute_ont_ref": "KbaseOntologies/Custom"
+    },
+    {
+      "attribute": "LinkerPrimerSequence",
+      "attribute_ont_id": "Custom:Term",
+      "attribute_ont_ref": "KbaseOntologies/Custom"
+    }
+  ],
+  "instances": {
+    "Sample1": [
+      "gut",
+      "CGCTTATCGAGA",
+      "human gut",
+      "CATGCTGCCTCCCGTAGGAGT"
+    ],
+    "Sample2": [
+      "gut",
+      "CATACCAGTAGC",
+      "human gut",
+      "CATGCTGCCTCCCGTAGGAGT"
+    ],
+    "Sample3": [
+      "gut",
+      "CTCTCTACCTGT",
+      "human gut",
+      "CATGCTGCCTCCCGTAGGAGT"
+    ],
+    "Sample4": [
+      "skin",
+      "CTCTCGGCCTGT",
+      "human skin",
+      "CATGCTGCCTCCCGTAGGAGT"
+    ],
+    "Sample5": [
+      "skin",
+      "CTCTCTACCAAT",
+      "human skin",
+      "CATGCTGCCTCCCGTAGGAGT"
+    ],
+    "Sample6": [
+      "skin",
+      "CTAACTACCAAT",
+      "human skin",
+      "CATGCTGCCTCCCGTAGGAGT"
+    ]
+  },
+  "ontology_mapping_method": "BIOM file"
+}
