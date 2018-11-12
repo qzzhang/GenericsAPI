@@ -213,42 +213,10 @@ class MatrixUtil:
                        'values': df.values.tolist()}
 
         data.update({'data': matrix_data})
-
-        if refs.get('col_attributemapping_ref'):
-            res = self.dfu.get_objects({'object_refs': [refs['col_attributemapping_ref']]})['data']
-            attri_data = res[0]['data']
-            instances = attri_data.get('instances')
-            key_values = instances.keys()
-            if key_values:
-                col_mapping = {key: value for (key, value) in zip(key_values, key_values)}
-                data.update({'col_mapping': col_mapping})
-        else:
-            col_mapping = self._process_mapping_sheet(file_path, 'col_mapping')
-            data.update({'col_mapping': col_mapping})
-            col_attributemapping_ref = self._process_attribute_mapping_sheet(
-                                                                        file_path,
-                                                                        'col_attribute_mapping',
-                                                                        matrix_name,
-                                                                        workspace_id)
-            data.update({'col_attributemapping_ref': col_attributemapping_ref})
-
-        if refs.get('row_attributemapping_ref'):
-            res = self.dfu.get_objects({'object_refs': [refs['row_attributemapping_ref']]})['data']
-            attri_data = res[0]['data']
-            instances = attri_data.get('instances')
-            key_values = instances.keys()
-            if key_values:
-                row_mapping = {key: value for (key, value) in zip(key_values, key_values)}
-                data.update({'row_mapping': row_mapping})
-        else:
-            row_mapping = self._process_mapping_sheet(file_path, 'row_mapping')
-            row_attributemapping_ref = self._process_attribute_mapping_sheet(
-                                                                        file_path,
-                                                                        'row_attribute_mapping',
-                                                                        matrix_name,
-                                                                        workspace_id)
-            data.update({'row_mapping': row_mapping})
-            data.update({'row_attributemapping_ref': row_attributemapping_ref})
+        data.update(self._get_axis_attributes('col', matrix_data, refs, file_path, matrix_name,
+                                              workspace_id))
+        data.update(self._get_axis_attributes('row', matrix_data, refs, file_path, matrix_name,
+                                              workspace_id))
 
         # processing metadata
         metadata = self._process_mapping_sheet(file_path, 'metadata')
@@ -264,6 +232,42 @@ class MatrixUtil:
                 data['search_attributes'].append(" | ".join((k, v)))
 
         return data
+
+    def _get_axis_attributes(self, axis, matrix_data, refs, file_path, matrix_name, workspace_id):
+        """Get the row/col_attributemapping and mapping of ids, validating as needed"""
+        # Parameter specified mappings should take precedence over tabs in excel so only process
+        # if attributemapping_ref is missing:
+        attr_data = {}
+        attributemapping_ref = refs.get(f'{axis}_attributemapping_ref',
+                                        self._process_attribute_mapping_sheet(
+                                            file_path, f'{axis}_attribute_mapping',
+                                            matrix_name, workspace_id))
+
+        if attributemapping_ref:
+            attr_data[f'{axis}_attributemapping_ref'] = attributemapping_ref
+
+        # col/row_mappings may not be supplied
+        id_mapping = self._process_mapping_sheet(file_path, f'{axis}_mapping')
+        if id_mapping:
+            attr_data[f'{axis}_mapping'] = id_mapping
+        # if no mapping, axis ids must match the attribute mapping
+        elif attributemapping_ref:
+            am_data = self.dfu.get_objects(
+                {'object_refs': [attributemapping_ref]}
+            )['data'][0]['data']
+            axis_ids = matrix_data[f'{axis}_ids']
+            unmatched_ids = set(axis_ids) - set(am_data['instances'].keys())
+            if unmatched_ids:
+                name = "Column" if axis == 'col' else "Row"
+                raise ValueError(f"The following {name} IDs from the uploaded matrix do not match "
+                                 f"the supplied {name} attribute mapping: {', '.join(unmatched_ids)}"
+                                 f"\nPlease verify the input data or upload an excel file with a"
+                                 f"{name} mapping tab.")
+            else:
+                # just gen the IDs in this matrix
+                attr_data[f'{axis}_mapping'] = {x: x for x in axis_ids}
+
+        return attr_data
 
     def _build_header_str(self, attribute_names):
 

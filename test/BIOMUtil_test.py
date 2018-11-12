@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import inspect
+import json
 import os
 import shutil
 import time
@@ -63,7 +64,19 @@ class GenericsAPITest(unittest.TestCase):
 
     @classmethod
     def prepare_data(cls):
-        pass #shutil.copytree('data', os.path.join(cls.scratch, 'data'))
+        workspace_id = cls.dfu.ws_name_to_id(cls.wsName)
+        object_type = 'KBaseExperiments.AttributeMapping'
+        attribute_mapping_object_name = 'test_attribute_mapping'
+        attribute_mapping_data = json.load(open('data/biom_am.json'))
+        save_object_params = {
+            'id': workspace_id,
+            'objects': [{'type': object_type,
+                         'data': attribute_mapping_data,
+                         'name': attribute_mapping_object_name}]
+        }
+
+        dfu_oi = cls.dfu.save_objects(save_object_params)[0]
+        cls.attribute_mapping_ref = str(dfu_oi[6]) + '/' + str(dfu_oi[0]) + '/' + str(dfu_oi[4])
 
     def getWsClient(self):
         return self.__class__.wsClient
@@ -151,6 +164,32 @@ class GenericsAPITest(unittest.TestCase):
         self.assertEqual(obj['description'], 'OTU data')
         self.assertIn('attributes', obj)
 
+    def test_import_with_external_am(self):
+        self.start_test()
+
+        params = {'obj_type': 'AmpliconMatrix',
+                  'matrix_name': 'test_AmpliconMatrix',
+                  'workspace_name': self.wsName,
+                  'input_file_path': os.path.join('data', 'phyloseq_test.biom'),
+                  'scale': 'raw',
+                  'description': "OTU data",
+                  'col_attributemapping_ref': self.attribute_mapping_ref
+                  }
+        returnVal = self.getImpl().import_matrix_from_biom(self.ctx, params)[0]
+        self.assertIn('matrix_obj_ref', returnVal)
+        self.assertIn('report_name', returnVal)
+        self.assertIn('report_ref', returnVal)
+        obj = self.dfu.get_objects(
+            {'object_refs': [returnVal['matrix_obj_ref']]}
+        )['data'][0]['data']
+        self.assertIn('description', obj)
+        self.assertEqual(obj['description'], 'OTU data')
+        self.assertIn('attributes', obj)
+        self.assertEqual(obj['attributes'], {'generated_by': 'QIIME revision XYZ'})
+        self.assertIn('row_attributemapping_ref', obj)
+        self.assertIn('col_attributemapping_ref', obj)
+        self.assertEqual(obj['col_attributemapping_ref'], self.attribute_mapping_ref)
+
     def test_bad_import_matrix_params(self):
         self.start_test()
 
@@ -185,5 +224,16 @@ class GenericsAPITest(unittest.TestCase):
                       'matrix_name': 'test_AmpliconMatrix',
                       'workspace_name': self.wsName,
                       'scale': 'log2'
+                      }
+            returnVal = self.getImpl().import_matrix_from_biom(self.ctx, params)[0]
+
+        with self.assertRaisesRegex(ValueError, "IDs from the uploaded matrix do not match"):
+            params = {'obj_type': 'AmpliconMatrix',
+                      'matrix_name': 'test_AmpliconMatrix',
+                      'workspace_name': self.wsName,
+                      'input_file_path': os.path.join('data', 'phyloseq_test.biom'),
+                      'scale': 'raw',
+                      'description': "OTU data",
+                      'row_attributemapping_ref': self.attribute_mapping_ref
                       }
             returnVal = self.getImpl().import_matrix_from_biom(self.ctx, params)[0]
