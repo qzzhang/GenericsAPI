@@ -290,14 +290,15 @@ module KBaseExperiments {
     typedef string taxonomy_source;
 
     /*
-      tax_id: optional - always attempt to look this up from the lineage
+      taxonomy_id: optional - always attempt to look this up from the lineage
       taxonomy_ref: optional - always attempt to look this up from the lineage
       taxonomy_source: one of [rdp, silva, ncbi, greengenes, other]
+      lineage: taxonomy array
 
       @optional tax_id taxonomy_ref score
     */
     typedef structure {
-      string tax_id;
+      string taxonomy_id;
       string taxonomy_ref;
       list<string> lineage;
       float score;
@@ -306,6 +307,7 @@ module KBaseExperiments {
     typedef string otu_id;
 
     /*
+      consensus_sequence: consensus sequence
       @optional KBaseTaxonomy species_name
     */
     typedef structure {
