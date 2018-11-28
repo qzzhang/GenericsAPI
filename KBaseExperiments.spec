@@ -10,6 +10,11 @@ module KBaseExperiments {
      */
      typedef string GenomeRef;
 
+     /* Ref to a AmpliconMatrix
+        @id ws KBaseMatrices.AmpliconMatrix
+     */
+     typedef string AmpliconMatrixRef;
+
      /* Ref to a Tree
         @id ws KBaseTrees.Tree
      */
@@ -278,4 +283,46 @@ module KBaseExperiments {
       list<float> explained_variance_ratio;
       WSRef original_matrix_ref;
     } PCAMatrix;
+
+    /*
+      one of [rdp, silva, ncbi, greengenes, other]
+    */
+    typedef string taxonomy_source;
+
+    /*
+      tax_id: optional - always attempt to look this up from the lineage
+      taxonomy_ref: optional - always attempt to look this up from the lineage
+      taxonomy_source: one of [rdp, silva, ncbi, greengenes, other]
+
+      @optional tax_id taxonomy_ref score
+    */
+    typedef structure {
+      string tax_id;
+      string taxonomy_ref;
+      list<string> lineage;
+      float score;
+    } TaxonomyData;
+
+    typedef string otu_id;
+
+    /*
+      @optional KBaseTaxonomy species_name
+    */
+    typedef structure {
+      string consensus_sequence;
+      TaxonomyData KBaseTaxonomy;
+      TaxonomyData taxonomy;
+      taxonomy_source taxonomy_source;
+      string species_name;
+    } Amplicon;
+
+    /*
+      @optional description reads_set_ref
+    */
+    typedef structure {
+      string description;
+      WSRef reads_set_ref;
+      AmpliconMatrixRef amplicon_matrix_ref;
+      mapping<otu_id, Amplicon> amplicons;
+    } AmpliconSet;
 };

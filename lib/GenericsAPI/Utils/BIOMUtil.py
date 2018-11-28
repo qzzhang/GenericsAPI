@@ -11,32 +11,59 @@ from KBaseReport.KBaseReportClient import KBaseReport
 
 class BiomUtil:
 
-    def _file_to_data(self, file_path, refs, matrix_name, workspace_id):
-        data = refs
+    def _file_to_data(self, file_path, refs, matrix_name, workspace_id, taxonomy_source):
+        amplicon_data = refs
+        amplicon_set_data = dict()
         table = biom.load_table(file_path)
 
-        matrix_data = {'row_ids': table._observation_ids.tolist(),
+        observation_ids = table._observation_ids.tolist()
+        observation_metadata = table._observation_metadata
+
+        amplicons = dict()
+        for index, observation_id in enumerate(observation_ids):
+            amplicon = dict()
+            taxonomy = dict()
+            if observation_metadata:
+                taxonomy.update({'lineage': observation_metadata[index].get('taxonomy')})
+            else:
+                taxonomy.update({'lineage': None})
+            # add TaxonomyData to Amplicon
+            amplicon.update({'taxonomy_source': taxonomy_source})
+            amplicon.update({'taxonomy': taxonomy})
+            # add Amplicon
+            amplicons.update({observation_id: amplicon})
+        amplicon_set_data.update({'amplicons': amplicons})
+
+        if 'reads_set_ref' in refs:
+            amplicon_set_data.udpate({'reads_set_ref': refs.get('reads_set_ref')})
+
+        matrix_data = {'row_ids': observation_ids,
                        'col_ids': table._sample_ids.tolist(),
                        'values': table.matrix_data.toarray().tolist()}
 
-        data.update({'data': matrix_data})
-        data.update(self.get_attribute_mapping("row", table._observation_metadata,
-                                               matrix_data, matrix_name, refs, workspace_id))
-        data.update(self.get_attribute_mapping("col", table._sample_metadata,
-                                               matrix_data, matrix_name, refs, workspace_id))
+        amplicon_data.update({'data': matrix_data})
+        amplicon_data.update(self.get_attribute_mapping("row", observation_metadata,
+                                                        matrix_data, matrix_name, refs,
+                                                        workspace_id))
+        amplicon_data.update(self.get_attribute_mapping("col", table._sample_metadata,
+                                                        matrix_data, matrix_name, refs,
+                                                        workspace_id))
 
-        data['attributes'] = {}
+        amplicon_data['attributes'] = {}
         for k in ('create_date', 'generated_by'):
             val = getattr(table, k)
             if not val:
                 continue
             if isinstance(val, bytes):
-                data['attributes'][k] = val.decode('utf-8')
+                amplicon_data['attributes'][k] = val.decode('utf-8')
             else:
-                data['attributes'][k] = str(val)
-        data['search_attributes'] = [f'{k}|{v}' for k, v in data['attributes'].items()]
+                amplicon_data['attributes'][k] = str(val)
+        amplicon_data['search_attributes'] = [f'{k}|{v}' for k, v in amplicon_data['attributes'].items()]
 
-        return data
+        print('fdsafdsafds')
+        print(amplicon_set_data)
+
+        return amplicon_data, amplicon_set_data
 
     def get_attribute_mapping(self, axis, metadata, matrix_data, matrix_name, refs,  workspace_id):
         mapping_data = {}
@@ -140,16 +167,22 @@ class BiomUtil:
         else:
             workspace_id = workspace_name
 
-        data = self._file_to_data(file_path, refs, matrix_name, workspace_id)
-        data['scale'] = scale
-        if params.get('description'):
-            data['description'] = params['description']
+        amplicon_data, amplicon_set_data = self._file_to_data(file_path, refs, matrix_name,
+                                                              workspace_id,
+                                                              params.get('taxonomy_source', 'other'))
+        amplicon_data['scale'] = scale
+        description = params.get('description')
+        if description:
+            amplicon_data['description'] = description
+            amplicon_set_data['description'] = description
 
         matrix_obj_ref = self.data_util.save_object({
                                                 'obj_type': 'KBaseMatrices.{}'.format(obj_type),
                                                 'obj_name': matrix_name,
-                                                'data': data,
+                                                'data': amplicon_data,
                                                 'workspace_name': workspace_id})['obj_ref']
+
+        amplicon_set_data['amplicon_matrix_ref'] = matrix_obj_ref
 
         returnVal = {'matrix_obj_ref': matrix_obj_ref}
 
