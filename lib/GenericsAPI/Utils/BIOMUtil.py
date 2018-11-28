@@ -60,9 +60,6 @@ class BiomUtil:
                 amplicon_data['attributes'][k] = str(val)
         amplicon_data['search_attributes'] = [f'{k}|{v}' for k, v in amplicon_data['attributes'].items()]
 
-        print('fdsafdsafds')
-        print(amplicon_set_data)
-
         return amplicon_data, amplicon_set_data
 
     def get_attribute_mapping(self, axis, metadata, matrix_data, matrix_name, refs,  workspace_id):
