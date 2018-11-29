@@ -295,27 +295,26 @@ module KBaseExperiments {
       taxonomy_source: one of [rdp, silva, ncbi, greengenes, other]
       lineage: taxonomy array
 
-      @optional tax_id taxonomy_ref score
+      @optional taxonomy_id taxonomy_ref score species_name taxonomy_source
     */
     typedef structure {
       string taxonomy_id;
       string taxonomy_ref;
       list<string> lineage;
       float score;
+      taxonomy_source taxonomy_source;
+      string species_name;
     } TaxonomyData;
 
     typedef string otu_id;
-
     /*
       consensus_sequence: consensus sequence
-      @optional KBaseTaxonomy species_name
+      @optional KBaseTaxonomy
     */
     typedef structure {
       string consensus_sequence;
       TaxonomyData KBaseTaxonomy;
       TaxonomyData taxonomy;
-      taxonomy_source taxonomy_source;
-      string species_name;
     } Amplicon;
 
     /*
