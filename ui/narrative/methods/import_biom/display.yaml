@@ -125,6 +125,14 @@ parameters :
         long-hint : |
             Provide a AttributeMapping associated with samples in data set
 
+    row_attributemapping_ref :
+        ui-name : |
+            Amplicons AttributeMapping Reference
+        short-hint : |
+            Provide a AttributeMapping associated with amplicons in data set
+        long-hint : |
+            Provide a AttributeMapping associated with amplicons in data set
+
     reads_set_ref:
         ui-name : |
             Reads Set Reference
