@@ -512,7 +512,7 @@ class BiomUtil:
                 mapping_data[f'{axis}_mapping'] = {x: x for x in axis_ids}
 
         elif metadata:
-            name = matrix_name + "_row_attributes"
+            name = matrix_name + "_{}_attributes".format(axis)
             mapping_data[f'{axis}_attributemapping_ref'] = self._metadata_to_attribute_mapping(
                 axis_ids, metadata, name, workspace_id)
             # if coming from biom file, metadata and axis IDs are guaranteed to match
