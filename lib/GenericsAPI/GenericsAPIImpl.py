@@ -19,7 +19,7 @@ class GenericsAPI:
     GenericsAPI
 
     Module Description:
-    
+
     '''
 
     ######## WARNING FOR GEVENT USERS ####### noqa
@@ -30,7 +30,7 @@ class GenericsAPI:
     ######################################### noqa
     VERSION = "0.0.1"
     GIT_URL = "git@github.com:Tianhao-Gu/GenericsAPI.git"
-    GIT_COMMIT_HASH = "3c03d56254be8b93f618468f7fdd0b8449576fe8"
+    GIT_COMMIT_HASH = "d12161055a2edc52007bc1fd3a88e2026a5954f7"
 
     #BEGIN_CLASS_HEADER
     logging.basicConfig(format='%(asctime)s %(levelname)-8s %(message)s',
@@ -475,6 +475,26 @@ class GenericsAPI:
         # At some point might do deeper type checking...
         if not isinstance(result, dict):
             raise ValueError('Method export_pca_matrix_excel return value ' +
+                             'result is not type dict as required.')
+        # return the results
+        return [result]
+
+    def export_amplicon_set_tsv(self, ctx, params):
+        """
+        :param params: instance of type "ExportObjectParams" -> structure:
+           parameter "input_ref" of type "obj_ref" (An X/Y/Z style reference)
+        :returns: instance of type "ExportOutput" -> structure: parameter
+           "shock_id" of String
+        """
+        # ctx is the context object
+        # return variables are: result
+        #BEGIN export_amplicon_set_tsv
+        result = self.biom_util.export_amplicon_set_tsv(params)
+        #END export_amplicon_set_tsv
+
+        # At some point might do deeper type checking...
+        if not isinstance(result, dict):
+            raise ValueError('Method export_amplicon_set_tsv return value ' +
                              'result is not type dict as required.')
         # return the results
         return [result]

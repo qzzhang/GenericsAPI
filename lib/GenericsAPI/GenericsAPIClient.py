@@ -301,6 +301,17 @@ class GenericsAPI(object):
             'GenericsAPI.export_pca_matrix_excel',
             [params], self._service_ver, context)
 
+    def export_amplicon_set_tsv(self, params, context=None):
+        """
+        :param params: instance of type "ExportObjectParams" -> structure:
+           parameter "input_ref" of type "obj_ref" (An X/Y/Z style reference)
+        :returns: instance of type "ExportOutput" -> structure: parameter
+           "shock_id" of String
+        """
+        return self._client.call_method(
+            'GenericsAPI.export_amplicon_set_tsv',
+            [params], self._service_ver, context)
+
     def compute_correlation_matrix(self, params, context=None):
         """
         compute_correlation_matrix: create sub-matrix based on input filter_ids
