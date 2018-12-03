@@ -2,11 +2,11 @@
 import inspect
 import json
 import os
-import shutil
 import time
 import unittest
 from configparser import ConfigParser
 from os import environ
+from mock import patch
 
 from DataFileUtil.DataFileUtilClient import DataFileUtil
 from GenericsAPI.GenericsAPIImpl import GenericsAPI
@@ -94,18 +94,32 @@ class GenericsAPITest(unittest.TestCase):
         testname = inspect.stack()[1][3]
         print('\n*** starting test: ' + testname + ' **')
 
-    def test_import_matrix_from_biom_1_0(self):
+    def mock_download_staging_file(params):
+        print('Mocking DataFileUtilClient.download_staging_file')
+        print(params)
+
+        file_path = params.get('staging_file_subdir_path')
+
+        return {'copy_file_path': file_path}
+
+    @patch.object(DataFileUtil, "download_staging_file", side_effect=mock_download_staging_file)
+    def test_import_matrix_from_biom_1_0_biom_tsv(self, download_staging_file):
         self.start_test()
 
         params = {'obj_type': 'AmpliconMatrix',
                   'matrix_name': 'test_AmpliconMatrix',
                   'workspace_name': self.wsName,
-                  'input_file_path': os.path.join('data', 'phyloseq_test.biom'),
+                  "biom_tsv": {
+                        "biom_file_biom_tsv": os.path.join('data', 'phyloseq_test.biom'),
+                        "tsv_file_biom_tsv": os.path.join('data', 'amplicon_test.tsv')
+                        },
                   'scale': 'raw',
                   'description': "OTU data",
+                  'amplicon_set_name': 'test_AmpliconSet'
                   }
         returnVal = self.getImpl().import_matrix_from_biom(self.ctx, params)[0]
         self.assertIn('matrix_obj_ref', returnVal)
+        self.assertIn('amplicon_set_obj_ref', returnVal)
         self.assertIn('report_name', returnVal)
         self.assertIn('report_ref', returnVal)
         obj = self.dfu.get_objects(
@@ -118,18 +132,24 @@ class GenericsAPITest(unittest.TestCase):
         self.assertIn('row_attributemapping_ref', obj)
         self.assertIn('col_attributemapping_ref', obj)
 
-    def test_import_matrix_from_biom_2_1(self):
+    @patch.object(DataFileUtil, "download_staging_file", side_effect=mock_download_staging_file)
+    def test_import_matrix_from_biom_1_0_biom_fasta(self, download_staging_file):
         self.start_test()
 
         params = {'obj_type': 'AmpliconMatrix',
                   'matrix_name': 'test_AmpliconMatrix',
                   'workspace_name': self.wsName,
-                  'input_file_path': os.path.join('data', 'v2.1example.biom'),
+                  "biom_fasta": {
+                        "biom_file_biom_fasta": os.path.join('data', 'phyloseq_test.biom'),
+                        "fasta_file_biom_fasta": os.path.join('data', 'phyloseq_test.fa')
+                        },
                   'scale': 'raw',
                   'description': "OTU data",
+                  'amplicon_set_name': 'test_AmpliconSet'
                   }
         returnVal = self.getImpl().import_matrix_from_biom(self.ctx, params)[0]
         self.assertIn('matrix_obj_ref', returnVal)
+        self.assertIn('amplicon_set_obj_ref', returnVal)
         self.assertIn('report_name', returnVal)
         self.assertIn('report_ref', returnVal)
         obj = self.dfu.get_objects(
@@ -138,23 +158,29 @@ class GenericsAPITest(unittest.TestCase):
         self.assertIn('description', obj)
         self.assertEqual(obj['description'], 'OTU data')
         self.assertIn('attributes', obj)
-        self.assertEqual(obj['attributes'], {'generated_by': 'QIIME 1.9.1',
-                                             'create_date': '2017-05-22T11:07:28.478444',
-                                             })
+        self.assertEqual(obj['attributes'], {'generated_by': 'QIIME revision XYZ'})
         self.assertIn('row_attributemapping_ref', obj)
+        self.assertIn('col_attributemapping_ref', obj)
 
-    def test_import_matrix_from_tsv(self):
+    @patch.object(DataFileUtil, "download_staging_file", side_effect=mock_download_staging_file)
+    def test_import_matrix_from_biom_1_0_tsv_fasta(self, download_staging_file):
         self.start_test()
 
         params = {'obj_type': 'AmpliconMatrix',
                   'matrix_name': 'test_AmpliconMatrix',
                   'workspace_name': self.wsName,
-                  'input_file_path': os.path.join('data', 'v2.1example.biom'),
+                  "tsv_fasta": {
+                        "tsv_file_tsv_fasta": os.path.join('data', 'amplicon_test.tsv'),
+                        "fasta_file_tsv_fasta": os.path.join('data', 'phyloseq_test.fa'),
+                        'metadata_keys_tsv_fasta': 'taxonomy_id, taxonomy, taxonomy_source, consensus_sequence',
+                        },
                   'scale': 'raw',
                   'description': "OTU data",
+                  'amplicon_set_name': 'test_AmpliconSet'
                   }
         returnVal = self.getImpl().import_matrix_from_biom(self.ctx, params)[0]
         self.assertIn('matrix_obj_ref', returnVal)
+        self.assertIn('amplicon_set_obj_ref', returnVal)
         self.assertIn('report_name', returnVal)
         self.assertIn('report_ref', returnVal)
         obj = self.dfu.get_objects(
@@ -162,19 +188,92 @@ class GenericsAPITest(unittest.TestCase):
         )['data'][0]['data']
         self.assertIn('description', obj)
         self.assertEqual(obj['description'], 'OTU data')
-        self.assertIn('attributes', obj)
+        self.assertIn('row_attributemapping_ref', obj)
+        self.assertNotIn('col_attributemapping_ref', obj)
 
-    def test_import_with_external_am(self):
+    @patch.object(DataFileUtil, "download_staging_file", side_effect=mock_download_staging_file)
+    def test_import_matrix_from_biom_1_0_tsv(self, download_staging_file):
         self.start_test()
 
         params = {'obj_type': 'AmpliconMatrix',
                   'matrix_name': 'test_AmpliconMatrix',
                   'workspace_name': self.wsName,
-                  'input_file_path': os.path.join('data', 'phyloseq_test.biom'),
+                  "tsv": {
+                        "tsv_file_tsv": os.path.join('data', 'amplicon_test.tsv'),
+                        'metadata_keys_tsv': 'taxonomy_id, taxonomy, taxonomy_source, consensus_sequence'
+                        },
                   'scale': 'raw',
                   'description': "OTU data",
+                  'amplicon_set_name': 'test_AmpliconSet'
+                  }
+        returnVal = self.getImpl().import_matrix_from_biom(self.ctx, params)[0]
+        self.assertIn('matrix_obj_ref', returnVal)
+        self.assertIn('amplicon_set_obj_ref', returnVal)
+        self.assertIn('report_name', returnVal)
+        self.assertIn('report_ref', returnVal)
+        obj = self.dfu.get_objects(
+            {'object_refs': [returnVal['matrix_obj_ref']]}
+        )['data'][0]['data']
+        self.assertIn('description', obj)
+        self.assertEqual(obj['description'], 'OTU data')
+        self.assertIn('row_attributemapping_ref', obj)
+        self.assertNotIn('col_attributemapping_ref', obj)
+
+    # @patch.object(DataFileUtil, "download_staging_file", side_effect=mock_download_staging_file)
+    # def test_import_matrix_from_biom_2_1(self, download_staging_file):
+    #     self.start_test()
+
+    #     params = {'obj_type': 'AmpliconMatrix',
+    #               'matrix_name': 'test_AmpliconMatrix',
+    #               'workspace_name': self.wsName,
+    #               'input_file_path': os.path.join('data', 'v2.1example.biom'),
+    #               'scale': 'raw',
+    #               'description': "OTU data",
+    #               }
+
+    #     params = {'obj_type': 'AmpliconMatrix',
+    #               'matrix_name': 'test_AmpliconMatrix',
+    #               'workspace_name': self.wsName,
+    #               "biom_fasta": {
+    #                     "biom_file_biom_fasta": os.path.join('data', 'v2.1example.biom'),
+    #                     "fasta_file_biom_fasta": os.path.join('data', 'phyloseq_test.fa')
+    #                     },
+    #               'scale': 'raw',
+    #               'description': "OTU data",
+    #               'amplicon_set_name': 'test_AmpliconSet'
+    #               }
+    #     returnVal = self.getImpl().import_matrix_from_biom(self.ctx, params)[0]
+    #     self.assertIn('matrix_obj_ref', returnVal)
+    #     self.assertIn('report_name', returnVal)
+    #     self.assertIn('report_ref', returnVal)
+    #     obj = self.dfu.get_objects(
+    #         {'object_refs': [returnVal['matrix_obj_ref']]}
+    #     )['data'][0]['data']
+    #     self.assertIn('description', obj)
+    #     self.assertEqual(obj['description'], 'OTU data')
+    #     self.assertIn('attributes', obj)
+    #     self.assertEqual(obj['attributes'], {'generated_by': 'QIIME 1.9.1',
+    #                                          'create_date': '2017-05-22T11:07:28.478444',
+    #                                          })
+    #     self.assertIn('row_attributemapping_ref', obj)
+
+    @patch.object(DataFileUtil, "download_staging_file", side_effect=mock_download_staging_file)
+    def test_import_with_external_am(self, download_staging_file):
+        self.start_test()
+
+        params = {'obj_type': 'AmpliconMatrix',
+                  'matrix_name': 'test_AmpliconMatrix',
+                  'workspace_name': self.wsName,
+                  "biom_fasta": {
+                        "biom_file_biom_fasta": os.path.join('data', 'phyloseq_test.biom'),
+                        "fasta_file_biom_fasta": os.path.join('data', 'phyloseq_test.fa')
+                        },
+                  'scale': 'raw',
+                  'description': "OTU data",
+                  'amplicon_set_name': 'test_AmpliconSet',
                   'col_attributemapping_ref': self.attribute_mapping_ref
                   }
+
         returnVal = self.getImpl().import_matrix_from_biom(self.ctx, params)[0]
         self.assertIn('matrix_obj_ref', returnVal)
         self.assertIn('report_name', returnVal)
@@ -190,22 +289,30 @@ class GenericsAPITest(unittest.TestCase):
         self.assertIn('col_attributemapping_ref', obj)
         self.assertEqual(obj['col_attributemapping_ref'], self.attribute_mapping_ref)
 
-    def test_bad_import_matrix_params(self):
+    @patch.object(DataFileUtil, "download_staging_file", side_effect=mock_download_staging_file)
+    def test_bad_import_matrix_params(self, download_staging_file):
         self.start_test()
 
         with self.assertRaisesRegex(ValueError, "parameter is required, but missing"):
             params = {'obj_type': 'AmpliconMatrix',
                       'matrix_name': 'test_AmpliconMatrix',
                       'workspace_name': self.wsName,
-                      'input_file_path': os.path.join('data', 'test_import.xlsx'),
+                      "biom_fasta": {
+                            "biom_file_biom_fasta": os.path.join('data', 'phyloseq_test.biom'),
+                            "fasta_file_biom_fasta": os.path.join('data', 'phyloseq_test.fa')
+                            }
                       }
             returnVal = self.getImpl().import_matrix_from_biom(self.ctx, params)[0]
 
         with self.assertRaisesRegex(ValueError, "Unknown matrix object type"):
             params = {'obj_type': 'foo',
                       'matrix_name': 'test_AmpliconMatrix',
+                      'amplicon_set_name': 'test_AmpliconSet',
                       'workspace_name': self.wsName,
-                      'input_file_path': os.path.join('data', 'test_import.xlsx'),
+                      "biom_fasta": {
+                            "biom_file_biom_fasta": os.path.join('data', 'phyloseq_test.biom'),
+                            "fasta_file_biom_fasta": os.path.join('data', 'phyloseq_test.fa')
+                            },
                       'scale': 'log2'
                       }
             returnVal = self.getImpl().import_matrix_from_biom(self.ctx, params)[0]
@@ -213,17 +320,13 @@ class GenericsAPITest(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "Unknown scale type"):
             params = {'obj_type': 'AmpliconMatrix',
                       'matrix_name': 'test_AmpliconMatrix',
+                      'amplicon_set_name': 'test_AmpliconSet',
                       'workspace_name': self.wsName,
-                      'input_file_path': os.path.join('data', 'test_import.xlsx'),
+                      "biom_fasta": {
+                            "biom_file_biom_fasta": os.path.join('data', 'phyloseq_test.biom'),
+                            "fasta_file_biom_fasta": os.path.join('data', 'phyloseq_test.fa')
+                            },
                       'scale': 'foo'
-                      }
-            returnVal = self.getImpl().import_matrix_from_biom(self.ctx, params)[0]
-
-        with self.assertRaisesRegex(ValueError, "input_shock_id or input_file_path"):
-            params = {'obj_type': 'AmpliconMatrix',
-                      'matrix_name': 'test_AmpliconMatrix',
-                      'workspace_name': self.wsName,
-                      'scale': 'log2'
                       }
             returnVal = self.getImpl().import_matrix_from_biom(self.ctx, params)[0]
 
@@ -231,9 +334,13 @@ class GenericsAPITest(unittest.TestCase):
             params = {'obj_type': 'AmpliconMatrix',
                       'matrix_name': 'test_AmpliconMatrix',
                       'workspace_name': self.wsName,
-                      'input_file_path': os.path.join('data', 'phyloseq_test.biom'),
+                      "biom_fasta": {
+                            "biom_file_biom_fasta": os.path.join('data', 'phyloseq_test.biom'),
+                            "fasta_file_biom_fasta": os.path.join('data', 'phyloseq_test.fa')
+                            },
                       'scale': 'raw',
                       'description': "OTU data",
+                      'amplicon_set_name': 'test_AmpliconSet',
                       'row_attributemapping_ref': self.attribute_mapping_ref
                       }
             returnVal = self.getImpl().import_matrix_from_biom(self.ctx, params)[0]

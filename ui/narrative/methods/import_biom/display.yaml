@@ -1,4 +1,4 @@
-name     : Import AmpliconMatrix from BIOM File in Staging Area
+name     : Import Amplicon Matrix from BIOM File in Staging Area
 subtitle : Import a BIOM file from your staging area into your Narrative as an AmpliconMatrix
 tooltip  : Import a BIOM file from your staging area into your Narrative as an AmpliconMatrix
 
@@ -21,13 +21,77 @@ suggestions :
 
 parameters :
 
-    input_staging_file_path :
+    biom_file_biom_tsv :
         ui-name : |
-            File Path
+            BIOM File Path
         short-hint : |
             Recognized extensions for the input file is .biom
         long-hint  : |
             Recognized extensions for the input file is .biom
+
+    biom_file_biom_fasta :
+        ui-name : |
+            BIOM File Path
+        short-hint : |
+            Recognized extensions for the input file is .biom
+        long-hint  : |
+            Recognized extensions for the input file is .biom
+
+    tsv_file_biom_tsv :
+        ui-name : |
+            TSV File Path
+        short-hint : |
+            Recognized extensions for the input file is .TSV
+        long-hint  : |
+            Recognized extensions for the input file is .TSV
+
+    tsv_file_tsv_fasta :
+        ui-name : |
+            TSV File Path
+        short-hint : |
+            Recognized extensions for the input file is .TSV
+        long-hint  : |
+            Recognized extensions for the input file is .TSV
+
+    metadata_keys_tsv_fasta :
+        ui-name : |
+            Metadata Keys
+        short-hint : |
+            Metadata keys used to build attribute mapping and AmpliconSet
+        long-hint  : |
+            Metadata keys used to build attribute mapping and AmpliconSet
+
+    tsv_file_tsv :
+        ui-name : |
+            TSV File Path
+        short-hint : |
+            Recognized extensions for the input file is .TSV
+        long-hint  : |
+            Recognized extensions for the input file is .TSV
+
+    metadata_keys_tsv :
+        ui-name : |
+            Metadata Keys
+        short-hint : |
+            Metadata keys used to build attribute mapping and AmpliconSet
+        long-hint  : |
+            Metadata keys used to build attribute mapping and AmpliconSet
+
+    fasta_file_biom_fasta :
+        ui-name : |
+            FASTA File Path
+        short-hint : |
+            Recognized extensions for the input file is .FASTA
+        long-hint  : |
+            Recognized extensions for the input file is .FASTA
+
+    fasta_file_tsv_fasta :
+        ui-name : |
+            FASTA File Path
+        short-hint : |
+            Recognized extensions for the input file is .FASTA
+        long-hint  : |
+            Recognized extensions for the input file is .FASTA
 
     description:
       ui-name : |
@@ -39,11 +103,19 @@ parameters :
 
     matrix_name :
         ui-name : |
-            Matrix Object Name
+            Amplicon Matrix Object Name
         short-hint : |
             Provide a name for the Matrix that will be created by this importer
         long-hint : |
             Provide a name for the Matrix that will be created by this importer
+
+    amplicon_set_name :
+        ui-name : |
+            Amplicon Set Object Name
+        short-hint : |
+            Provide a name for the AmpliconSet that will be created by this importer
+        long-hint : |
+            Provide a name for the AmpliconSet that will be created by this importer
 
     col_attributemapping_ref :
         ui-name : |
@@ -68,6 +140,20 @@ parameters :
             The reads library set that produced the upload matrix
         long-hint : |
             The reads library set that produced the upload matrix
+
+parameter-groups :
+    biom_tsv:
+        ui-name : BIOM and TSV
+        short-hint :  Biom and TSV
+    biom_fasta:
+        ui-name : BIOM and FASTA
+        short-hint : Biom and FASTA
+    tsv_fasta:
+        ui-name : TSV and FASTA
+        short-hint : Biom and FASTA
+    tsv:
+        ui-name : TSV
+        short-hint : Biom and FASTA
 
 
 description : |

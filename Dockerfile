@@ -24,6 +24,8 @@ RUN conda install -yc bioconda biom-format
 RUN pip install sklearn \
     && pip install plotly
 
+RUN pip install mock
+
 # -----------------------------------------
 
 RUN mkdir -p /kb/module/work
