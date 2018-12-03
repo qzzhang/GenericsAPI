@@ -570,16 +570,25 @@ class BiomUtil:
         })[0]
         return f'{info[6]}/{info[0]}/{info[4]}'
 
-    def _generate_report(self, matrix_obj_ref, amplicon_set_obj_ref, workspace_name):
+    def _generate_report(self, matrix_obj_ref, amplicon_set_obj_ref, new_row_attr_ref,
+                         new_col_attr_ref, workspace_name):
         """
         _generate_report: generate summary report
         """
 
+        objects_created = [{'ref': matrix_obj_ref, 'description': 'Imported Amplicon Matrix'},
+                           {'ref': amplicon_set_obj_ref, 'description': 'Imported Amplicon Set'}]
+
+        if new_row_attr_ref:
+            objects_created.append({'ref': new_row_attr_ref,
+                                    'description': 'Imported Amplicons(Row) Attribute Mapping'})
+
+        if new_col_attr_ref:
+            objects_created.append({'ref': new_col_attr_ref,
+                                    'description': 'Imported Samples(Column) Attribute Mapping'})
+
         report_params = {'message': '',
-                         'objects_created': [{'ref': matrix_obj_ref,
-                                              'description': 'Imported Amplicon Matrix'},
-                                             {'ref': amplicon_set_obj_ref,
-                                              'description': 'Imported Amplicon Set'}],
+                         'objects_created': objects_created,
                          'workspace_name': workspace_name,
                          'report_object_name': 'import_matrix_from_biom_' + str(uuid.uuid4())}
 
@@ -638,6 +647,14 @@ class BiomUtil:
         amplicon_data = self._file_to_amplicon_data(biom_file, tsv_file, mode, refs, matrix_name,
                                                     workspace_id, scale, description, metadata_keys)
 
+        new_row_attr_ref = None
+        if 'row_attributemapping_ref' not in refs and 'row_attributemapping_ref' in amplicon_data:
+            new_row_attr_ref = amplicon_data.get('row_attributemapping_ref')
+
+        new_col_attr_ref = None
+        if 'col_attributemapping_ref' not in refs and 'col_attributemapping_ref' in amplicon_data:
+            new_col_attr_ref = amplicon_data.get('col_attributemapping_ref')
+
         log('start saving Matrix object: {}'.format(matrix_name))
         matrix_obj_ref = self.data_util.save_object({
                                                 'obj_type': 'KBaseMatrices.{}'.format(obj_type),
@@ -658,7 +675,8 @@ class BiomUtil:
         returnVal = {'matrix_obj_ref': matrix_obj_ref,
                      'amplicon_set_obj_ref': amplicon_set_obj_ref}
 
-        report_output = self._generate_report(matrix_obj_ref, amplicon_set_obj_ref, workspace_name)
+        report_output = self._generate_report(matrix_obj_ref, amplicon_set_obj_ref,
+                                              new_row_attr_ref, new_col_attr_ref, workspace_name)
 
         returnVal.update(report_output)
 
