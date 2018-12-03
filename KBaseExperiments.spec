@@ -220,7 +220,7 @@ module KBaseExperiments {
 
     /*
       Represents an edge in a network.
-      node_id node_1 - Identifier (key of Network.nodes) of the first node (source node, if the edge is directed) connected by a given edge 
+      node_id node_1 - Identifier (key of Network.nodes) of the first node (source node, if the edge is directed) connected by a given edge
       node_id node_2 - Identifier (key of Network.nodes) of the second node (target node, if the edge is directed) connected by a given edge
       boolean directed - Specify whether the edge is directed or not. 1 if it is directed, 0 if it is not directed
       float weight - Weight of an edge
