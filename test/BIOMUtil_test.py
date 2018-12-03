@@ -226,14 +226,6 @@ class GenericsAPITest(unittest.TestCase):
     #     params = {'obj_type': 'AmpliconMatrix',
     #               'matrix_name': 'test_AmpliconMatrix',
     #               'workspace_name': self.wsName,
-    #               'input_file_path': os.path.join('data', 'v2.1example.biom'),
-    #               'scale': 'raw',
-    #               'description': "OTU data",
-    #               }
-
-    #     params = {'obj_type': 'AmpliconMatrix',
-    #               'matrix_name': 'test_AmpliconMatrix',
-    #               'workspace_name': self.wsName,
     #               "biom_fasta": {
     #                     "biom_file_biom_fasta": os.path.join('data', 'v2.1example.biom'),
     #                     "fasta_file_biom_fasta": os.path.join('data', 'phyloseq_test.fa')
