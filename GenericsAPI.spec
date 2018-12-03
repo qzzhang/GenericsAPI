@@ -68,7 +68,7 @@ module GenericsAPI {
   } ExportOutput;
 
   funcdef export_matrix (ExportParams params) returns (ExportOutput returnVal) authentication required;
-  
+
   /* Input of the validate_data function
     obj_type: obj type e.g.: 'KBaseMatrices.ExpressionMatrix-1.1'
     data: data to be validated
@@ -111,6 +111,7 @@ module GenericsAPI {
       string input_file_path;
       string input_staging_file_path;
       string matrix_name;
+      string amplicon_set_name;
       string scale;
       string description;
       workspace_name workspace_name;
@@ -242,6 +243,9 @@ module GenericsAPI {
         returns (ExportOutput result) authentication required;
 
     funcdef export_pca_matrix_excel(ExportObjectParams params)
+        returns (ExportOutput result) authentication required;
+
+    funcdef export_amplicon_set_tsv(ExportObjectParams params)
         returns (ExportOutput result) authentication required;
 
 

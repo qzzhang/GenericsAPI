@@ -4,6 +4,8 @@ import biom
 import time
 import pandas as pd
 from Bio import SeqIO
+import os
+import errno
 
 from DataFileUtil.DataFileUtilClient import DataFileUtil
 from GenericsAPI.Utils.AttributeUtils import AttributesUtil
@@ -24,6 +26,20 @@ DEFAULT_META_KEYS = ["taxonomy_id", "lineage", "score", "taxonomy_source", "spec
 
 
 class BiomUtil:
+
+    def _mkdir_p(self, path):
+        """
+        _mkdir_p: make directory for given path
+        """
+        if not path:
+            return
+        try:
+            os.makedirs(path)
+        except OSError as exc:
+            if exc.errno == errno.EEXIST and os.path.isdir(path):
+                pass
+            else:
+                raise
 
     def _process_params(self, params):
         log('start validating import_matrix_from_biom params')
@@ -599,6 +615,60 @@ class BiomUtil:
 
         return report_output
 
+    def _df_to_tsv(self, amplicon_set_df, result_dir, amplicon_set_ref):
+        log('writting amplicon set data frame to tsv file')
+        amplicon_set_obj = self.dfu.get_objects({'object_refs': [amplicon_set_ref]})['data'][0]
+        amplicon_set_info = amplicon_set_obj['info']
+        amplicon_set_name = amplicon_set_info[1]
+
+        file_path = os.path.join(result_dir, amplicon_set_name + ".tsv")
+
+        amplicon_set_df.to_csv(file_path, sep='\t', index=True, header=True)
+
+        return file_path
+
+    def _amplicon_set_to_df(self, amplicon_set_ref):
+        log('converting amplicon set to data frame')
+        am_set_data = self.dfu.get_objects({'object_refs': [amplicon_set_ref]})['data'][0]['data']
+
+        amplicon_matrix_ref = am_set_data.get('amplicon_matrix_ref')
+        matrix_data = self.dfu.get_objects({'object_refs': [amplicon_matrix_ref]})['data'][0]['data']
+        matrix_value_data = matrix_data.get('data')
+
+        index = matrix_value_data.get('row_ids')
+        columns = matrix_value_data.get('col_ids')
+        values = matrix_value_data.get('values')
+
+        df = pd.DataFrame(values, index=index, columns=columns)
+
+        amplicons = am_set_data.get('amplicons')
+
+        meta_index = list()
+        meta_columns = ['taxonomy_id', 'taxonomy', 'score', 'taxonomy_source', 'species_name',
+                        'consensus_sequence']
+        meta_values = list()
+        for otu_id, amplicon in amplicons.items():
+            meta_index.append(otu_id)
+
+            taxonomy_data = amplicon.get('taxonomy')
+            taxonomy_id = taxonomy_data.get('taxonomy_id')
+            taxonomy = taxonomy_data.get('lineage')
+            score = taxonomy_data.get('score')
+            taxonomy_source = taxonomy_data.get('taxonomy_source')
+            species_name = taxonomy_data.get('species_name')
+
+            consensus_sequence = amplicon.get('consensus_sequence')
+
+            meta_values.append([taxonomy_id, taxonomy, score, taxonomy_source, species_name,
+                                consensus_sequence])
+
+        meta_df = pd.DataFrame(meta_values, index=meta_index, columns=meta_columns)
+
+        merged_df = df.merge(meta_df, left_index=True, right_index=True, how='left',
+                             validate='one_to_one')
+
+        return merged_df
+
     def __init__(self, config):
         self.callback_url = config['SDK_CALLBACK_URL']
         self.scratch = config['scratch']
@@ -679,3 +749,24 @@ class BiomUtil:
         returnVal.update(report_output)
 
         return returnVal
+
+    def export_amplicon_set_tsv(self, params):
+        """
+        export AmpliconSet as TSV
+        """
+        log('start exporting amplicon set object')
+        amplicon_set_ref = params.get('input_ref')
+
+        amplicon_set_df = self._amplicon_set_to_df(amplicon_set_ref)
+
+        result_dir = os.path.join(self.scratch, str(uuid.uuid4()))
+        self._mkdir_p(result_dir)
+
+        self._df_to_tsv(amplicon_set_df, result_dir, amplicon_set_ref)
+
+        package_details = self.dfu.package_for_download({
+            'file_path': result_dir,
+            'ws_refs': [amplicon_set_ref]
+        })
+
+        return {'shock_id': package_details['shock_id']}

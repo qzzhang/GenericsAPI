@@ -424,6 +424,23 @@ public class GenericsAPIClient {
     }
 
     /**
+     * <p>Original spec-file function name: export_amplicon_set_tsv</p>
+     * <pre>
+     * </pre>
+     * @param   params   instance of type {@link us.kbase.genericsapi.ExportObjectParams ExportObjectParams}
+     * @return   parameter "result" of type {@link us.kbase.genericsapi.ExportOutput ExportOutput}
+     * @throws IOException if an IO exception occurs
+     * @throws JsonClientException if a JSON RPC exception occurs
+     */
+    public ExportOutput exportAmpliconSetTsv(ExportObjectParams params, RpcContext... jsonRpcContext) throws IOException, JsonClientException {
+        List<Object> args = new ArrayList<Object>();
+        args.add(params);
+        TypeReference<List<ExportOutput>> retType = new TypeReference<List<ExportOutput>>() {};
+        List<ExportOutput> res = caller.jsonrpcCall("GenericsAPI.export_amplicon_set_tsv", args, retType, true, true, jsonRpcContext, this.serviceVersion);
+        return res.get(0);
+    }
+
+    /**
      * <p>Original spec-file function name: compute_correlation_matrix</p>
      * <pre>
      * compute_correlation_matrix: create sub-matrix based on input filter_ids

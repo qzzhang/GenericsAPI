@@ -411,6 +411,7 @@ ImportMatrixParams is a reference to a hash where the following keys are defined
 	input_file_path has a value which is a string
 	input_staging_file_path has a value which is a string
 	matrix_name has a value which is a string
+	amplicon_set_name has a value which is a string
 	scale has a value which is a string
 	description has a value which is a string
 	workspace_name has a value which is a GenericsAPI.workspace_name
@@ -441,6 +442,7 @@ ImportMatrixParams is a reference to a hash where the following keys are defined
 	input_file_path has a value which is a string
 	input_staging_file_path has a value which is a string
 	matrix_name has a value which is a string
+	amplicon_set_name has a value which is a string
 	scale has a value which is a string
 	description has a value which is a string
 	workspace_name has a value which is a GenericsAPI.workspace_name
@@ -535,6 +537,7 @@ ImportMatrixParams is a reference to a hash where the following keys are defined
 	input_file_path has a value which is a string
 	input_staging_file_path has a value which is a string
 	matrix_name has a value which is a string
+	amplicon_set_name has a value which is a string
 	scale has a value which is a string
 	description has a value which is a string
 	workspace_name has a value which is a GenericsAPI.workspace_name
@@ -565,6 +568,7 @@ ImportMatrixParams is a reference to a hash where the following keys are defined
 	input_file_path has a value which is a string
 	input_staging_file_path has a value which is a string
 	matrix_name has a value which is a string
+	amplicon_set_name has a value which is a string
 	scale has a value which is a string
 	description has a value which is a string
 	workspace_name has a value which is a GenericsAPI.workspace_name
@@ -1594,6 +1598,98 @@ ExportOutput is a reference to a hash where the following keys are defined:
  
 
 
+=head2 export_amplicon_set_tsv
+
+  $result = $obj->export_amplicon_set_tsv($params)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$params is a GenericsAPI.ExportObjectParams
+$result is a GenericsAPI.ExportOutput
+ExportObjectParams is a reference to a hash where the following keys are defined:
+	input_ref has a value which is a GenericsAPI.obj_ref
+obj_ref is a string
+ExportOutput is a reference to a hash where the following keys are defined:
+	shock_id has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$params is a GenericsAPI.ExportObjectParams
+$result is a GenericsAPI.ExportOutput
+ExportObjectParams is a reference to a hash where the following keys are defined:
+	input_ref has a value which is a GenericsAPI.obj_ref
+obj_ref is a string
+ExportOutput is a reference to a hash where the following keys are defined:
+	shock_id has a value which is a string
+
+
+=end text
+
+=item Description
+
+
+
+=back
+
+=cut
+
+ sub export_amplicon_set_tsv
+{
+    my($self, @args) = @_;
+
+# Authentication: required
+
+    if ((my $n = @args) != 1)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function export_amplicon_set_tsv (received $n, expecting 1)");
+    }
+    {
+	my($params) = @args;
+
+	my @_bad_arguments;
+        (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument 1 \"params\" (value was \"$params\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to export_amplicon_set_tsv:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'export_amplicon_set_tsv');
+	}
+    }
+
+    my $url = $self->{url};
+    my $result = $self->{client}->call($url, $self->{headers}, {
+	    method => "GenericsAPI.export_amplicon_set_tsv",
+	    params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'export_amplicon_set_tsv',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method export_amplicon_set_tsv",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'export_amplicon_set_tsv',
+				       );
+    }
+}
+ 
+
+
 =head2 compute_correlation_matrix
 
   $returnVal = $obj->compute_correlation_matrix($params)
@@ -2488,6 +2584,7 @@ input_shock_id has a value which is a string
 input_file_path has a value which is a string
 input_staging_file_path has a value which is a string
 matrix_name has a value which is a string
+amplicon_set_name has a value which is a string
 scale has a value which is a string
 description has a value which is a string
 workspace_name has a value which is a GenericsAPI.workspace_name
@@ -2510,6 +2607,7 @@ input_shock_id has a value which is a string
 input_file_path has a value which is a string
 input_staging_file_path has a value which is a string
 matrix_name has a value which is a string
+amplicon_set_name has a value which is a string
 scale has a value which is a string
 description has a value which is a string
 workspace_name has a value which is a GenericsAPI.workspace_name
