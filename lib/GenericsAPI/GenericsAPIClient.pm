@@ -411,6 +411,7 @@ ImportMatrixParams is a reference to a hash where the following keys are defined
 	input_file_path has a value which is a string
 	input_staging_file_path has a value which is a string
 	matrix_name has a value which is a string
+	amplicon_set_name has a value which is a string
 	scale has a value which is a string
 	description has a value which is a string
 	workspace_name has a value which is a GenericsAPI.workspace_name
@@ -441,6 +442,7 @@ ImportMatrixParams is a reference to a hash where the following keys are defined
 	input_file_path has a value which is a string
 	input_staging_file_path has a value which is a string
 	matrix_name has a value which is a string
+	amplicon_set_name has a value which is a string
 	scale has a value which is a string
 	description has a value which is a string
 	workspace_name has a value which is a GenericsAPI.workspace_name
@@ -535,6 +537,7 @@ ImportMatrixParams is a reference to a hash where the following keys are defined
 	input_file_path has a value which is a string
 	input_staging_file_path has a value which is a string
 	matrix_name has a value which is a string
+	amplicon_set_name has a value which is a string
 	scale has a value which is a string
 	description has a value which is a string
 	workspace_name has a value which is a GenericsAPI.workspace_name
@@ -565,6 +568,7 @@ ImportMatrixParams is a reference to a hash where the following keys are defined
 	input_file_path has a value which is a string
 	input_staging_file_path has a value which is a string
 	matrix_name has a value which is a string
+	amplicon_set_name has a value which is a string
 	scale has a value which is a string
 	description has a value which is a string
 	workspace_name has a value which is a GenericsAPI.workspace_name
@@ -2580,6 +2584,7 @@ input_shock_id has a value which is a string
 input_file_path has a value which is a string
 input_staging_file_path has a value which is a string
 matrix_name has a value which is a string
+amplicon_set_name has a value which is a string
 scale has a value which is a string
 description has a value which is a string
 workspace_name has a value which is a GenericsAPI.workspace_name
@@ -2602,6 +2607,7 @@ input_shock_id has a value which is a string
 input_file_path has a value which is a string
 input_staging_file_path has a value which is a string
 matrix_name has a value which is a string
+amplicon_set_name has a value which is a string
 scale has a value which is a string
 description has a value which is a string
 workspace_name has a value which is a GenericsAPI.workspace_name

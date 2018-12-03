@@ -40,6 +40,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
     "input_file_path",
     "input_staging_file_path",
     "matrix_name",
+    "amplicon_set_name",
     "scale",
     "description",
     "workspace_name",
@@ -62,6 +63,8 @@ public class ImportMatrixParams {
     private String inputStagingFilePath;
     @JsonProperty("matrix_name")
     private String matrixName;
+    @JsonProperty("amplicon_set_name")
+    private String ampliconSetName;
     @JsonProperty("scale")
     private String scale;
     @JsonProperty("description")
@@ -154,6 +157,21 @@ public class ImportMatrixParams {
 
     public ImportMatrixParams withMatrixName(String matrixName) {
         this.matrixName = matrixName;
+        return this;
+    }
+
+    @JsonProperty("amplicon_set_name")
+    public String getAmpliconSetName() {
+        return ampliconSetName;
+    }
+
+    @JsonProperty("amplicon_set_name")
+    public void setAmpliconSetName(String ampliconSetName) {
+        this.ampliconSetName = ampliconSetName;
+    }
+
+    public ImportMatrixParams withAmpliconSetName(String ampliconSetName) {
+        this.ampliconSetName = ampliconSetName;
         return this;
     }
 
@@ -304,7 +322,7 @@ public class ImportMatrixParams {
 
     @Override
     public String toString() {
-        return ((((((((((((((((((((((((((((((("ImportMatrixParams"+" [objType=")+ objType)+", inputShockId=")+ inputShockId)+", inputFilePath=")+ inputFilePath)+", inputStagingFilePath=")+ inputStagingFilePath)+", matrixName=")+ matrixName)+", scale=")+ scale)+", description=")+ description)+", workspaceName=")+ workspaceName)+", genomeRef=")+ genomeRef)+", colAttributemappingRef=")+ colAttributemappingRef)+", rowAttributemappingRef=")+ rowAttributemappingRef)+", diffExprMatrixRef=")+ diffExprMatrixRef)+", biochemistryRef=")+ biochemistryRef)+", readsSetRef=")+ readsSetRef)+", additionalProperties=")+ additionalProperties)+"]");
+        return ((((((((((((((((((((((((((((((((("ImportMatrixParams"+" [objType=")+ objType)+", inputShockId=")+ inputShockId)+", inputFilePath=")+ inputFilePath)+", inputStagingFilePath=")+ inputStagingFilePath)+", matrixName=")+ matrixName)+", ampliconSetName=")+ ampliconSetName)+", scale=")+ scale)+", description=")+ description)+", workspaceName=")+ workspaceName)+", genomeRef=")+ genomeRef)+", colAttributemappingRef=")+ colAttributemappingRef)+", rowAttributemappingRef=")+ rowAttributemappingRef)+", diffExprMatrixRef=")+ diffExprMatrixRef)+", biochemistryRef=")+ biochemistryRef)+", readsSetRef=")+ readsSetRef)+", additionalProperties=")+ additionalProperties)+"]");
     }
 
 }
