@@ -193,7 +193,9 @@ class MatrixUtil:
                 except Exception:
                     raise ValueError('Cannot parse file. Please provide valide tsv, excel or csv file')
 
-        df.fillna(0, inplace=True)
+        df.index.astype('str', copy=False)
+        # fill NA with "None" so that they are properly represented as nulls in the KBase Object
+        df = df.where((pd.notnull(df)), None)
 
         return df
 
