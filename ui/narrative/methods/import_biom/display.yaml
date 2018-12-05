@@ -1,4 +1,4 @@
-name     : Import Amplicon Matrix from BIOM File in Staging Area
+name     : Import Amplicon Matrix from BIOM/TSV/FASTA File in Staging Area
 subtitle : Import a BIOM file from your staging area into your Narrative as an AmpliconMatrix
 tooltip  : Import a BIOM file from your staging area into your Narrative as an AmpliconMatrix
 
