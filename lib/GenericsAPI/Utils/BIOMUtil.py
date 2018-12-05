@@ -1,24 +1,17 @@
+import errno
 import logging
+import os
 import uuid
 
 import biom
-import time
 import pandas as pd
 from Bio import SeqIO
-import os
-import errno
 
 from DataFileUtil.DataFileUtilClient import DataFileUtil
 from GenericsAPI.Utils.AttributeUtils import AttributesUtil
 from GenericsAPI.Utils.DataUtil import DataUtil
 from GenericsAPI.Utils.MatrixUtil import MatrixUtil
 from KBaseReport.KBaseReportClient import KBaseReport
-
-
-def log(message, prefix_newline=False):
-    time_str = time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime(time.time()))
-    print(('\n' if prefix_newline else '') + time_str + ': ' + message)
-
 
 TYPE_ATTRIBUTES = {'description', 'scale', 'row_normalization', 'col_normalization'}
 SCALE_TYPES = {'raw', 'ln', 'log2', 'log10'}
@@ -43,7 +36,7 @@ class BiomUtil:
                 raise
 
     def _process_params(self, params):
-        log('start validating import_matrix_from_biom params')
+        logging.info('start validating import_matrix_from_biom params')
 
         # check for required parameters
         for p in ['obj_type', 'matrix_name', 'workspace_name', 'scale', 'amplicon_set_name']:
@@ -144,7 +137,7 @@ class BiomUtil:
         amplicons = dict()
 
         try:
-            log('start parsing TSV file')
+            logging.info('start parsing TSV file')
             reader = pd.read_csv(tsv_file, sep=None, iterator=True)
             inferred_sep = reader._engine.data.dialect.delimiter
             df = pd.read_csv(tsv_file, sep=inferred_sep, index_col=0)
@@ -154,7 +147,7 @@ class BiomUtil:
         if 'consensus_sequence' not in df.columns.tolist():
             raise ValueError('TSV file does not include consensus_sequence')
 
-        log('start processing each row in TSV')
+        logging.info('start processing each row in TSV')
         for observation_id in df.index:
             amplicon = dict()
             taxonomy = dict()
@@ -198,27 +191,27 @@ class BiomUtil:
 
             amplicons.update({observation_id: amplicon})
 
-        log('finished parsing TSV file')
+        logging.info('finished parsing TSV file')
 
         return amplicons
 
     def _retrieve_tsv_fasta_amplicon_set_data(self, tsv_file, fasta_file):
         amplicons = dict()
         try:
-            log('start parsing FASTA file')
+            logging.info('start parsing FASTA file')
             fastq_dict = SeqIO.index(fasta_file, "fasta")
         except Exception:
             raise ValueError('Cannot parse file. Please provide valide FASTA file')
 
         try:
-            log('start parsing TSV file')
+            logging.info('start parsing TSV file')
             reader = pd.read_csv(tsv_file, sep=None, iterator=True)
             inferred_sep = reader._engine.data.dialect.delimiter
             df = pd.read_csv(tsv_file, sep=inferred_sep, index_col=0)
         except Exception:
             raise ValueError('Cannot parse file. Please provide valide TSV file')
 
-        log('start processing files')
+        logging.info('start processing files')
         for observation_id in df.index:
             if observation_id not in fastq_dict:
                 raise ValueError('FASTA file does not have [{}] OTU id'.format(observation_id))
@@ -262,24 +255,24 @@ class BiomUtil:
 
             amplicons.update({observation_id: amplicon})
 
-        log('finished processing files')
+        logging.info('finished processing files')
         return amplicons
 
     def _retrieve_biom_fasta_amplicon_set_data(self, biom_file, fasta_file):
         amplicons = dict()
         try:
-            log('start parsing FASTA file')
+            logging.info('start parsing FASTA file')
             fastq_dict = SeqIO.index(fasta_file, "fasta")
         except Exception:
             raise ValueError('Cannot parse file. Please provide valide FASTA file')
 
-        log('start parsing BIOM file')
+        logging.info('start parsing BIOM file')
         table = biom.load_table(biom_file)
 
         observation_ids = table._observation_ids.tolist()
         observation_metadata = table._observation_metadata
 
-        log('start processing files')
+        logging.info('start processing files')
         for index, observation_id in enumerate(observation_ids):
             if observation_id not in fastq_dict:
                 raise ValueError('FASTA file does not have [{}] OTU id'.format(observation_id))
@@ -321,13 +314,13 @@ class BiomUtil:
 
             amplicons.update({observation_id: amplicon})
 
-        log('finished processing files')
+        logging.info('finished processing files')
         return amplicons
 
     def _retrieve_biom_tsv_amplicon_set_data(self, biom_file, tsv_file):
         amplicons = dict()
         try:
-            log('start parsing TSV file')
+            logging.info('start parsing TSV file')
             reader = pd.read_csv(tsv_file, sep=None, iterator=True)
             inferred_sep = reader._engine.data.dialect.delimiter
             df = pd.read_csv(tsv_file, sep=inferred_sep, index_col=0)
@@ -337,13 +330,13 @@ class BiomUtil:
         if 'consensus_sequence' not in df.columns.tolist():
             raise ValueError('TSV file does not include consensus_sequence')
 
-        log('start parsing BIOM file')
+        logging.info('start parsing BIOM file')
         table = biom.load_table(biom_file)
 
         observation_ids = table._observation_ids.tolist()
         observation_metadata = table._observation_metadata
 
-        log('start processing files')
+        logging.info('start processing files')
         for index, observation_id in enumerate(observation_ids):
             if observation_id not in df.index:
                 raise ValueError('TSV file does not have [{}] OTU id'.format(observation_id))
@@ -393,13 +386,13 @@ class BiomUtil:
 
             amplicons.update({observation_id: amplicon})
 
-        log('finished processing files')
+        logging.info('finished processing files')
         return amplicons
 
     def _file_to_amplicon_set_data(self, biom_file, tsv_file, fasta_file, mode, refs, description,
                                    matrix_obj_ref):
 
-        log('start parsing amplicon_set_data')
+        logging.info('start parsing amplicon_set_data')
 
         amplicon_set_data = dict()
 
@@ -432,7 +425,7 @@ class BiomUtil:
         amplicon_data = refs
 
         if mode.startswith('biom'):
-            log('start parsing BIOM file for matrix data')
+            logging.info('start parsing BIOM file for matrix data')
             table = biom.load_table(biom_file)
             observation_metadata = table._observation_metadata
             sample_metadata = table._sample_metadata
@@ -441,7 +434,7 @@ class BiomUtil:
                            'col_ids': table._sample_ids.tolist(),
                            'values': table.matrix_data.toarray().tolist()}
 
-            log('start building attribute mapping object')
+            logging.info('start building attribute mapping object')
             amplicon_data.update(self.get_attribute_mapping("row", observation_metadata,
                                                             matrix_data, matrix_name, refs,
                                                             workspace_id))
@@ -462,7 +455,7 @@ class BiomUtil:
             observation_metadata = None
             sample_metadata = None
             try:
-                log('start parsing TSV file for matrix data')
+                logging.info('start parsing TSV file for matrix data')
                 reader = pd.read_csv(tsv_file, sep=None, iterator=True)
                 inferred_sep = reader._engine.data.dialect.delimiter
                 df = pd.read_csv(tsv_file, sep=inferred_sep, index_col=0)
@@ -488,7 +481,7 @@ class BiomUtil:
                                'col_ids': df.columns.tolist(),
                                'values': df.values.tolist()}
 
-            log('start building attribute mapping object')
+            logging.info('start building attribute mapping object')
             amplicon_data.update(self.get_attribute_mapping("row", observation_metadata,
                                                             matrix_data, matrix_name, refs,
                                                             workspace_id, metadata_df))
@@ -553,7 +546,7 @@ class BiomUtil:
         for axis_id in axis_ids:
             data['instances'][axis_id] = metadata_df.loc[axis_id].tolist()
 
-        log('start saving AttributeMapping object: {}'.format(obj_name))
+        logging.info('start saving AttributeMapping object: {}'.format(obj_name))
         info = self.dfu.save_objects({
             "id": ws_id,
             "objects": [{
@@ -576,7 +569,7 @@ class BiomUtil:
         for inst, meta in zip(instances, metadata):
             data['instances'][inst] = [str(meta[attr]) for attr in metadata_keys]
 
-        log('start saving AttributeMapping object: {}'.format(obj_name))
+        logging.info('start saving AttributeMapping object: {}'.format(obj_name))
         info = self.dfu.save_objects({
             "id": ws_id,
             "objects": [{
@@ -617,7 +610,7 @@ class BiomUtil:
         return report_output
 
     def _df_to_tsv(self, amplicon_set_df, result_dir, amplicon_set_ref):
-        log('writting amplicon set data frame to tsv file')
+        logging.info('writting amplicon set data frame to tsv file')
         amplicon_set_obj = self.dfu.get_objects({'object_refs': [amplicon_set_ref]})['data'][0]
         amplicon_set_info = amplicon_set_obj['info']
         amplicon_set_name = amplicon_set_info[1]
@@ -629,7 +622,7 @@ class BiomUtil:
         return file_path
 
     def _amplicon_set_to_df(self, amplicon_set_ref):
-        log('converting amplicon set to data frame')
+        logging.info('converting amplicon set to data frame')
         am_set_data = self.dfu.get_objects({'object_refs': [amplicon_set_ref]})['data'][0]['data']
 
         amplicon_matrix_ref = am_set_data.get('amplicon_matrix_ref')
@@ -724,7 +717,7 @@ class BiomUtil:
         new_col_attr_ref = refs.get('col_attributemapping_ref',
                                     amplicon_data.get('col_attributemapping_ref'))
 
-        log('start saving Matrix object: {}'.format(matrix_name))
+        logging.info('start saving Matrix object: {}'.format(matrix_name))
         matrix_obj_ref = self.data_util.save_object({
                                                 'obj_type': 'KBaseMatrices.{}'.format(obj_type),
                                                 'obj_name': matrix_name,
@@ -734,7 +727,7 @@ class BiomUtil:
         amplicon_set_data = self._file_to_amplicon_set_data(biom_file, tsv_file, fasta_file, mode,
                                                             refs, description, matrix_obj_ref)
 
-        log('start saving AmpliconSet object: {}'.format(amplicon_set_name))
+        logging.info('start saving AmpliconSet object: {}'.format(amplicon_set_name))
         amplicon_set_obj_ref = self.data_util.save_object({
                                                 'obj_type': 'KBaseExperiments.AmpliconSet',
                                                 'obj_name': amplicon_set_name,
@@ -755,7 +748,7 @@ class BiomUtil:
         """
         export AmpliconSet as TSV
         """
-        log('start exporting amplicon set object')
+        logging.info('start exporting amplicon set object')
         amplicon_set_ref = params.get('input_ref')
 
         amplicon_set_df = self._amplicon_set_to_df(amplicon_set_ref)

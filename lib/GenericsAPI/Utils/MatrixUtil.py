@@ -198,7 +198,7 @@ class MatrixUtil:
         return df
 
     def _file_to_data(self, file_path, refs, matrix_name, workspace_id):
-        log('Start reading and converting excel file data')
+        logging.info('Start reading and converting excel file data')
         data = refs
 
         df = self._file_to_df(file_path)

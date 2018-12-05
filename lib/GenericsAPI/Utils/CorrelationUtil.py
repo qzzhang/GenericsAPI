@@ -1,19 +1,3 @@
-import pandas as pd
-import os
-import uuid
-import errno
-import traceback
-from matplotlib import pyplot as plt
-import plotly.graph_objs as go
-from plotly.offline import plot
-import json
-import shutil
-from scipy import stats
-import logging
-
-from GenericsAPI.Utils.DataUtil import DataUtil
-from DataFileUtil.DataFileUtilClient import DataFileUtil
-from KBaseReport.KBaseReportClient import KBaseReport
 import errno
 import json
 import logging
