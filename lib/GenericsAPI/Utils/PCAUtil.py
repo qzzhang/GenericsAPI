@@ -1,26 +1,22 @@
-import time
-import pandas as pd
-import os
-import uuid
 import errno
-from matplotlib import pyplot as plt
-import json
-from sklearn.preprocessing import StandardScaler
-from sklearn.decomposition import PCA
-import plotly.graph_objs as go
-from plotly.offline import plot
 import itertools
+import json
+import logging
+import os
 import shutil
 import sys
+import uuid
 
-from GenericsAPI.Utils.DataUtil import DataUtil
+import pandas as pd
+import plotly.graph_objs as go
+from matplotlib import pyplot as plt
+from plotly.offline import plot
+from sklearn.decomposition import PCA
+from sklearn.preprocessing import StandardScaler
+
 from DataFileUtil.DataFileUtilClient import DataFileUtil
+from GenericsAPI.Utils.DataUtil import DataUtil
 from KBaseReport.KBaseReportClient import KBaseReport
-
-
-def log(message, prefix_newline=False):
-    time_str = time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime(time.time()))
-    print(('\n' if prefix_newline else '') + time_str + ': ' + message)
 
 
 class PCAUtil:
@@ -45,7 +41,7 @@ class PCAUtil:
             validates params passed to run_pca method
         """
 
-        log('start validating run_pca params')
+        logging.info('start validating run_pca params')
 
         # check for required parameters
         for p in ['input_obj_ref', 'workspace_name', 'pca_matrix_name']:
@@ -68,7 +64,7 @@ class PCAUtil:
         """
         write PCA matrix df into excel
         """
-        log('writting pca data frame to excel file')
+        logging.info('writting pca data frame to excel file')
         pca_matrix_obj = self.dfu.get_objects({'object_refs': [pca_matrix_ref]})['data'][0]
         pca_matrix_info = pca_matrix_obj['info']
         pca_matrix_name = pca_matrix_info[1]
@@ -98,7 +94,7 @@ class PCAUtil:
         """
         retrieve pca matrix ws object to pca_df
         """
-        log('converting pca matrix to data frame')
+        logging.info('converting pca matrix to data frame')
         pca_data = self.dfu.get_objects({'object_refs': [pca_matrix_ref]})['data'][0]['data']
 
         rotation_matrix_data = pca_data.get('rotation_matrix')
@@ -110,7 +106,7 @@ class PCAUtil:
         pca_df.loc['explained_variance_ratio'] = explained_variance_ratio
 
         if original_matrix_ref:
-            log('appending instance group information to pca data frame')
+            logging.info('appending instance group information to pca data frame')
             obj_data = self.dfu.get_objects({'object_refs': [original_matrix_ref]})['data'][0]['data']
 
             if dimension == 'row':
@@ -129,7 +125,7 @@ class PCAUtil:
     def _save_pca_matrix(self, workspace_name, input_obj_ref, pca_matrix_name, rotation_matrix_df,
                          explained_variance_ratio, n_components, dimension):
 
-        log('saving PCAMatrix')
+        logging.info('saving PCAMatrix')
 
         if not isinstance(workspace_name, int):
             ws_name_id = self.dfu.ws_name_to_id(workspace_name)
@@ -176,7 +172,7 @@ class PCAUtil:
             raise ValueError('Number of components should be less than min(n_samples, n_features)')
 
         # normalize sample
-        log("Standardizing the matrix")
+        logging.info("Standardizing the matrix")
         s_values = StandardScaler().fit_transform(data_df.values)
 
         # Projection to ND
@@ -198,7 +194,7 @@ class PCAUtil:
 
     def _generate_pca_html_report(self, pca_plots, n_components):
 
-        log('start generating html report')
+        logging.info('start generating html report')
         html_report = list()
 
         output_directory = os.path.join(self.scratch, str(uuid.uuid4()))
@@ -235,7 +231,7 @@ class PCAUtil:
         return html_report
 
     def _generate_pca_report(self, pca_ref, pca_plots, workspace_name, n_components):
-        log('creating report')
+        logging.info('creating report')
 
         output_html_files = self._generate_pca_html_report(pca_plots, n_components)
 
@@ -269,7 +265,7 @@ class PCAUtil:
             raise ValueError('Unexpected dimension')
 
         if not attribute_mapping:
-            log('Matrix object does not have {}_mapping attribute'.format(dimension))
+            logging.warning('Matrix object does not have {}_mapping attribute'.format(dimension))
             # build matrix with unify color and shape
             return plot_pca_matrix
         else:
@@ -282,7 +278,7 @@ class PCAUtil:
         """
         _build_size_pca_matrix: append attribute value to rotation_matrix
         """
-        log('appending attribute value for sizing to rotation matrix')
+        logging.info('appending attribute value for sizing to rotation matrix')
 
         plot_pca_matrix = plot_pca_matrix.copy()
 
@@ -296,7 +292,7 @@ class PCAUtil:
             raise ValueError('Unexpected dimension')
 
         if not attribute_mapping:
-            log('Matrix object does not have {}_mapping attribute'.format(dimension))
+            logging.warning('Matrix object does not have {}_mapping attribute'.format(dimension))
             # build matrix with unify color and shape
             return plot_pca_matrix
         else:
@@ -332,7 +328,7 @@ class PCAUtil:
         """
         _build_color_pca_matrix: append attribute value to rotation_matrix
         """
-        log('appending attribute value for grouping color to rotation matrix')
+        logging.info('appending attribute value for grouping color to rotation matrix')
 
         plot_pca_matrix = plot_pca_matrix.copy()
 
@@ -346,7 +342,7 @@ class PCAUtil:
             raise ValueError('Unexpected dimension')
 
         if not attribute_mapping:
-            log('Matrix object does not have {}_mapping attribute'.format(dimension))
+            logging.warning('Matrix object does not have {}_mapping attribute'.format(dimension))
             # build matrix with unify color and shape
             return plot_pca_matrix
         else:
@@ -535,7 +531,7 @@ class PCAUtil:
         dimension: compute correlation on column or row, one of ['col', 'row']
         """
 
-        log('--->\nrunning NetworkUtil.build_network\n' +
+        logging.info('--->\nrunning NetworkUtil.build_network\n' +
             'params:\n{}'.format(json.dumps(params, indent=1)))
 
         self._validate_run_pca_params(params)
@@ -596,7 +592,7 @@ class PCAUtil:
         """
         export PCAMatrix as Excel
         """
-        log('start exporting pca matrix')
+        logging.info('start exporting pca matrix')
         pca_matrix_ref = params.get('input_ref')
 
         pca_df = self._pca_to_df(pca_matrix_ref)

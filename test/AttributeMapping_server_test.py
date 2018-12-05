@@ -208,6 +208,7 @@ class AttributeUtilsTest(unittest.TestCase):
         self.assertEqual(data, self.attribute_mapping_2)
 
     def test_isa_import_1(self):
+        self.maxDiff = None
         params = {'output_ws_id': self.wsId,
                   'input_file_path': 'data/test_ISA.tsv',
                   'output_obj_name': 'ISA_AM'}
@@ -231,9 +232,9 @@ class AttributeUtilsTest(unittest.TestCase):
                           'attribute_ont_id': 'Custom:Term',
                           'attribute_ont_ref': 'KbaseOntologies/Custom',
                           'categories': {'orotic acid': {'attribute_ont_id': 'CHEBI:16742',
-                                                           'value': 'orotic acid'},
-                                          'vehicle': {'attribute_ont_id': ':',
-                                                       'value': 'vehicle'}}})
+                                                         'value': 'orotic acid'},
+                                         'vehicle': {'attribute_ont_id': ':',
+                                                     'value': 'vehicle'}}})
 
     def test_isa_import_2(self):
         params = {'output_ws_id': self.wsId,

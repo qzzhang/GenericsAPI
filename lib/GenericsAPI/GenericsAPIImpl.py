@@ -33,9 +33,6 @@ class GenericsAPI:
     GIT_COMMIT_HASH = "6642ddf41759dbaf519f3b04f2553486333eaf17"
 
     #BEGIN_CLASS_HEADER
-    logging.basicConfig(format='%(asctime)s %(levelname)-8s %(message)s',
-                        level=logging.INFO,
-                        datefmt='%Y-%m-%d %H:%M:%S')
     #END_CLASS_HEADER
 
     # config contains contents of config file in a hash or None if it couldn't
@@ -53,7 +50,8 @@ class GenericsAPI:
         self.network_util = NetworkUtil(self.config)
         self.biom_util = BiomUtil(self.config)
         self.pca_util = PCAUtil(self.config)
-        logging.basicConfig(level=logging.INFO)
+        logging.basicConfig(format='%(created)s %(levelname)s: %(message)s',
+                            level=logging.INFO)
         #END_CONSTRUCTOR
         pass
 

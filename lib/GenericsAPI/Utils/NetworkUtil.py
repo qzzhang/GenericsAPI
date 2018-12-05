@@ -1,27 +1,23 @@
-import time
-import pandas as pd
-import os
-import uuid
 import errno
-import networkx as nx
-from matplotlib import pyplot as plt
-import plotly.graph_objs as go
-from plotly.offline import plot
 import json
-import shutil
-from random import seed
-from random import randint
+import logging
 import math
+import os
+import shutil
+import uuid
+from random import randint
+from random import seed
 
-from GenericsAPI.Utils.DataUtil import DataUtil
-from GenericsAPI.Utils.CorrelationUtil import CorrelationUtil
+import networkx as nx
+import pandas as pd
+import plotly.graph_objs as go
+from matplotlib import pyplot as plt
+from plotly.offline import plot
+
 from DataFileUtil.DataFileUtilClient import DataFileUtil
+from GenericsAPI.Utils.CorrelationUtil import CorrelationUtil
+from GenericsAPI.Utils.DataUtil import DataUtil
 from KBaseReport.KBaseReportClient import KBaseReport
-
-
-def log(message, prefix_newline=False):
-    time_str = time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime(time.time()))
-    print(('\n' if prefix_newline else '') + time_str + ': ' + message)
 
 
 class NetworkUtil:
@@ -80,7 +76,7 @@ class NetworkUtil:
         _generate_network_html_report: generate html summary report
         """
 
-        log('Start generating html report')
+        logging.info('Start generating html report')
         html_report = list()
 
         output_directory = os.path.join(self.scratch, str(uuid.uuid4()))
@@ -116,7 +112,7 @@ class NetworkUtil:
         _generate_ploty_network: generate html summary report
         """
 
-        log('Start generating html report')
+        logging.info('Start generating html report')
         html_report = list()
 
         output_directory = os.path.join(self.scratch, str(uuid.uuid4()))
@@ -136,7 +132,7 @@ class NetworkUtil:
         return html_report
 
     def _plotly_network(self, graph, result_file_path):
-        log('start ploting network using plotly')
+        logging.info('start ploting network using plotly')
 
         # create node position
         seed(1)
@@ -224,7 +220,7 @@ class NetworkUtil:
         """
         _generate_report: generate summary report
         """
-        log('Start creating report')
+        logging.info('Start creating report')
 
         output_html_files = self._generate_plotly_network(graph)
 
@@ -308,7 +304,7 @@ class NetworkUtil:
 
     def _process_build_nx_params(self, params):
 
-        log('start validating build_network params')
+        logging.info('start validating build_network params')
 
         params = params.copy()
 
@@ -384,7 +380,7 @@ class NetworkUtil:
         build_network: filter correlation matrix and build network on filtered correlation matrix
         """
 
-        log('--->\nrunning NetworkUtil.build_network\n' +
+        logging.info('--->\nrunning NetworkUtil.build_network\n' +
             'params:\n{}'.format(json.dumps(params, indent=1)))
 
         params = self._process_build_nx_params(params)

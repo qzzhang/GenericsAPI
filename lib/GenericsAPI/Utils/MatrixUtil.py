@@ -1,24 +1,19 @@
-import time
+import collections
+import errno
+import logging
 import os
 import re
-import pandas as pd
-import uuid
-import errno
-from xlrd.biffh import XLRDError
-from openpyxl import load_workbook
-import collections
 import shutil
+import uuid
+
+import pandas as pd
+from openpyxl import load_workbook
+from xlrd.biffh import XLRDError
 
 from DataFileUtil.DataFileUtilClient import DataFileUtil
-from KBaseReport.KBaseReportClient import KBaseReport
-from GenericsAPI.Utils.DataUtil import DataUtil
 from GenericsAPI.Utils.AttributeUtils import AttributesUtil
-
-
-def log(message, prefix_newline=False):
-    time_str = time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime(time.time()))
-    print(('\n' if prefix_newline else '') + time_str + ': ' + message)
-
+from GenericsAPI.Utils.DataUtil import DataUtil
+from KBaseReport.KBaseReportClient import KBaseReport
 
 TYPE_ATTRIBUTES = {'description', 'scale', 'row_normalization', 'col_normalization'}
 SCALE_TYPES = {'raw', 'ln', 'log2', 'log10'}
@@ -31,7 +26,7 @@ class MatrixUtil:
         _validate_import_matrix_from_excel_params:
             validates params passed to import_matrix_from_excel method
         """
-        log('start validating import_matrix_from_excel params')
+        logging.info('start validating import_matrix_from_excel params')
 
         # check for required parameters
         for p in ['obj_type', 'matrix_name', 'workspace_name', 'scale']:
@@ -70,7 +65,7 @@ class MatrixUtil:
         """
         _upload_to_shock: upload target file to shock using DataFileUtil
         """
-        log('Start uploading file to shock: {}'.format(file_path))
+        logging.info('Start uploading file to shock: {}'.format(file_path))
 
         file_to_shock_params = {
             'file_path': file_path,
@@ -178,7 +173,7 @@ class MatrixUtil:
             return ref.get('attribute_mapping_ref')
 
     def _file_to_df(self, file_path):
-        log('start parsing file content to data frame')
+        logging.info('start parsing file content to data frame')
 
         try:
             df = pd.read_excel(file_path, sheet_name='data', index_col=0)
@@ -186,8 +181,8 @@ class MatrixUtil:
         except XLRDError:
             try:
                 df = pd.read_excel(file_path, index_col=0)
-                print('WARNING: A sheet named "data" was not found in the attached file, '
-                      'proceeding with the first sheet as the data sheet.')
+                logging.warning('WARNING: A sheet named "data" was not found in the attached file,'
+                                ' proceeding with the first sheet as the data sheet.')
 
             except XLRDError:
 
@@ -198,12 +193,14 @@ class MatrixUtil:
                 except Exception:
                     raise ValueError('Cannot parse file. Please provide valide tsv, excel or csv file')
 
-        df.fillna(0, inplace=True)
+        df.index.astype('str', copy=False)
+        # fill NA with "None" so that they are properly represented as nulls in the KBase Object
+        df = df.where((pd.notnull(df)), None)
 
         return df
 
     def _file_to_data(self, file_path, refs, matrix_name, workspace_id):
-        log('Start reading and converting excel file data')
+        logging.info('Start reading and converting excel file data')
         data = refs
 
         df = self._file_to_df(file_path)
@@ -286,7 +283,7 @@ class MatrixUtil:
 
     def _build_html_str(self, row_mapping, attributemapping_data, row_ids):
 
-        log('Start building html replacement')
+        logging.info('Start building html replacement')
 
         attribute_names = [attributes.get('attribute') for attributes in attributemapping_data.get('attributes')]
 
@@ -341,7 +338,7 @@ class MatrixUtil:
         return html_report
 
     def _generate_search_report(self, header_str, table_str, workspace_name):
-        log('Start creating report')
+        logging.info('Start creating report')
 
         output_html_files = self._generate_search_html_report(header_str, table_str)
 
@@ -561,7 +558,7 @@ class MatrixUtil:
                         generics_module should be
                         {'data': 'FloatMatrix2D'}
         """
-        log('Start exporting matrix')
+        logging.info('Start exporting matrix')
 
         if 'input_ref' in params:
             params['obj_ref'] = params.pop('input_ref')
@@ -592,7 +589,7 @@ class MatrixUtil:
         try:
             obj_data.pop('data')
         except KeyError:
-            log('Missing key [data]')
+            logging.warning('Missing key [data]')
 
         obj_data.update(obj_data.get('attributes', {}))  # flatten for printing
         self._write_mapping_sheet(file_path, 'metadata', obj_data, ['name', 'value'])
