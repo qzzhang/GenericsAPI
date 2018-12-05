@@ -57,10 +57,10 @@ class AttributesUtil:
         else:
             raise ValueError("Must supply either a input_shock_id or input_file_path")
         try:
-            df = pd.read_excel(scratch_file_path, dtype='str')
+            df = pd.read_excel(scratch_file_path)
         except XLRDError:
-            df = pd.read_csv(scratch_file_path, sep=None, dtype='str')
-        df.fillna('', inplace=True)
+            df = pd.read_csv(scratch_file_path, sep=None)
+        df = df.fillna(value='').astype('str')
         if df.columns[1].lower() == "attribute ontology id":
             comp_set = self._df_to_am_obj(df)
         else:
