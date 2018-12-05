@@ -1,20 +1,14 @@
-
-import time
 import json
-import traceback
+import logging
 import re
-import pandas as pd
+import traceback
 from collections import defaultdict
+
+import pandas as pd
 from dotmap import DotMap
 
-from Workspace.WorkspaceClient import Workspace as workspaceService
 from DataFileUtil.DataFileUtilClient import DataFileUtil
-
-
-def log(message, prefix_newline=False):
-    time_str = time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime(time.time()))
-    print(('\n' if prefix_newline else '') + time_str + ': ' + message)
-
+from Workspace.WorkspaceClient import Workspace as workspaceService
 
 GENERICS_TYPE = ['FloatMatrix2D']  # add case in _convert_data for each additional type
 GENERICS_MODULES = ['KBaseMatrices']
@@ -28,7 +22,7 @@ class DataUtil:
             validates params passed to fetch_data method
         """
 
-        log('start validating fetch_data params')
+        logging.info('start validating fetch_data params')
 
         # check for required parameters
         for p in ['obj_ref']:
@@ -92,7 +86,7 @@ class DataUtil:
         return constraints
 
     def _retrieve_value(self, data, value):
-        log('Getting value for {}'.format(value))
+        logging.info('Getting value for {}'.format(value))
         retrieve_data = []
         m_data = DotMap(data)
         if value.startswith('values'):  # TODO: nested values e.g. values(values(ids))
@@ -126,7 +120,7 @@ class DataUtil:
                 m_data_cp = getattr(m_data_cp, attr)
             retrieve_data = list(m_data_cp)
 
-        log('Retrieved value (first 20):\n{}\n'.format(retrieve_data[:20]))
+        logging.info('Retrieved value (first 20):\n{}\n'.format(retrieve_data[:20]))
 
         return retrieve_data
 
@@ -180,7 +174,7 @@ class DataUtil:
 
         type_spec_list = type_spec.split(obj_type_name + ';')
         obj_type_spec = type_spec_list[0].split('structure')[-1]
-        log('Found spec for {}\n{}\n'.format(obj_type, obj_type_spec))
+        logging.debug('Found spec for {}\n{}\n'.format(obj_type, obj_type_spec))
 
         return obj_type_spec
 
@@ -189,7 +183,7 @@ class DataUtil:
         _find_generics_type: try to find generics type in an object
         """
 
-        log('Start finding generics type and name')
+        logging.info('Start finding generics type and name')
 
         obj_type_spec = self._find_type_spec(obj_type)
 
@@ -209,7 +203,7 @@ class DataUtil:
                 generics_type_name = item.split(';')[0].strip().split(' ')[-1].strip()
                 generics_module.update({generics_type_name: generics_type})
 
-        log('Found generics type:\n{}\n'.format(generics_module))
+        logging.debug('Found generics type:\n{}\n'.format(generics_module))
 
         return generics_module
 
@@ -238,7 +232,7 @@ class DataUtil:
         """
         _retrieve_data: retrieve object data and return a dataframe in json format
         """
-        log('Start retrieving data')
+        logging.info('Start retrieving data')
         obj_source = self.dfu.get_objects(
             {"object_refs": [obj_ref]})['data'][0]
 
@@ -302,7 +296,7 @@ class DataUtil:
         data_matrix: a pandas dataframe in json format
         """
 
-        log('--->\nrunning DataUtil.fetch_data\n' +
+        logging.info('--->\nrunning DataUtil.fetch_data\n' +
             'params:\n{}'.format(json.dumps(params, indent=1)))
 
         self._validate_fetch_data_params(params)
@@ -357,7 +351,7 @@ class DataUtil:
         return:
         obj_ref: object reference
         """
-        log('Starting saving object')
+        logging.info('Starting saving object')
 
         obj_type = params.get('obj_type')
 
@@ -376,7 +370,7 @@ class DataUtil:
                                        'data': data})
 
         if not validate.get('validated'):
-            log('Data failed type checking')
+            logging.error('Data failed type checking')
             failed_constraints = validate.get('failed_constraints')
             error_msg = ['Object {} failed type checking:'.format(params.get('obj_name'))]
             if failed_constraints.get('unique'):

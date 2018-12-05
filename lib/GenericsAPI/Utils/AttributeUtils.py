@@ -59,7 +59,7 @@ class AttributesUtil:
         try:
             df = pd.read_excel(scratch_file_path, dtype='str')
         except XLRDError:
-            df = pd.read_csv(scratch_file_path, sep="\t", dtype='str')
+            df = pd.read_csv(scratch_file_path, sep=None, dtype='str')
         df.fillna('', inplace=True)
         if df.columns[1].lower() == "attribute ontology id":
             comp_set = self._df_to_am_obj(df)

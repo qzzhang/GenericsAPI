@@ -1,4 +1,3 @@
-import time
 import pandas as pd
 import os
 import uuid
@@ -10,16 +9,28 @@ from plotly.offline import plot
 import json
 import shutil
 from scipy import stats
+import logging
 
 from GenericsAPI.Utils.DataUtil import DataUtil
 from DataFileUtil.DataFileUtilClient import DataFileUtil
 from KBaseReport.KBaseReportClient import KBaseReport
+import errno
+import json
+import logging
+import os
+import shutil
+import traceback
+import uuid
 
+import pandas as pd
+import plotly.graph_objs as go
+from matplotlib import pyplot as plt
+from plotly.offline import plot
+from scipy import stats
 
-def log(message, prefix_newline=False):
-    time_str = time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime(time.time()))
-    print(('\n' if prefix_newline else '') + time_str + ': ' + message)
-
+from DataFileUtil.DataFileUtilClient import DataFileUtil
+from GenericsAPI.Utils.DataUtil import DataUtil
+from KBaseReport.KBaseReportClient import KBaseReport
 
 CORR_METHOD = ['pearson', 'kendall', 'spearman']  # correlation method
 
@@ -46,7 +57,7 @@ class CorrelationUtil:
             validates params passed to compute_correlation_matrix method
         """
 
-        log('start validating compute_corrrelation_matrix params')
+        logging.info('start validating compute_corrrelation_matrix params')
 
         # check for required parameters
         for p in ['input_obj_ref', 'workspace_name', 'corr_matrix_name']:
@@ -59,7 +70,7 @@ class CorrelationUtil:
             validates params passed to compute_correlation_across_matrices method
         """
 
-        log('start validating compute_correlation_across_matrices params')
+        logging.info('start validating compute_correlation_across_matrices params')
 
         # check for required parameters
         for p in ['workspace_name', 'corr_matrix_name', 'matrix_ref_1', 'matrix_ref_2']:
@@ -210,7 +221,7 @@ class CorrelationUtil:
         _generate_corr_html_report: generate html summary report for correlation
         """
 
-        log('Start generating html report')
+        logging.info('Start generating html report')
         html_report = list()
 
         output_directory = os.path.join(self.scratch, str(uuid.uuid4()))
@@ -245,7 +256,7 @@ class CorrelationUtil:
         """
         _generate_report: generate summary report
         """
-        log('Start creating report')
+        logging.info('Start creating report')
 
         output_html_files = self._generate_corr_html_report(corr_matrix_obj_ref,
                                                             corr_matrix_plot_path,
@@ -286,7 +297,7 @@ class CorrelationUtil:
                                two-sided p-value for a hypothesis test
         """
 
-        log('Start computing significance matrix')
+        logging.info('Start computing significance matrix')
         if dimension == 'row':
             data_df = data_df.T
 
@@ -469,7 +480,7 @@ class CorrelationUtil:
         method: one of ['pearson', 'kendall', 'spearman']
         """
 
-        log('Computing correlation matrix')
+        logging.info('Computing correlation matrix')
 
         if method not in CORR_METHOD:
             err_msg = 'Input correlation method [{}] is not available.\n'.format(method)
@@ -488,7 +499,7 @@ class CorrelationUtil:
         return corr_df
 
     def plotly_corr_matrix(self, corr_df):
-        log('Plotting matrix of correlation')
+        logging.info('Plotting matrix of correlation')
 
         result_dir = os.path.join(self.scratch, str(uuid.uuid4()) + '_corr_matrix_plots')
         self._mkdir_p(result_dir)
@@ -504,7 +515,7 @@ class CorrelationUtil:
             raise ValueError(err_msg)
         else:
             corr_matrix_plot_path = os.path.join(result_dir, 'corr_matrix_plots.html')
-            log('Saving plot to:\n{}'.format(corr_matrix_plot_path))
+            logging.info('Saving plot to:\n{}'.format(corr_matrix_plot_path))
             plot(data, filename=corr_matrix_plot_path)
 
         return corr_matrix_plot_path
@@ -513,7 +524,7 @@ class CorrelationUtil:
         """
         plot_corr_matrix: genreate correlation matrix plot
         """
-        log('Plotting matrix of correlation')
+        logging.info('Plotting matrix of correlation')
 
         result_dir = os.path.join(self.scratch, str(uuid.uuid4()) + '_corr_matrix_plots')
         self._mkdir_p(result_dir)
@@ -538,7 +549,7 @@ class CorrelationUtil:
             raise ValueError(err_msg)
         else:
             corr_matrix_plot_path = os.path.join(result_dir, 'corr_matrix_plots.png')
-            log('Saving plot to:\n{}'.format(corr_matrix_plot_path))
+            logging.info('Saving plot to:\n{}'.format(corr_matrix_plot_path))
             plt.savefig(corr_matrix_plot_path)
 
         return corr_matrix_plot_path
@@ -548,7 +559,7 @@ class CorrelationUtil:
         plot_scatter_matrix: generate scatter plot for dimension (col or row)
                              ref: https://pandas.pydata.org/pandas-docs/stable/generated/pandas.plotting.scatter_matrix.html
         """
-        log('Plotting matrix of scatter')
+        logging.info('Plotting matrix of scatter')
 
         result_dir = os.path.join(self.scratch, str(uuid.uuid4()) + '_scatter_plots')
         self._mkdir_p(result_dir)
@@ -580,7 +591,7 @@ class CorrelationUtil:
             raise ValueError(err_msg)
         else:
             scatter_plot_path = os.path.join(result_dir, 'scatter_plots.png')
-            log('Saving plot to:\n{}'.format(scatter_plot_path))
+            logging.info('Saving plot to:\n{}'.format(scatter_plot_path))
             plt.savefig(scatter_plot_path)
 
         return scatter_plot_path
@@ -597,7 +608,7 @@ class CorrelationUtil:
         compute_significance: also compute Significance in addition to correlation matrix
         """
 
-        log('--->\nrunning CorrelationUtil.compute_correlation_across_matrices\n' +
+        logging.info('--->\nrunning CorrelationUtil.compute_correlation_across_matrices\n' +
             'params:\n{}'.format(json.dumps(params, indent=1)))
 
         self._validate_compute_correlation_across_matrices_params(params)
@@ -650,7 +661,7 @@ class CorrelationUtil:
         plot_scatter_matrix: plot scatter matrix in report, default False
         """
 
-        log('--->\nrunning CorrelationUtil.compute_correlation_matrix\n' +
+        logging.info('--->\nrunning CorrelationUtil.compute_correlation_matrix\n' +
             'params:\n{}'.format(json.dumps(params, indent=1)))
 
         self._validate_compute_corr_matrix_params(params)
