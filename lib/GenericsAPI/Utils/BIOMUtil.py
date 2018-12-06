@@ -721,11 +721,13 @@ class BiomUtil:
         amplicon_data = self._file_to_amplicon_data(biom_file, tsv_file, mode, refs, matrix_name,
                                                     workspace_id, scale, description, metadata_keys)
 
-        new_row_attr_ref = refs.get('row_attributemapping_ref',
-                                    amplicon_data.get('row_attributemapping_ref'))
+        new_row_attr_ref = None
+        if not refs.get('row_attributemapping_ref'):
+            new_row_attr_ref = amplicon_data.get('row_attributemapping_ref')
 
-        new_col_attr_ref = refs.get('col_attributemapping_ref',
-                                    amplicon_data.get('col_attributemapping_ref'))
+        new_col_attr_ref = None
+        if not refs.get('col_attributemapping_ref'):
+            new_row_attr_ref = amplicon_data.get('col_attributemapping_ref')
 
         log('start saving Matrix object: {}'.format(matrix_name))
         matrix_obj_ref = self.data_util.save_object({
