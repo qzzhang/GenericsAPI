@@ -158,7 +158,8 @@ class BiomUtil:
 
             if isinstance(lineage, str):
                 lineage = list(set([x.strip() for x in lineage.split(',')]))
-            taxonomy.update({'lineage': lineage})
+            if lineage:
+                taxonomy.update({'lineage': lineage})
 
             # retrieve 'taxonomy_id' info
             taxonomy_id = self._retrieve_value([], df.loc[observation_id],
@@ -223,7 +224,8 @@ class BiomUtil:
                                            'taxonomy', required=True)
             if isinstance(lineage, str):
                 lineage = list(set([x.strip() for x in lineage.split(',')]))
-            taxonomy.update({'lineage': lineage})
+            if lineage:
+                taxonomy.update({'lineage': lineage})
 
             # retrieve 'taxonomy_id' info
             taxonomy_id = self._retrieve_value([], df.loc[observation_id],
@@ -282,7 +284,8 @@ class BiomUtil:
             # retrieve 'lineage'/'taxonomy' info
             lineage = self._retrieve_value(observation_metadata[index], [],
                                            'taxonomy', required=True)
-            taxonomy.update({'lineage': lineage})
+            if lineage:
+                taxonomy.update({'lineage': lineage})
 
             # retrieve 'taxonomy_id' info
             taxonomy_id = self._retrieve_value(observation_metadata[index], [],
@@ -349,7 +352,8 @@ class BiomUtil:
                                            'taxonomy', required=True)
             if isinstance(lineage, str):
                 lineage += list(set([x.strip() for x in lineage.split(',')]))
-            taxonomy.update({'lineage': lineage})
+            if lineage:
+                taxonomy.update({'lineage': lineage})
 
             # retrieve 'taxonomy_id' info
             taxonomy_id = self._retrieve_value(observation_metadata[index],

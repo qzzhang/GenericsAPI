@@ -295,7 +295,7 @@ module KBaseExperiments {
       taxonomy_source: one of [rdp, silva, ncbi, greengenes, other]
       lineage: taxonomy array
 
-      @optional taxonomy_id taxonomy_ref score species_name taxonomy_source
+      @optional taxonomy_id taxonomy_ref lineage score species_name taxonomy_source
     */
     typedef structure {
       string taxonomy_id;
