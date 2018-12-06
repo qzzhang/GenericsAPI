@@ -727,7 +727,7 @@ class BiomUtil:
 
         new_col_attr_ref = None
         if not refs.get('col_attributemapping_ref'):
-            new_row_attr_ref = amplicon_data.get('col_attributemapping_ref')
+            new_col_attr_ref = amplicon_data.get('col_attributemapping_ref')
 
         log('start saving Matrix object: {}'.format(matrix_name))
         matrix_obj_ref = self.data_util.save_object({
