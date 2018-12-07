@@ -160,6 +160,7 @@ class PCAUtil:
         data_matrix = self.data_util.fetch_data({'obj_ref': input_obj_ref}).get('data_matrix')
 
         data_df = pd.read_json(data_matrix)
+        data_df.fillna(0, inplace=True)
 
         if dimension == 'col':
             data_df = data_df.T

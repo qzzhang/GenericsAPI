@@ -231,7 +231,7 @@ class AttributeUtilsTest(unittest.TestCase):
                          {'attribute': 'Factor Value[compound]',
                           'attribute_ont_id': 'Custom:Term',
                           'attribute_ont_ref': 'KbaseOntologies/Custom',
-                          'categories': {'orotic acid': {'attribute_ont_id': 'CHEBI:16742',
+                          'categories': {'orotic acid': {'attribute_ont_id': 'CHEBI:16742.0',
                                                          'value': 'orotic acid'},
                                          'vehicle': {'attribute_ont_id': ':',
                                                      'value': 'vehicle'}}})
