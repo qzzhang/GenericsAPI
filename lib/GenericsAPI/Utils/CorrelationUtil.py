@@ -431,8 +431,13 @@ class CorrelationUtil:
         sig_df = pd.DataFrame(index=idx_1, columns=idx_2)
 
         logging.info('start calculating correlation matrix')
+        logging.info('sizing {} x {}'.format(idx_1.size, idx_2.size))
+        counter = 0
         for idx_value in idx_1:
             for col_value in idx_2:
+
+                if counter % 100 == 0:
+                    logging.info('computed {} corr/sig values'.format(counter))
 
                 value_array_1 = df1.loc[idx_value].tolist()
                 value_array_2 = df2.loc[col_value].tolist()
@@ -451,6 +456,8 @@ class CorrelationUtil:
                 corr_df.at[idx_value, col_value] = round(corr_value, 4)
                 if compute_significance:
                     sig_df.at[idx_value, col_value] = round(p_value, 4)
+
+                counter += 1
 
         if not compute_significance:
             sig_df = None
