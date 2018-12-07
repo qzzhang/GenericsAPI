@@ -313,6 +313,7 @@ class CorrelationUtil:
         """
         _save_corr_matrix: save KBaseExperiments.CorrelationMatrix object
         """
+        logging.info('Start saving CorrelationMatrix')
 
         if not isinstance(workspace_name, int):
             ws_name_id = self.dfu.ws_name_to_id(workspace_name)
@@ -436,7 +437,7 @@ class CorrelationUtil:
         for idx_value in idx_1:
             for col_value in idx_2:
 
-                if counter % 100 == 0:
+                if counter % 100000 == 0:
                     logging.info('computed {} corr/sig values'.format(counter))
 
                 value_array_1 = df1.loc[idx_value].tolist()
