@@ -393,6 +393,8 @@ class CorrelationUtil:
 
     def _fetch_matrix_data(self, matrix_ref):
 
+        logging.info('start fectching matrix data')
+
         res = self.dfu.get_objects({'object_refs': [matrix_ref]})['data'][0]
         obj_type = res['info'][2]
 
@@ -407,24 +409,33 @@ class CorrelationUtil:
 
     def _compute_metrices_corr(self, df1, df2, method, compute_significance):
 
+        df1.fillna(0, inplace=True)
+        df2.fillna(0, inplace=True)
+
         col_1 = df1.columns
         col_2 = df2.columns
         idx_1 = df1.index
         idx_2 = df2.index
 
         common_col = col_1.intersection(col_2)
+        logging.info('matrices share [{}] common columns'.format(common_col.size))
 
         if common_col.empty:
             raise ValueError('Matrices share no common columns')
 
+        logging.info('start trimming original matrix')
+        df1 = df1.loc[:][common_col]
+        df2 = df2.loc[:][common_col]
+
         corr_df = pd.DataFrame(index=idx_1, columns=idx_2)
         sig_df = pd.DataFrame(index=idx_1, columns=idx_2)
 
+        logging.info('start calculating correlation matrix')
         for idx_value in idx_1:
             for col_value in idx_2:
 
-                value_array_1 = df1.loc[[idx_value]][common_col].values[0]
-                value_array_2 = df2.loc[[col_value]][common_col].values[0]
+                value_array_1 = df1.loc[idx_value].tolist()
+                value_array_2 = df2.loc[col_value].tolist()
 
                 if method == 'pearson':
                     corr_value, p_value = stats.pearsonr(value_array_1, value_array_2)
