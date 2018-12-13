@@ -10,6 +10,7 @@ from GenericsAPI.Utils.DataUtil import DataUtil
 from GenericsAPI.Utils.MatrixUtil import MatrixUtil
 from GenericsAPI.Utils.NetworkUtil import NetworkUtil
 from GenericsAPI.Utils.PCAUtil import PCAUtil
+from installed_clients.GenericsServiceClient import GenericsService
 #END_HEADER
 
 
