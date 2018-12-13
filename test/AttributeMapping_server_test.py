@@ -10,12 +10,11 @@ from configparser import ConfigParser
 import pandas as pd
 
 from GenericsAPI.Utils.AttributeUtils import AttributesUtil
-from DataFileUtil.DataFileUtilClient import DataFileUtil
+from installed_clients.DataFileUtilClient import DataFileUtil
 from GenericsAPI.GenericsAPIImpl import GenericsAPI
 from GenericsAPI.GenericsAPIServer import MethodContext
 from GenericsAPI.authclient import KBaseAuth as _KBaseAuth
-from Workspace.WorkspaceClient import Workspace as workspaceService
-import pprint
+from installed_clients.WorkspaceClient import Workspace as workspaceService
 
 class AttributeUtilsTest(unittest.TestCase):
 

@@ -12,9 +12,9 @@ from matplotlib import pyplot as plt
 from plotly.offline import plot
 from scipy import stats
 
-from DataFileUtil.DataFileUtilClient import DataFileUtil
+from installed_clients.DataFileUtilClient import DataFileUtil
 from GenericsAPI.Utils.DataUtil import DataUtil
-from KBaseReport.KBaseReportClient import KBaseReport
+from installed_clients.KBaseReportClient import KBaseReport
 
 CORR_METHOD = ['pearson', 'kendall', 'spearman']  # correlation method
 
