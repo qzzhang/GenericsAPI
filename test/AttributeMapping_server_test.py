@@ -10,12 +10,11 @@ from configparser import ConfigParser
 import pandas as pd
 
 from GenericsAPI.Utils.AttributeUtils import AttributesUtil
-from DataFileUtil.DataFileUtilClient import DataFileUtil
+from installed_clients.DataFileUtilClient import DataFileUtil
 from GenericsAPI.GenericsAPIImpl import GenericsAPI
 from GenericsAPI.GenericsAPIServer import MethodContext
 from GenericsAPI.authclient import KBaseAuth as _KBaseAuth
-from Workspace.WorkspaceClient import Workspace as workspaceService
-import pprint
+from installed_clients.WorkspaceClient import Workspace as workspaceService
 
 class AttributeUtilsTest(unittest.TestCase):
 
@@ -231,7 +230,7 @@ class AttributeUtilsTest(unittest.TestCase):
                          {'attribute': 'Factor Value[compound]',
                           'attribute_ont_id': 'Custom:Term',
                           'attribute_ont_ref': 'KbaseOntologies/Custom',
-                          'categories': {'orotic acid': {'attribute_ont_id': 'CHEBI:16742',
+                          'categories': {'orotic acid': {'attribute_ont_id': 'CHEBI:16742.0',
                                                          'value': 'orotic acid'},
                                          'vehicle': {'attribute_ont_id': ':',
                                                      'value': 'vehicle'}}})

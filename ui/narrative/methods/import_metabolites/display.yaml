@@ -55,19 +55,19 @@ parameters :
 
     col_attributemapping_ref :
         ui-name : |
-            Samples AttributeMapping Reference
+            Samples (Column) AttributeMapping Reference
         short-hint : |
-            Provide a AttributeMapping associated with sample in data set
+            Provide a AttributeMapping associated with columns in metabolite matrix
         long-hint : |
-            Provide a AttributeMapping associated with sample in data set
+            Provide a AttributeMapping associated with columns in metabolite matrix
 
     row_attributemapping_ref :
         ui-name : |
-            Compounds AttributeMapping Reference
+            Compounds (Row) AttributeMapping Reference
         short-hint : |
-            Provide a AttributeMapping associated with compounds in data set
+            Provide a AttributeMapping associated with rows in metabolite matrix
         long-hint : |
-            Provide a AttributeMapping associated with compounds in data set
+            Provide a AttributeMapping associated with rows in metabolite matrix
 
 
 description : |

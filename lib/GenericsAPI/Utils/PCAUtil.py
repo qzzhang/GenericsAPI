@@ -14,9 +14,9 @@ from plotly.offline import plot
 from sklearn.decomposition import PCA
 from sklearn.preprocessing import StandardScaler
 
-from DataFileUtil.DataFileUtilClient import DataFileUtil
+from installed_clients.DataFileUtilClient import DataFileUtil
 from GenericsAPI.Utils.DataUtil import DataUtil
-from KBaseReport.KBaseReportClient import KBaseReport
+from installed_clients.KBaseReportClient import KBaseReport
 
 
 class PCAUtil:
@@ -160,6 +160,7 @@ class PCAUtil:
         data_matrix = self.data_util.fetch_data({'obj_ref': input_obj_ref}).get('data_matrix')
 
         data_df = pd.read_json(data_matrix)
+        data_df.fillna(0, inplace=True)
 
         if dimension == 'col':
             data_df = data_df.T

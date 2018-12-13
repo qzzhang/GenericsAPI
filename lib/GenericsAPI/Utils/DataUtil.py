@@ -4,9 +4,9 @@ from collections import defaultdict
 
 from dotmap import DotMap
 
-from DataFileUtil.DataFileUtilClient import DataFileUtil
+from installed_clients.DataFileUtilClient import DataFileUtil
 from installed_clients.GenericsServiceClient import GenericsService
-from Workspace.WorkspaceClient import Workspace as workspaceService
+from installed_clients.WorkspaceClient import Workspace as workspaceService
 
 GENERICS_TYPE = ['FloatMatrix2D']  # add case in _convert_data for each additional type
 GENERICS_MODULES = ['KBaseMatrices']

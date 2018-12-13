@@ -183,7 +183,6 @@ class BaseClient(object):
         if ret.status_code == 500:
             if ret.headers.get(_CT) == _AJ:
                 err = ret.json()
-                print(url, body, err)
                 if 'error' in err:
                     raise ServerError(**err['error'])
                 else:

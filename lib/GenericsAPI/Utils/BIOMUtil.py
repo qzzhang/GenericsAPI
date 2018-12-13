@@ -7,11 +7,11 @@ import biom
 import pandas as pd
 from Bio import SeqIO
 
-from DataFileUtil.DataFileUtilClient import DataFileUtil
+from installed_clients.DataFileUtilClient import DataFileUtil
 from GenericsAPI.Utils.AttributeUtils import AttributesUtil
 from GenericsAPI.Utils.DataUtil import DataUtil
 from GenericsAPI.Utils.MatrixUtil import MatrixUtil
-from KBaseReport.KBaseReportClient import KBaseReport
+from installed_clients.KBaseReportClient import KBaseReport
 
 TYPE_ATTRIBUTES = {'description', 'scale', 'row_normalization', 'col_normalization'}
 SCALE_TYPES = {'raw', 'ln', 'log2', 'log10'}
@@ -154,11 +154,12 @@ class BiomUtil:
 
             # retrieve 'lineage'/'taxonomy' info
             lineage = self._retrieve_value([], df.loc[observation_id],
-                                           'taxonomy', required=True)
+                                           'taxonomy')
 
             if isinstance(lineage, str):
                 lineage = list(set([x.strip() for x in lineage.split(',')]))
-            taxonomy.update({'lineage': lineage})
+            if lineage:
+                taxonomy.update({'lineage': lineage})
 
             # retrieve 'taxonomy_id' info
             taxonomy_id = self._retrieve_value([], df.loc[observation_id],
@@ -220,10 +221,11 @@ class BiomUtil:
 
             # retrieve 'lineage'/'taxonomy' info
             lineage = self._retrieve_value([], df.loc[observation_id],
-                                           'taxonomy', required=True)
+                                           'taxonomy')
             if isinstance(lineage, str):
                 lineage = list(set([x.strip() for x in lineage.split(',')]))
-            taxonomy.update({'lineage': lineage})
+            if lineage:
+                taxonomy.update({'lineage': lineage})
 
             # retrieve 'taxonomy_id' info
             taxonomy_id = self._retrieve_value([], df.loc[observation_id],
@@ -281,8 +283,9 @@ class BiomUtil:
 
             # retrieve 'lineage'/'taxonomy' info
             lineage = self._retrieve_value(observation_metadata[index], [],
-                                           'taxonomy', required=True)
-            taxonomy.update({'lineage': lineage})
+                                           'taxonomy')
+            if lineage:
+                taxonomy.update({'lineage': lineage})
 
             # retrieve 'taxonomy_id' info
             taxonomy_id = self._retrieve_value(observation_metadata[index], [],
@@ -346,10 +349,11 @@ class BiomUtil:
             # retrieve 'lineage'/'taxonomy' info
             lineage = self._retrieve_value(observation_metadata[index],
                                            df.loc[observation_id],
-                                           'taxonomy', required=True)
+                                           'taxonomy')
             if isinstance(lineage, str):
                 lineage += list(set([x.strip() for x in lineage.split(',')]))
-            taxonomy.update({'lineage': lineage})
+            if lineage:
+                taxonomy.update({'lineage': lineage})
 
             # retrieve 'taxonomy_id' info
             taxonomy_id = self._retrieve_value(observation_metadata[index],
@@ -711,11 +715,13 @@ class BiomUtil:
         amplicon_data = self._file_to_amplicon_data(biom_file, tsv_file, mode, refs, matrix_name,
                                                     workspace_id, scale, description, metadata_keys)
 
-        new_row_attr_ref = refs.get('row_attributemapping_ref',
-                                    amplicon_data.get('row_attributemapping_ref'))
+        new_row_attr_ref = None
+        if not refs.get('row_attributemapping_ref'):
+            new_row_attr_ref = amplicon_data.get('row_attributemapping_ref')
 
-        new_col_attr_ref = refs.get('col_attributemapping_ref',
-                                    amplicon_data.get('col_attributemapping_ref'))
+        new_col_attr_ref = None
+        if not refs.get('col_attributemapping_ref'):
+            new_col_attr_ref = amplicon_data.get('col_attributemapping_ref')
 
         logging.info('start saving Matrix object: {}'.format(matrix_name))
         matrix_obj_ref = self.data_util.save_object({
