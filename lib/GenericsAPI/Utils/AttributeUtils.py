@@ -6,9 +6,9 @@ import uuid
 import pandas as pd
 from xlrd.biffh import XLRDError
 
-from DataFileUtil.DataFileUtilClient import DataFileUtil
-from KBaseSearchEngine.KBaseSearchEngineClient import KBaseSearchEngine
-from Workspace.WorkspaceClient import Workspace as workspaceService
+from installed_clients.DataFileUtilClient import DataFileUtil
+from installed_clients.KBaseSearchEngineClient import KBaseSearchEngine
+from installed_clients.WorkspaceClient import Workspace as workspaceService
 from GenericsAPI.Utils.DataUtil import DataUtil
 
 

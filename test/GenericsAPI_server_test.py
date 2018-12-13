@@ -13,9 +13,9 @@ from configparser import ConfigParser  # py2
 from GenericsAPI.GenericsAPIImpl import GenericsAPI
 from GenericsAPI.GenericsAPIServer import MethodContext
 from GenericsAPI.authclient import KBaseAuth as _KBaseAuth
-from DataFileUtil.DataFileUtilClient import DataFileUtil
-from GenomeFileUtil.GenomeFileUtilClient import GenomeFileUtil
-from Workspace.WorkspaceClient import Workspace as workspaceService
+from installed_clients.DataFileUtilClient import DataFileUtil
+from installed_clients.GenomeFileUtilClient import GenomeFileUtil
+from installed_clients.WorkspaceClient import Workspace as workspaceService
 
 
 class GenericsAPITest(unittest.TestCase):

@@ -10,10 +10,10 @@ import pandas as pd
 from openpyxl import load_workbook
 from xlrd.biffh import XLRDError
 
-from DataFileUtil.DataFileUtilClient import DataFileUtil
+from installed_clients.DataFileUtilClient import DataFileUtil
 from GenericsAPI.Utils.AttributeUtils import AttributesUtil
 from GenericsAPI.Utils.DataUtil import DataUtil
-from KBaseReport.KBaseReportClient import KBaseReport
+from installed_clients.KBaseReportClient import KBaseReport
 
 TYPE_ATTRIBUTES = {'description', 'scale', 'row_normalization', 'col_normalization'}
 SCALE_TYPES = {'raw', 'ln', 'log2', 'log10'}

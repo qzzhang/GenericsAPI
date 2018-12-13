@@ -14,9 +14,9 @@ from plotly.offline import plot
 from sklearn.decomposition import PCA
 from sklearn.preprocessing import StandardScaler
 
-from DataFileUtil.DataFileUtilClient import DataFileUtil
+from installed_clients.DataFileUtilClient import DataFileUtil
 from GenericsAPI.Utils.DataUtil import DataUtil
-from KBaseReport.KBaseReportClient import KBaseReport
+from installed_clients.KBaseReportClient import KBaseReport
 
 
 class PCAUtil:

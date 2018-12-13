@@ -14,10 +14,10 @@ import plotly.graph_objs as go
 from matplotlib import pyplot as plt
 from plotly.offline import plot
 
-from DataFileUtil.DataFileUtilClient import DataFileUtil
+from installed_clients.DataFileUtilClient import DataFileUtil
 from GenericsAPI.Utils.CorrelationUtil import CorrelationUtil
 from GenericsAPI.Utils.DataUtil import DataUtil
-from KBaseReport.KBaseReportClient import KBaseReport
+from installed_clients.KBaseReportClient import KBaseReport
 
 
 class NetworkUtil:
