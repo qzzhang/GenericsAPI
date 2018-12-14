@@ -14,7 +14,8 @@ GENERICS_MODULES = ['KBaseMatrices']
 
 class DataUtil:
 
-    def _find_between(self, s, start, end):
+    @staticmethod
+    def _find_between(s, start, end):
         """
         _find_between: find string in between start and end
         """
@@ -23,29 +24,26 @@ class DataUtil:
 
     def _find_constraints(self, obj_type):
         """
-        _find_constraints: retrieve constraints (@contains, rowsum, unique)
+        _find_constraints: retrieve constraints (@contains, rowsum, unique, conditionally_required)
         """
 
         type_info = self.wsClient.get_type_info(obj_type)
         type_desc = type_info.get('description')
+        constraints = {}
 
-        constraints = {'contains': [], 'rowsum': [], 'unique': []}
-
-        unique = [item.split('\n')[0].strip() for item in type_desc.split('@unique')[1:]]
-        constraints['unique'] = unique
-
-        contains = [item.split('\n')[0].strip() for item in type_desc.split('@contains')[1:]]
-        constraints['contains'] = contains
+        for tag in ('contains', 'rowsum', 'unique', 'conditionally_required'):
+            constraints[tag] = [line.strip().split()[1:] for line in type_desc.split("\n")
+                                if line.startswith(f'@{tag}')]
 
         return constraints
 
     def _filter_constraints(self, constraints, data):
-
+        """filters out constraints with missing keys"""
         contains_constraints = constraints.get('contains')
 
         filtered_constraints = []
         for contains_constraint in contains_constraints:
-            in_values = contains_constraint.split(' ')[1:]
+            in_values = contains_constraint[1:]
             missing_key = True
             for in_value in in_values:
                 if in_value.startswith('values'):
@@ -71,10 +69,13 @@ class DataUtil:
         return constraints
 
     def _retrieve_value(self, data, value):
+        """Parse the provided 'data' object to retrieve the item in 'value'."""
         logging.info('Getting value for {}'.format(value))
         retrieve_data = []
         m_data = DotMap(data)
-        if value.startswith('values'):  # TODO: nested values e.g. values(values(ids))
+        if value.startswith('set('):
+            retrieve_data = value[4:-1].split(",")
+        elif value.startswith('values('):  # TODO: nested values e.g. values(values(ids))
             search_value = re.search('{}(.*){}'.format('\(', '\)'), value).group(1)
             unique_list = search_value.split('.')
             m_data_cp = m_data.copy()
@@ -115,30 +116,30 @@ class DataUtil:
         """
 
         validated = True
-        # TODO: add @conditionally_required to type specs
-        conditionally_required = {'row_attributemapping_ref': ['row_mapping'],
-                                  'col_attributemapping_ref': ['col_mapping']}
         failed_constraints = defaultdict(list)
 
         unique_constraints = constraints.get('unique')
         for unique_constraint in unique_constraints:
-            retrieved_value = self._retrieve_value(data, unique_constraint)
+            retrieved_value = self._retrieve_value(data, unique_constraint[0])
             if len(set(retrieved_value)) != len(retrieved_value):
                 validated = False
-                failed_constraints['unique'].append(unique_constraint)
+                failed_constraints['unique'].append(unique_constraint[0])
 
         contains_constraints = constraints.get('contains')
         for contains_constraint in contains_constraints:
-            value = contains_constraint.split(' ')[0]
-            in_values = contains_constraint.split(' ')[1:]
+            value = contains_constraint[0]
+            in_values = contains_constraint[1:]
             retrieved_in_values = []
             for in_value in in_values:
                 retrieved_in_values += self._retrieve_value(data, in_value)
             if not (set(self._retrieve_value(data, value)) <= set(retrieved_in_values)):
                 validated = False
-                failed_constraints['contains'].append(contains_constraint)
+                failed_constraints['contains'].append(" ".join(contains_constraint))
 
-        for trigger, required_keys in conditionally_required.items():
+        conditional_constraints = constraints.get('conditionally_required')
+        for conditional_constraint in conditional_constraints:
+            trigger = conditional_constraint[0]
+            required_keys = conditional_constraint[1:]
             if trigger in data:
                 missing_keys = [key for key in required_keys if key not in data]
                 if missing_keys:
@@ -147,6 +148,36 @@ class DataUtil:
                         (trigger, required_keys, missing_keys))
 
         return validated, failed_constraints
+
+    @staticmethod
+    def _raise_validation_error(params, validate):
+        """Raise a meaningful error message for failed validation"""
+        logging.error('Data failed type checking')
+        failed_constraints = validate.get('failed_constraints')
+        error_msg = ['Object {} failed type checking:'.format(params.get('obj_name'))]
+        if failed_constraints.get('unique'):
+            unique_values = failed_constraints.get('unique')
+            error_msg.append('Object should have unique field: {}'.format(unique_values))
+        if failed_constraints.get('contains'):
+            contained_values = failed_constraints.get('contains')
+            for contained_value in contained_values:
+                subset_value = contained_value.split(' ')[0]
+                super_value = ' '.join(contained_value.split(' ')[1:])
+                if 'col_mapping' in super_value:
+                    error_msg.append('Column attribute mapping instances should contain all '
+                                     'column index from original data')
+
+                if 'row_mapping' in super_value:
+                    error_msg.append('Row attribute mapping instances should contain all row '
+                                     'index from original data')
+
+                error_msg.append('Object field [{}] should contain field [{}]'.format(
+                    super_value,
+                    subset_value))
+        for failure in failed_constraints.get('conditionally_required', []):
+            error_msg.append('If object field "{}" is present than object field(s) {} should '
+                             'also be present. Object is missing {}'.format(*failure))
+        raise ValueError('\n'.join(error_msg))
 
     def __init__(self, config):
         self.ws_url = config["workspace-url"]
@@ -219,10 +250,8 @@ class DataUtil:
 
         validated, failed_constraints = self._validate(constraints, data)
 
-        returnVal = {'validated': validated,
-                     'failed_constraints': failed_constraints}
-
-        return returnVal
+        return {'validated': validated,
+                'failed_constraints': failed_constraints}
 
     def save_object(self, params):
         """
@@ -256,33 +285,7 @@ class DataUtil:
                                        'data': data})
 
         if not validate.get('validated'):
-            logging.error('Data failed type checking')
-            failed_constraints = validate.get('failed_constraints')
-            error_msg = ['Object {} failed type checking:'.format(params.get('obj_name'))]
-            if failed_constraints.get('unique'):
-                unique_values = failed_constraints.get('unique')
-                error_msg.append('Object should have unique field: {}'.format(unique_values))
-            if failed_constraints.get('contains'):
-                contained_values = failed_constraints.get('contains')
-                for contained_value in contained_values:
-                    subset_value = contained_value.split(' ')[0]
-                    super_value = ' '.join(contained_value.split(' ')[1:])
-                    if 'col_mapping' in super_value:
-                        error_msg.append('Column attribute mapping instances should contain all '
-                                         'column index from original data')
-
-                    if 'row_mapping' in super_value:
-                        error_msg.append('Row attribute mapping instances should contain all row '
-                                         'index from original data')
-
-                    error_msg.append('Object field [{}] should contain field [{}]'.format(
-                                                                                    super_value,
-                                                                                    subset_value))
-            for failure in failed_constraints.get('conditionally_required', []):
-                error_msg.append('If object field "{}" is present than object field(s) {} should '
-                                 'also be present. Object is missing {}'.format(*failure))
-
-            raise ValueError('\n'.join(error_msg))
+            self._raise_validation_error(params, validate)
 
         workspace_name = params.get('workspace_name')
         if not isinstance(workspace_name, int):

@@ -306,7 +306,7 @@ class GenericsAPITest(unittest.TestCase):
     def test_validate_data(self):
         self.start_test()
 
-        obj_type = 'KBaseMatrices.ExpressionMatrix-3.0'
+        obj_type = 'KBaseMatrices.ExpressionMatrix-3.2'
 
         # testing unique
         data = {'data': {'row_ids': ['same_row_id', 'same_row_id'],
@@ -342,8 +342,8 @@ class GenericsAPITest(unittest.TestCase):
                               returnVal.get('failed_constraints').get('contains'))
 
         # testing conditionally_required
-        data = {'data': {'row_ids': ['same_row_id', 'unknown_row_id'],
-                         'col_ids': ['same_col_id', 'unknown_col_id']},
+        data = {'data': {'row_ids': ['same_row_id'],
+                         'col_ids': ['same_col_id']},
                 'row_attributemapping_ref': self.attribute_mapping_ref,
                 'col_attributemapping_ref': self.attribute_mapping_ref,
                 'genome_ref': self.genome_ref}
