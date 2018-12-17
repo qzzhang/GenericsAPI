@@ -60,7 +60,7 @@ class PCAUtil:
 
         return matrix_data
 
-    def _pca_df_to_excel(self, pca_df, result_dir, pca_matrix_ref):
+    def _pca_df_to_excel(self, pca_df, components_df, result_dir, pca_matrix_ref):
         """
         write PCA matrix df into excel
         """
@@ -73,7 +73,8 @@ class PCAUtil:
 
         writer = pd.ExcelWriter(file_path)
 
-        pca_df.to_excel(writer, "pca_matrix", index=True)
+        pca_df.to_excel(writer, "principal_component_matrix", index=True)
+        components_df.to_excel(writer, "component_variance_matrix", index=True)
 
         writer.close()
 
@@ -98,29 +99,36 @@ class PCAUtil:
         pca_data = self.dfu.get_objects({'object_refs': [pca_matrix_ref]})['data'][0]['data']
 
         rotation_matrix_data = pca_data.get('rotation_matrix')
+        components_matrix_data = pca_data.get('components_matrix')
+
+        explained_variance = pca_data.get('explained_variance')
         explained_variance_ratio = pca_data.get('explained_variance_ratio')
         dimension = pca_data.get('pca_parameters').get('dimension')
         original_matrix_ref = pca_data.get('original_matrix_ref')
 
         pca_df = self._Matrix2D_to_df(rotation_matrix_data)
-        pca_df.loc['explained_variance_ratio'] = explained_variance_ratio
+        components_df = self._Matrix2D_to_df(components_matrix_data)
+        components_df.loc['explained_variance'] = explained_variance
+        components_df.loc['explained_variance_ratio'] = explained_variance_ratio
 
         if original_matrix_ref:
             logging.info('appending instance group information to pca data frame')
             obj_data = self.dfu.get_objects({'object_refs': [original_matrix_ref]})['data'][0]['data']
 
-            if dimension == 'row':
-                attribute_mapping = obj_data.get('row_mapping')
-            elif dimension == 'col':
-                attribute_mapping = obj_data.get('col_mapping')
-            else:
-                attribute_mapping = None
+            attributemapping_ref = obj_data.get('{}_attributemapping_ref'.format(dimension))
 
-            if attribute_mapping:
-                # append instance col mapping from row/col_mapping
-                pca_df['instance_group'] = pca_df.index.map(attribute_mapping)
+            am_data = self.dfu.get_objects({'object_refs': [attributemapping_ref]})['data'][0]['data']
 
-        return pca_df
+            attributes = am_data.get('attributes')
+            instances = am_data.get('instances')
+            am_df = pd.DataFrame(data=list(instances.values()),
+                                 columns=list(map(lambda x: x.get('attribute'), attributes)),
+                                 index=instances.keys())
+
+            pca_df = pca_df.merge(am_df, left_index=True, right_index=True, how='left',
+                                  validate='one_to_one')
+
+        return pca_df, components_df
 
     def _save_pca_matrix(self, workspace_name, input_obj_ref, pca_matrix_name, rotation_matrix_df,
                          components_df, explained_variance, explained_variance_ratio,
@@ -136,7 +144,7 @@ class PCAUtil:
         pca_data = {}
 
         pca_data.update({'rotation_matrix': self._df_to_list(rotation_matrix_df)})
-        pca_data.update({'rotation_matrix': self._df_to_list(components_df)})
+        pca_data.update({'components_matrix': self._df_to_list(components_df)})
         pca_data.update({'explained_variance': explained_variance})
         pca_data.update({'explained_variance_ratio': explained_variance_ratio})
         pca_data.update({'pca_parameters': {'n_components': str(n_components),
@@ -608,12 +616,12 @@ class PCAUtil:
         logging.info('start exporting pca matrix')
         pca_matrix_ref = params.get('input_ref')
 
-        pca_df = self._pca_to_df(pca_matrix_ref)
+        pca_df, components_df = self._pca_to_df(pca_matrix_ref)
 
         result_dir = os.path.join(self.scratch, str(uuid.uuid4()))
         self._mkdir_p(result_dir)
 
-        self._pca_df_to_excel(pca_df, result_dir, pca_matrix_ref)
+        self._pca_df_to_excel(pca_df, components_df, result_dir, pca_matrix_ref)
 
         package_details = self.dfu.package_for_download({
             'file_path': result_dir,
