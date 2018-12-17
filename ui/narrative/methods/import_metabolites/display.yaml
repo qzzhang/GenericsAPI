@@ -65,9 +65,9 @@ parameters :
         ui-name : |
             Compounds (Row) AttributeMapping Reference
         short-hint : |
-            Provide a AttributeMapping associated with rows in metabolite matrix
+            Provide a AttributeMapping with data about the compounds
         long-hint : |
-            Provide a AttributeMapping associated with rows in metabolite matrix
+            Provide a AttributeMapping with data about the compounds including mass, formula and inchikey
 
 
 description : |

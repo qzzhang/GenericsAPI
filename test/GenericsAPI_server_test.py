@@ -306,7 +306,7 @@ class GenericsAPITest(unittest.TestCase):
     def test_validate_data(self):
         self.start_test()
 
-        obj_type = 'KBaseMatrices.ExpressionMatrix-3.2'
+        obj_type = 'KBaseMatrices.ExpressionMatrix'
 
         # testing unique
         data = {'data': {'row_ids': ['same_row_id', 'same_row_id'],
@@ -357,6 +357,26 @@ class GenericsAPITest(unittest.TestCase):
                                        ('col_attributemapping_ref', ['col_mapping'], ['col_mapping'])]
         self.assertCountEqual(expected_failed_constraints,
                               returnVal.get('failed_constraints').get('conditionally_required'))
+
+    def test_validate_biochem(self):
+        self.start_test()
+
+        obj_type = 'KBaseMatrices.MetaboliteMatrix'
+
+        # testing unique
+        data = {'data': {'row_ids': ['same_row_id']},
+                'row_mapping': {'same_row_id': 'test_instance_1'},
+                'row_attributemapping_ref': self.attribute_mapping_ref
+                }
+        params = {'obj_type': obj_type,
+                  'data': data}
+        returnVal = self.getImpl().validate_data(self.ctx, params)[0]
+        self.assertFalse(returnVal.get('validated'))
+
+        expected_failed_constraints = ['set(mass,formula,inchikey) row_attributemapping_ref:attributes.[*].attribute',
+                                      ]
+        self.assertCountEqual(expected_failed_constraints,
+                              returnVal.get('failed_constraints').get('contains'))
 
     def test_search_matrix(self):
         self.start_test()
