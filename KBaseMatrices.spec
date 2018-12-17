@@ -74,6 +74,8 @@ module KBaseMatrices{
       Validation:
       @unique data.row_ids
       @unique data.col_ids
+      @conditionally_required row_attributemapping_ref row_mapping
+      @conditionally_required col_attributemapping_ref col_mapping
       @contains data.row_ids row_mapping
       @contains data.col_ids col_mapping
       @contains values(row_mapping) row_attributemapping_ref:instances
@@ -140,6 +142,8 @@ module KBaseMatrices{
       Validation:
       @unique data.row_ids
       @unique data.col_ids
+      @conditionally_required row_attributemapping_ref row_mapping
+      @conditionally_required col_attributemapping_ref col_mapping
       @contains data.row_ids row_mapping
       @contains data.col_ids col_mapping
       @contains values(row_mapping) row_attributemapping_ref:instances
@@ -204,6 +208,8 @@ module KBaseMatrices{
       Validation:
       @unique data.row_ids
       @unique data.col_ids
+      @conditionally_required row_attributemapping_ref row_mapping
+      @conditionally_required col_attributemapping_ref col_mapping
       @contains data.row_ids row_mapping
       @contains data.col_ids col_mapping
       @contains values(row_mapping) row_attributemapping_ref:instances
@@ -268,15 +274,18 @@ module KBaseMatrices{
       Validation:
       @unique data.row_ids
       @unique data.col_ids
+      @conditionally_required row_attributemapping_ref row_mapping
+      @conditionally_required col_attributemapping_ref col_mapping
       @contains data.row_ids row_mapping
       @contains data.col_ids col_mapping
       @contains values(row_mapping) row_attributemapping_ref:instances
       @contains values(col_mapping) col_attributemapping_ref:instances
       @contains values(biochemistry_mapping) biochemistry_ref:compounds.[*].id
+      @contains set(mass,formula,inchikey) row_attributemapping_ref:attributes.[*].attribute
 
       @optional description row_normalization col_normalization
-      @optional col_mapping row_mapping col_attributemapping_ref row_attributemapping_ref
-      @optional attributes search_attributes biochemistry_ref biochemistry_mapping
+      @optional col_mapping row_mapping col_attributemapping_ref
+      @optional attributes search_attributes biochemistry_mapping
 
       @metadata ws scale
       @metadata ws row_normalization
@@ -330,6 +339,8 @@ module KBaseMatrices{
       Validation:
       @unique data.row_ids
       @unique data.col_ids
+      @conditionally_required row_attributemapping_ref row_mapping
+      @conditionally_required col_attributemapping_ref col_mapping
       @contains data.row_ids row_mapping
       @contains data.col_ids col_mapping
       @contains values(row_mapping) row_attributemapping_ref:instances

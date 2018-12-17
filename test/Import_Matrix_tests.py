@@ -153,11 +153,34 @@ class GenericsAPITest(unittest.TestCase):
     def test_import_matrix_from_csv(self):
         self.start_test()
 
+        obj_type = 'ExpressionMatrix'
+        params = {'obj_type': obj_type,
+                  'matrix_name': 'test_ExpressionMatrix2',
+                  'workspace_name': self.wsName,
+                  'input_file_path': os.path.join('data', 'generic_data.csv'),
+                  'genome_ref': self.genome_ref,
+                  'scale': 'log2',
+                  'description': "an expression matrix",
+                  }
+        returnVal = self.serviceImpl.import_matrix_from_excel(self.ctx, params)[0]
+        self.assertIn('matrix_obj_ref', returnVal)
+        self.assertIn('report_name', returnVal)
+        self.assertIn('report_ref', returnVal)
+        obj = self.dfu.get_objects(
+            {'object_refs': [returnVal['matrix_obj_ref']]}
+        )['data'][0]['data']
+        self.assertIn('genome_ref', obj)
+        self.assertIn('description', obj)
+        self.assertEqual(obj['description'], 'an expression matrix')
+
+    def test_import_metabolite_matrix_from_excel(self):
+        self.start_test()
+
         obj_type = 'MetaboliteMatrix'
         params = {'obj_type': obj_type,
                   'matrix_name': 'test_MetaboliteMatrix',
                   'workspace_name': self.wsName,
-                  'input_file_path': os.path.join('data', 'generic_data.csv'),
+                  'input_file_path': os.path.join('data', 'metabolite.xlsx'),
                   'scale': 'log2',
                   'biochemistry_ref': 'kbase/default',
                   'description': "a biochem matrix",
