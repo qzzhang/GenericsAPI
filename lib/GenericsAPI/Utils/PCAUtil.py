@@ -136,7 +136,7 @@ class PCAUtil:
         pca_data = {}
 
         pca_data.update({'rotation_matrix': self._df_to_list(rotation_matrix_df)})
-        pca_data.update({'components_matrix': self._df_to_list(components_df)})
+        pca_data.update({'rotation_matrix': self._df_to_list(components_df)})
         pca_data.update({'explained_variance': explained_variance})
         pca_data.update({'explained_variance_ratio': explained_variance_ratio})
         pca_data.update({'pca_parameters': {'n_components': str(n_components),
@@ -196,8 +196,8 @@ class PCAUtil:
                                           index=data_df.index)
 
         components_df = pd.DataFrame(data=components,
-                                     columns=col,
-                                     index=data_df.columns)
+                                     columns=data_df.columns,
+                                     index=col).transpose()
 
         rotation_matrix_df.fillna(0, inplace=True)
 
