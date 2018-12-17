@@ -266,11 +266,13 @@ module KBaseExperiments {
       PCAMatrix Fields:
       description - short optional description of the dataset
       rotation_matrix  - result rotation matrix
+      components_matrix - Principal axes in feature space, representing the directions of maximum variance in the data
+      explained_variance - The amount of variance explained by each of the selected components
       explained_variance_ratio - Percentage of variance explained by each of the selected components
       pca_parameters - arguments used to perform PCA analysis
 
       @optional description pca_parameters
-      @optional explained_variance_ratio original_matrix_ref
+      @optional components_matrix explained_variance_ratio explained_variance original_matrix_ref
 
       @metadata ws length(rotation_matrix.row_ids) as matrix_size
       @metadata ws length(rotation_matrix.col_ids) as n_components
@@ -280,6 +282,8 @@ module KBaseExperiments {
       string description;
       mapping<string, string> pca_parameters;
       FloatMatrix2D rotation_matrix;
+      FloatMatrix2D components_matrix;
+      list<float> explained_variance;
       list<float> explained_variance_ratio;
       WSRef original_matrix_ref;
     } PCAMatrix;

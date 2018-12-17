@@ -123,7 +123,8 @@ class PCAUtil:
         return pca_df
 
     def _save_pca_matrix(self, workspace_name, input_obj_ref, pca_matrix_name, rotation_matrix_df,
-                         explained_variance_ratio, n_components, dimension):
+                         components_df, explained_variance, explained_variance_ratio,
+                         n_components, dimension):
 
         logging.info('saving PCAMatrix')
 
@@ -135,6 +136,8 @@ class PCAUtil:
         pca_data = {}
 
         pca_data.update({'rotation_matrix': self._df_to_list(rotation_matrix_df)})
+        pca_data.update({'components_matrix': self._df_to_list(components_df)})
+        pca_data.update({'explained_variance': explained_variance})
         pca_data.update({'explained_variance_ratio': explained_variance_ratio})
         pca_data.update({'pca_parameters': {'n_components': str(n_components),
                                             'dimension': str(dimension)}})
@@ -179,7 +182,10 @@ class PCAUtil:
         # Projection to ND
         pca = PCA(n_components=n_components, whiten=True)
         principalComponents = pca.fit_transform(s_values)
+        explained_variance = list(pca.explained_variance_)
         explained_variance_ratio = list(pca.explained_variance_ratio_)
+
+        components = pca.components_
 
         col = list()
         for i in range(n_components):
@@ -189,9 +195,13 @@ class PCAUtil:
                                           columns=col,
                                           index=data_df.index)
 
+        components_df = pd.DataFrame(data=components,
+                                     columns=col,
+                                     index=data_df.columns)
+
         rotation_matrix_df.fillna(0, inplace=True)
 
-        return rotation_matrix_df, explained_variance_ratio
+        return rotation_matrix_df, components_df, explained_variance, explained_variance_ratio
 
     def _generate_pca_html_report(self, pca_plots, n_components):
 
@@ -552,7 +562,8 @@ class PCAUtil:
                                   params.get('color_marker_by'), params.get('scale_size_by'))
 
         if "KBaseMatrices" in obj_type:
-            (rotation_matrix_df,
+
+            (rotation_matrix_df, components_df, explained_variance,
              explained_variance_ratio) = self._pca_for_matrix(input_obj_ref, n_components,
                                                               dimension)
         else:
@@ -561,7 +572,8 @@ class PCAUtil:
             raise ValueError("err_msg")
 
         pca_ref = self._save_pca_matrix(workspace_name, input_obj_ref, pca_matrix_name,
-                                        rotation_matrix_df, explained_variance_ratio,
+                                        rotation_matrix_df, components_df, explained_variance,
+                                        explained_variance_ratio,
                                         n_components, dimension)
 
         plot_pca_matrix = self._append_instance_group(rotation_matrix_df.copy(), obj_data,
