@@ -220,9 +220,8 @@ class PCAUtilTest(unittest.TestCase):
         self.assertCountEqual(xl.sheet_names, expected_sheet_names)
 
         df = xl.parse("pca_matrix")
-        expected_index = ['WRI_RS00010_CDS_1', 'WRI_RS00015_CDS_1', 'WRI_RS00025_CDS_1',
-                          'explained_variance_ratio']
-        expected_col = ['principal_component_1', 'principal_component_2', 'instance_group']
+        expected_index = ['WRI_RS00010_CDS_1', 'WRI_RS00015_CDS_1', 'WRI_RS00025_CDS_1']
+        expected_col = ['principal_component_1', 'principal_component_2']
         self.assertCountEqual(df.index.tolist(), expected_index)
         self.assertCountEqual(df.columns.tolist(), expected_col)
 
