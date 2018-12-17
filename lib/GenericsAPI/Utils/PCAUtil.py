@@ -104,6 +104,7 @@ class PCAUtil:
 
         explained_variance = pca_data.get('explained_variance')
         explained_variance_ratio = pca_data.get('explained_variance_ratio')
+        singular_values = pca_data.get('singular_values')
         dimension = pca_data.get('pca_parameters').get('dimension')
         original_matrix_ref = pca_data.get('original_matrix_ref')
 
@@ -113,6 +114,7 @@ class PCAUtil:
             components_df = self._Matrix2D_to_df(components_matrix_data)
             components_df.loc['explained_variance'] = explained_variance
             components_df.loc['explained_variance_ratio'] = explained_variance_ratio
+            components_df.loc['singular_values'] = singular_values
 
         if original_matrix_ref:
             logging.info('appending instance group information to pca data frame')
@@ -135,7 +137,7 @@ class PCAUtil:
 
     def _save_pca_matrix(self, workspace_name, input_obj_ref, pca_matrix_name, rotation_matrix_df,
                          components_df, explained_variance, explained_variance_ratio,
-                         n_components, dimension):
+                         singular_values, n_components, dimension):
 
         logging.info('saving PCAMatrix')
 
@@ -150,6 +152,7 @@ class PCAUtil:
         pca_data.update({'components_matrix': self._df_to_list(components_df)})
         pca_data.update({'explained_variance': explained_variance})
         pca_data.update({'explained_variance_ratio': explained_variance_ratio})
+        pca_data.update({'singular_values': singular_values})
         pca_data.update({'pca_parameters': {'n_components': str(n_components),
                                             'dimension': str(dimension)}})
         pca_data.update({'original_matrix_ref': input_obj_ref})
@@ -197,6 +200,7 @@ class PCAUtil:
         explained_variance_ratio = list(pca.explained_variance_ratio_)
 
         components = pca.components_
+        singular_values = list(pca.singular_values_)
 
         col = list()
         for i in range(n_components):
@@ -212,7 +216,8 @@ class PCAUtil:
 
         rotation_matrix_df.fillna(0, inplace=True)
 
-        return rotation_matrix_df, components_df, explained_variance, explained_variance_ratio
+        return rotation_matrix_df, components_df, explained_variance, explained_variance_ratio,
+               singular_values
 
     def _generate_pca_html_report(self, pca_plots, n_components):
 
@@ -575,8 +580,9 @@ class PCAUtil:
         if "KBaseMatrices" in obj_type:
 
             (rotation_matrix_df, components_df, explained_variance,
-             explained_variance_ratio) = self._pca_for_matrix(input_obj_ref, n_components,
-                                                              dimension)
+             explained_variance_ratio, singular_values) = self._pca_for_matrix(input_obj_ref,
+                                                                               n_components,
+                                                                               dimension)
         else:
             err_msg = 'Ooops! [{}] is not supported.\n'.format(obj_type)
             err_msg += 'Please supply KBaseMatrices object'
@@ -584,7 +590,7 @@ class PCAUtil:
 
         pca_ref = self._save_pca_matrix(workspace_name, input_obj_ref, pca_matrix_name,
                                         rotation_matrix_df, components_df, explained_variance,
-                                        explained_variance_ratio,
+                                        explained_variance_ratio, singular_values
                                         n_components, dimension)
 
         plot_pca_matrix = self._append_instance_group(rotation_matrix_df.copy(), obj_data,
