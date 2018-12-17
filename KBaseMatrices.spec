@@ -74,6 +74,8 @@ module KBaseMatrices{
       Validation:
       @unique data.row_ids
       @unique data.col_ids
+      @conditionally_required row_attributemapping_ref row_mapping
+      @conditionally_required col_attributemapping_ref col_mapping
       @contains data.row_ids row_mapping
       @contains data.col_ids col_mapping
       @contains values(row_mapping) row_attributemapping_ref:instances
@@ -140,6 +142,8 @@ module KBaseMatrices{
       Validation:
       @unique data.row_ids
       @unique data.col_ids
+      @conditionally_required row_attributemapping_ref row_mapping
+      @conditionally_required col_attributemapping_ref col_mapping
       @contains data.row_ids row_mapping
       @contains data.col_ids col_mapping
       @contains values(row_mapping) row_attributemapping_ref:instances
@@ -204,6 +208,8 @@ module KBaseMatrices{
       Validation:
       @unique data.row_ids
       @unique data.col_ids
+      @conditionally_required row_attributemapping_ref row_mapping
+      @conditionally_required col_attributemapping_ref col_mapping
       @contains data.row_ids row_mapping
       @contains data.col_ids col_mapping
       @contains values(row_mapping) row_attributemapping_ref:instances
@@ -268,6 +274,8 @@ module KBaseMatrices{
       Validation:
       @unique data.row_ids
       @unique data.col_ids
+      @conditionally_required row_attributemapping_ref row_mapping
+      @conditionally_required col_attributemapping_ref col_mapping
       @contains data.row_ids row_mapping
       @contains data.col_ids col_mapping
       @contains values(row_mapping) row_attributemapping_ref:instances
@@ -330,6 +338,8 @@ module KBaseMatrices{
       Validation:
       @unique data.row_ids
       @unique data.col_ids
+      @conditionally_required row_attributemapping_ref row_mapping
+      @conditionally_required col_attributemapping_ref col_mapping
       @contains data.row_ids row_mapping
       @contains data.col_ids col_mapping
       @contains values(row_mapping) row_attributemapping_ref:instances
