@@ -590,7 +590,7 @@ class PCAUtil:
 
         pca_ref = self._save_pca_matrix(workspace_name, input_obj_ref, pca_matrix_name,
                                         rotation_matrix_df, components_df, explained_variance,
-                                        explained_variance_ratio, singular_values
+                                        explained_variance_ratio, singular_values,
                                         n_components, dimension)
 
         plot_pca_matrix = self._append_instance_group(rotation_matrix_df.copy(), obj_data,
