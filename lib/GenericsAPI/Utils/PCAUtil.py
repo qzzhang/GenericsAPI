@@ -74,7 +74,8 @@ class PCAUtil:
         writer = pd.ExcelWriter(file_path)
 
         pca_df.to_excel(writer, "principal_component_matrix", index=True)
-        components_df.to_excel(writer, "component_variance_matrix", index=True)
+        if components_df is not None:
+            components_df.to_excel(writer, "component_variance_matrix", index=True)
 
         writer.close()
 
@@ -107,9 +108,11 @@ class PCAUtil:
         original_matrix_ref = pca_data.get('original_matrix_ref')
 
         pca_df = self._Matrix2D_to_df(rotation_matrix_data)
-        components_df = self._Matrix2D_to_df(components_matrix_data)
-        components_df.loc['explained_variance'] = explained_variance
-        components_df.loc['explained_variance_ratio'] = explained_variance_ratio
+        components_df = None
+        if components_matrix_data:
+            components_df = self._Matrix2D_to_df(components_matrix_data)
+            components_df.loc['explained_variance'] = explained_variance
+            components_df.loc['explained_variance_ratio'] = explained_variance_ratio
 
         if original_matrix_ref:
             logging.info('appending instance group information to pca data frame')

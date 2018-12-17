@@ -108,7 +108,8 @@ class PCAUtilTest(unittest.TestCase):
         object_type = 'KBaseExperiments.PCAMatrix'
         pca_matrix_object_name = 'test_PCA_matrix'
         pca_matrix_data = {'explained_variance_ratio': [0.628769688409428, 0.371230311590572],
-                           'original_matrix_ref': original_matrix_ref,
+                           'explained_variance': [0.628769688409428, 0.371230311590572],
+                           # 'original_matrix_ref': original_matrix_ref,
                            'pca_parameters': {'dimension': 'row', 'n_components': '2'},
                            'rotation_matrix': {'col_ids': ['principal_component_1',
                                                            'principal_component_2'],
@@ -216,13 +217,12 @@ class PCAUtilTest(unittest.TestCase):
         self.assertEqual(len(xl_files), 1)
 
         xl = pd.ExcelFile(os.path.join(output_directory, xl_files[0]))
-        expected_sheet_names = ['pca_matrix']
+        expected_sheet_names = ['principal_component_matrix']
         self.assertCountEqual(xl.sheet_names, expected_sheet_names)
 
-        df = xl.parse("pca_matrix")
-        expected_index = ['WRI_RS00010_CDS_1', 'WRI_RS00015_CDS_1', 'WRI_RS00025_CDS_1',
-                          'explained_variance_ratio']
-        expected_col = ['principal_component_1', 'principal_component_2', 'instance_group']
+        df = xl.parse("principal_component_matrix")
+        expected_index = ['WRI_RS00010_CDS_1', 'WRI_RS00015_CDS_1', 'WRI_RS00025_CDS_1']
+        expected_col = ['principal_component_1', 'principal_component_2']
         self.assertCountEqual(df.index.tolist(), expected_index)
         self.assertCountEqual(df.columns.tolist(), expected_col)
 
