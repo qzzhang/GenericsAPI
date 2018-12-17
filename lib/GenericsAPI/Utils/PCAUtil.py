@@ -216,8 +216,8 @@ class PCAUtil:
 
         rotation_matrix_df.fillna(0, inplace=True)
 
-        return rotation_matrix_df, components_df, explained_variance, explained_variance_ratio,
-               singular_values
+        return (rotation_matrix_df, components_df, explained_variance, explained_variance_ratio,
+               singular_values)
 
     def _generate_pca_html_report(self, pca_plots, n_components):
 
