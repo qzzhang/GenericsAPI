@@ -716,11 +716,11 @@ class BiomUtil:
                                                     workspace_id, scale, description, metadata_keys)
 
         new_row_attr_ref = None
-        if not refs.get('row_attributemapping_ref'):
+        if not params.get('row_attributemapping_ref'):
             new_row_attr_ref = amplicon_data.get('row_attributemapping_ref')
 
         new_col_attr_ref = None
-        if not refs.get('col_attributemapping_ref'):
+        if not params.get('col_attributemapping_ref'):
             new_col_attr_ref = amplicon_data.get('col_attributemapping_ref')
 
         logging.info('start saving Matrix object: {}'.format(matrix_name))
