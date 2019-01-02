@@ -161,7 +161,7 @@ class MatrixUtil:
         except XLRDError:
             return ''
         else:
-            obj_name = '{}_{}'.format(sheet_name, matrix_name)
+            obj_name = f'{matrix_name}_{sheet_name}'
             result_directory = os.path.join(self.scratch, str(uuid.uuid4()))
             self._mkdir_p(result_directory)
             file_path = os.path.join(result_directory, '{}.xlsx'.format(obj_name))
