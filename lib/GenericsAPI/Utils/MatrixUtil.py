@@ -75,7 +75,8 @@ class MatrixUtil:
 
         return shock_id
 
-    def _mkdir_p(self, path):
+    @staticmethod
+    def _mkdir_p(path):
         """
         _mkdir_p: make directory for given path
         """
@@ -89,14 +90,16 @@ class MatrixUtil:
             else:
                 raise
 
-    def _find_between(self, s, start, end):
+    @staticmethod
+    def _find_between(s, start, end):
         """
         _find_between: find string in between start and end
         """
 
         return re.search('{}(.*){}'.format(start, end), s).group(1)
 
-    def _write_mapping_sheet(self, file_path, sheet_name, mapping, index):
+    @staticmethod
+    def _write_mapping_sheet(file_path, sheet_name, mapping, index):
         """
         _write_mapping_sheet: write mapping to sheet
         """
@@ -133,13 +136,14 @@ class MatrixUtil:
 
         return report_output
 
-    def _process_mapping_sheet(self, file_path, sheet_name):
+    @staticmethod
+    def _process_mapping_sheet(file_path, sheet_name):
         """
         _process_mapping: process mapping sheet
         """
 
         try:
-            df = pd.read_excel(file_path, sheet_name=sheet_name)
+            df = pd.read_excel(file_path, sheet_name=sheet_name, dtype='str')
         except XLRDError:
             return dict()
         else:
@@ -172,7 +176,8 @@ class MatrixUtil:
 
             return ref.get('attribute_mapping_ref')
 
-    def _file_to_df(self, file_path):
+    @staticmethod
+    def _file_to_df(file_path):
         logging.info('start parsing file content to data frame')
 
         try:
@@ -193,7 +198,7 @@ class MatrixUtil:
                 except Exception:
                     raise ValueError('Cannot parse file. Please provide valide tsv, excel or csv file')
 
-        df.index.astype('str', copy=False)
+        df.index = df.index.astype('str')
         # fill NA with "None" so that they are properly represented as nulls in the KBase Object
         df = df.where((pd.notnull(df)), None)
 
@@ -266,7 +271,8 @@ class MatrixUtil:
 
         return attr_data
 
-    def _build_header_str(self, attribute_names):
+    @staticmethod
+    def _build_header_str(attribute_names):
 
         header_str = ''
         width = 100.0/len(attribute_names)
