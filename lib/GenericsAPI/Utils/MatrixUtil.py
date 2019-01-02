@@ -240,10 +240,12 @@ class MatrixUtil:
         # Parameter specified mappings should take precedence over tabs in excel so only process
         # if attributemapping_ref is missing:
         attr_data = {}
-        attributemapping_ref = refs.get(f'{axis}_attributemapping_ref',
-                                        self._process_attribute_mapping_sheet(
-                                            file_path, f'{axis}_attribute_mapping',
-                                            matrix_name, workspace_id))
+
+        if refs.get(f'{axis}_attributemapping_ref'):
+            attributemapping_ref = refs[f'{axis}_attributemapping_ref']
+        else:
+            attributemapping_ref = self._process_attribute_mapping_sheet(
+                file_path, f'{axis}_attribute_mapping', matrix_name, workspace_id)
 
         if attributemapping_ref:
             attr_data[f'{axis}_attributemapping_ref'] = attributemapping_ref
