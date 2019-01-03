@@ -105,9 +105,6 @@ class AttributesUtil:
         old_am_name = old_am_info[1]
         old_am_data = old_am_obj['data']
 
-        print('fdsafds')
-        print(old_am_info)
-
         new_am_data = self._check_and_append_am_data(old_am_data, append_am_data)
 
         if not new_am_name:
