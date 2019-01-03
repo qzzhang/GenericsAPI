@@ -1,15 +1,18 @@
 import logging
 import os
 import shutil
+import time
 import uuid
 
 import pandas as pd
 from xlrd.biffh import XLRDError
+from copy import deepcopy
 
 from installed_clients.DataFileUtilClient import DataFileUtil
 from installed_clients.KBaseSearchEngineClient import KBaseSearchEngine
 from installed_clients.WorkspaceClient import Workspace as workspaceService
 from GenericsAPI.Utils.DataUtil import DataUtil
+from installed_clients.KBaseReportClient import KBaseReport
 
 
 class AttributesUtil:
@@ -74,6 +77,146 @@ class AttributesUtil:
             }]
         })[0]
         return {"attribute_mapping_ref": "%s/%s/%s" % (info[6], info[0], info[4])}
+
+    def append_file_to_attribute_mapping(self, staging_file_subdir_path, old_am_ref, output_ws_id,
+                                         new_am_name=None):
+        """append an attribute mapping file to existing attribute mapping object
+        """
+
+        download_staging_file_params = {
+            'staging_file_subdir_path': staging_file_subdir_path
+        }
+        scratch_file_path = self.dfu.download_staging_file(
+                        download_staging_file_params).get('copy_file_path')
+
+        try:
+            df = pd.read_excel(scratch_file_path)
+        except XLRDError:
+            df = pd.read_csv(scratch_file_path, sep=None)
+        df = df.fillna(value='').astype('str')
+        if df.columns[1].lower() == "attribute ontology id":
+            append_am_data = self._df_to_am_obj(df)
+        else:
+            append_am_data = self._isa_df_to_am_object(df)
+
+        old_am_obj = self.dfu.get_objects({'object_refs': [old_am_ref]})['data'][0]
+
+        old_am_info = old_am_obj['info']
+        old_am_name = old_am_info[1]
+        old_am_data = old_am_obj['data']
+
+        new_am_data = self._check_and_append_am_data(old_am_data, append_am_data)
+
+        if not new_am_name:
+            current_time = time.localtime()
+            new_am_name = old_am_name + time.strftime('_%H_%M_%S_%Y_%m_%d', current_time)
+
+        info = self.dfu.save_objects({
+            "id": output_ws_id,
+            "objects": [{
+                "type": "KBaseExperiments.AttributeMapping",
+                "data": new_am_data,
+                "name": new_am_name
+            }]
+        })[0]
+        return {"attribute_mapping_ref": "%s/%s/%s" % (info[6], info[0], info[4])}
+
+    def update_matrix_attribute_mapping(self, params):
+
+        dimension = params.get('dimension')
+        if dimension not in ['col', 'row']:
+            raise ValueError('Please use "col" or "row" for input dimension')
+
+        workspace_name = params.get('workspace_name')
+
+        if not isinstance(workspace_name, int):
+            workspace_id = self.dfu.ws_name_to_id(workspace_name)
+        else:
+            workspace_id = workspace_name
+
+        old_matrix_ref = params.get('input_matrix_ref')
+        old_matrix_obj = self.dfu.get_objects({'object_refs': [old_matrix_ref]})['data'][0]
+        old_matrix_info = old_matrix_obj['info']
+        old_matrix_data = old_matrix_obj['data']
+
+        old_am_ref = old_matrix_data.get('{}_attributemapping_ref'.format(dimension))
+
+        if not old_am_ref:
+            raise ValueError('Matrix object does not have {} attribute mapping'.format(dimension))
+
+        new_am_ref = self.append_file_to_attribute_mapping(
+                                            params['staging_file_subdir_path'], old_am_ref,
+                                            workspace_id,
+                                            params['output_am_obj_name'])['attribute_mapping_ref']
+
+        old_matrix_data['{}_attributemapping_ref'.format(dimension)] = new_am_ref
+
+        info = self.dfu.save_objects({
+            "id": workspace_id,
+            "objects": [{
+                "type": old_matrix_info[2],
+                "data": old_matrix_data,
+                "name": params['output_matrix_obj_name']
+            }]
+        })[0]
+
+        new_attribute_mapping_ref = "%s/%s/%s" % (info[6], info[0], info[4])
+
+        objects_created = [{'ref': new_am_ref, 'description': 'Updated Attribute Mapping'},
+                           {'ref': new_attribute_mapping_ref, 'description': 'Updated Matrix'}]
+
+        report_params = {'message': '',
+                         'objects_created': objects_created,
+                         'workspace_name': workspace_name,
+                         'report_object_name': 'import_matrix_from_biom_' + str(uuid.uuid4())}
+
+        kbase_report_client = KBaseReport(self.callback_url, token=self.token)
+        output = kbase_report_client.create_extended_report(report_params)
+
+        return {'new_matrix_obj_ref': new_am_ref,
+                'new_attribute_mapping_ref': new_attribute_mapping_ref,
+                'report_name': output['name'], 'report_ref': output['ref']}
+
+    def _check_and_append_am_data(self, old_am_data, append_am_data):
+
+        exclude_keys = {'attributes', 'instances'}
+        new_am_data = {k: old_am_data[k] for k in set(list(old_am_data.keys())) - exclude_keys}
+
+        old_attrs = old_am_data.get('attributes')
+        old_insts = old_am_data.get('instances')
+
+        append_attrs = append_am_data.get('attributes')
+        append_insts = append_am_data.get('instances')
+
+        # checking duplicate attributes
+        old_attrs_names = [old_attr.get('attribute') for old_attr in old_attrs]
+        append_attrs_names = [append_attr.get('attribute') for append_attr in append_attrs]
+
+        duplicate_attrs = set(old_attrs_names).intersection(append_attrs_names)
+
+        if duplicate_attrs:
+            error_msg = 'Duplicate attribute mappings: [{}]'.format(duplicate_attrs)
+            raise ValueError(error_msg)
+
+        # checking missing instances
+        missing_inst = old_insts.keys() - append_insts.keys()
+
+        if missing_inst:
+            error_msg = 'Appended attribute mapping misses [{}] instances'.format(missing_inst)
+            raise ValueError(error_msg)
+
+        new_attrs = old_attrs + append_attrs
+        new_am_data['attributes'] = new_attrs
+
+        new_insts = deepcopy(old_insts)
+
+        for inst_name, val in new_insts.items():
+            append_val = append_insts.get(inst_name)
+            val.extend(append_val)
+
+        new_am_data['instances'] = new_insts
+
+        return new_am_data
 
     def _am_data_to_df(self, data):
         """

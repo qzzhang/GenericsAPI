@@ -374,6 +374,10 @@ class Application(object):
                              name='GenericsAPI.file_to_attribute_mapping',
                              types=[dict])
         self.method_authentication['GenericsAPI.file_to_attribute_mapping'] = 'required'  # noqa
+        self.rpc_service.add(impl_GenericsAPI.update_matrix_attribute_mapping,
+                             name='GenericsAPI.update_matrix_attribute_mapping',
+                             types=[dict])
+        self.method_authentication['GenericsAPI.update_matrix_attribute_mapping'] = 'required'  # noqa
         self.rpc_service.add(impl_GenericsAPI.attribute_mapping_to_tsv_file,
                              name='GenericsAPI.attribute_mapping_to_tsv_file',
                              types=[dict])

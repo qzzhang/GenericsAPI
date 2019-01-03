@@ -1,0 +1,142 @@
+{
+  "ver" : "",
+  "authors" : ["tgu2"],
+  "contact" : "http://kbase.us/contact-us/",
+  "visible" : true,
+  "categories" : ["active","util"],
+  "widgets": {
+    "input": "kbaseNarrativeMethodInput",
+    "output" : "no-display"
+  },
+  "parameters" : [
+    {
+      "id" : "input_matrix_ref",
+      "optional" : false,
+      "advanced" : false,
+      "allow_multiple" : false,
+      "default_values" : [ "" ],
+      "field_type" : "text",
+      "text_options" : {
+        "valid_ws_types" : ["KBaseMatrices"]
+      }
+    },
+    {
+      "id" : "staging_file_subdir_path",
+      "optional" : false,
+      "advanced" : false,
+      "allow_multiple" : false,
+      "default_values" : [ "" ],
+      "field_type" : "dynamic_dropdown",
+      "dynamic_dropdown_options" : {
+        "data_source": "ftp_staging"
+      }
+    },
+    {
+      "id" : "dimension",
+      "optional" : false,
+      "advanced" : true,
+      "allow_multiple" : false,
+      "default_values" : ["row"],
+      "field_type" : "dropdown",
+      "dropdown_options":
+      {
+        "options":
+        [
+          {
+              "display": "Row Attribute Mapping",
+              "value": "row"
+          },
+          {
+              "display": "Column Attribute Mapping",
+              "value": "col"
+          }
+        ]
+      }
+    },
+    {
+      "id" : "output_am_obj_name",
+      "optional" : false,
+      "advanced" : false,
+      "allow_multiple" : false,
+      "default_values" : [ "" ],
+      "field_type" : "text",
+      "text_options" : {
+          "valid_ws_types" : ["KBaseExperiments.AttributeMapping"],
+          "is_output_name" : true
+        }
+    },
+    {
+      "id" : "output_matrix_obj_name",
+      "optional" : false,
+      "advanced" : false,
+      "allow_multiple" : false,
+      "default_values" : [ "" ],
+      "field_type" : "text",
+      "text_options" : {
+          "valid_ws_types" : ["KBaseMatrices"],
+          "is_output_name" : true
+        }
+    }
+  ],
+  "behavior" : {
+    "service-mapping" : {
+      "url" : "",
+      "name" : "GenericsAPI",
+      "method" : "update_matrix_attribute_mapping",
+      "input_mapping" : [
+        {
+          "narrative_system_variable": "workspace",
+          "target_property": "workspace_name"
+        },
+        {
+          "input_parameter" : "input_matrix_ref",
+          "target_property" : "input_matrix_ref",
+          "target_type_transform": "resolved-ref"
+        },
+        {
+          "input_parameter" : "staging_file_subdir_path",
+          "target_property" : "staging_file_subdir_path"
+        },
+        {
+          "input_parameter" : "dimension",
+          "target_property" : "dimension"
+        },
+        {
+          "input_parameter" : "output_am_obj_name",
+          "target_property" : "output_am_obj_name"
+        },
+        {
+          "input_parameter" : "output_matrix_obj_name",
+          "target_property" : "output_matrix_obj_name"
+        }
+      ],
+      "output_mapping" : [
+        {
+          "narrative_system_variable": "workspace",
+          "target_property": "wsName"
+        },
+        {
+            "service_method_output_path": [0, "new_matrix_obj_ref"],
+            "target_property": "new_matrix_obj_ref"
+        },
+        {
+            "service_method_output_path": [0, "new_attribute_mapping_ref"],
+            "target_property": "new_attribute_mapping_ref"
+        },
+        {
+            "service_method_output_path": [0, "report_name"],
+            "target_property": "report_name"
+        },
+        {
+            "service_method_output_path": [0, "report_ref"],
+            "target_property": "report_ref"
+        },
+        {
+            "constant_value": "16",
+            "target_property": "report_window_line_height"
+        }
+      ]
+    }
+  },
+  "job_id_output_field": "docker"
+}

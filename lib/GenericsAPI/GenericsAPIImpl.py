@@ -31,7 +31,7 @@ class GenericsAPI:
     ######################################### noqa
     VERSION = "0.0.1"
     GIT_URL = "git@github.com:Tianhao-Gu/GenericsAPI.git"
-    GIT_COMMIT_HASH = "6642ddf41759dbaf519f3b04f2553486333eaf17"
+    GIT_COMMIT_HASH = "463c7eb6a3a81f3f5576fe6215952de519ce26cd"
 
     #BEGIN_CLASS_HEADER
     #END_CLASS_HEADER
@@ -343,6 +343,38 @@ class GenericsAPI:
                              'result is not type dict as required.')
         # return the results
         return [result]
+
+    def update_matrix_attribute_mapping(self, ctx, params):
+        """
+        :param params: instance of type "UpdateMatrixAMParams" -> structure:
+           parameter "staging_file_subdir_path" of String, parameter
+           "dimension" of String, parameter "input_matrix_ref" of type
+           "obj_ref" (An X/Y/Z style reference), parameter "workspace_name"
+           of String, parameter "output_am_obj_name" of String, parameter
+           "output_matrix_obj_name" of String
+        :returns: instance of type "UpdateMatrixAMOutput" -> structure:
+           parameter "report_name" of String, parameter "report_ref" of
+           String, parameter "new_matrix_obj_ref" of type "obj_ref" (An X/Y/Z
+           style reference), parameter "new_attribute_mapping_ref" of type
+           "obj_ref" (An X/Y/Z style reference)
+        """
+        # ctx is the context object
+        # return variables are: returnVal
+        #BEGIN update_matrix_attribute_mapping
+        logging.info("Starting 'update_matrix_attribute_mapping' with params:{}".format(params))
+        self.attr_util.validate_params(params, ("staging_file_subdir_path", "dimension",
+                                                "workspace_name", "output_am_obj_name",
+                                                "input_matrix_ref",
+                                                "output_matrix_obj_name"))
+        returnVal = self.attr_util.update_matrix_attribute_mapping(params)
+        #END update_matrix_attribute_mapping
+
+        # At some point might do deeper type checking...
+        if not isinstance(returnVal, dict):
+            raise ValueError('Method update_matrix_attribute_mapping return value ' +
+                             'returnVal is not type dict as required.')
+        # return the results
+        return [returnVal]
 
     def attribute_mapping_to_tsv_file(self, ctx, params):
         """

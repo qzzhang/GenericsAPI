@@ -215,6 +215,25 @@ module GenericsAPI {
         returns (FileToAttributeMappingOutput result) authentication required;
 
     typedef structure {
+        string staging_file_subdir_path;
+        string dimension;
+        obj_ref input_matrix_ref;
+        string workspace_name;
+        string output_am_obj_name;
+        string output_matrix_obj_name;
+    } UpdateMatrixAMParams;
+
+    typedef structure {
+        string report_name;
+        string report_ref;
+        obj_ref new_matrix_obj_ref;
+        obj_ref new_attribute_mapping_ref;
+    } UpdateMatrixAMOutput;
+
+    funcdef update_matrix_attribute_mapping(UpdateMatrixAMParams params)
+        returns (UpdateMatrixAMOutput returnVal) authentication required;
+
+    typedef structure {
         obj_ref input_ref;
         string destination_dir;
     } AttributeMappingToTsvFileParams;
