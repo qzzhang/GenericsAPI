@@ -1,10 +1,12 @@
 import logging
 import os
 import shutil
+import time
 import uuid
 
 import pandas as pd
 from xlrd.biffh import XLRDError
+from copy import deepcopy
 
 from installed_clients.DataFileUtilClient import DataFileUtil
 from installed_clients.KBaseSearchEngineClient import KBaseSearchEngine
@@ -74,6 +76,77 @@ class AttributesUtil:
             }]
         })[0]
         return {"attribute_mapping_ref": "%s/%s/%s" % (info[6], info[0], info[4])}
+
+    def append_file_to_attribute_mapping(self, staging_file_subdir_path, old_am_ref, output_ws_id,
+                                         new_am_name=None):
+        """append an attribute mapping file to existing attribute mapping object
+        """
+
+        download_staging_file_params = {
+            'staging_file_subdir_path': staging_file_subdir_path
+        }
+        scratch_file_path = self.dfu.download_staging_file(
+                        download_staging_file_params).get('copy_file_path')
+
+        try:
+            df = pd.read_excel(scratch_file_path)
+        except XLRDError:
+            df = pd.read_csv(scratch_file_path, sep=None)
+        df = df.fillna(value='').astype('str')
+        if df.columns[1].lower() == "attribute ontology id":
+            append_am_data = self._df_to_am_obj(df)
+        else:
+            append_am_data = self._isa_df_to_am_object(df)
+
+        old_am_obj = self.dfu.get_objects({'object_refs': [old_am_ref]})['data'][0]
+
+        old_am_info = old_am_obj['info']
+        old_am_name = old_am_info[1]
+        old_am_data = old_am_obj['data']
+
+        new_am_data = self._check_and_append_am_data(old_am_data, append_am_data)
+
+        if not new_am_name:
+            current_time = time.localtime()
+            new_am_name = old_am_name + time.strftime('_%H_%M_%S_%Y_%m_%d', current_time)
+
+        info = self.dfu.save_objects({
+            "id": output_ws_id,
+            "objects": [{
+                "type": "KBaseExperiments.AttributeMapping",
+                "data": new_am_data,
+                "name": new_am_name
+            }]
+        })[0]
+        return {"attribute_mapping_ref": "%s/%s/%s" % (info[6], info[0], info[4])}
+
+    def _check_and_append_am_data(self, old_am_data, append_am_data):
+        new_am_data = dict()
+
+        old_attrs = old_am_data.get('attributes')
+        old_insts = old_am_data.get('instances')
+
+        append_attrs = append_am_data.get('attributes')
+        append_insts = append_am_data.get('instances')
+
+        missing_inst = old_insts.keys() - append_insts.keys()
+
+        if missing_inst:
+            error_msg = 'Appended attribute mapping misses [{}] instances'.format(missing_inst)
+            raise ValueError(error_msg)
+
+        new_attrs = old_attrs + append_attrs
+        new_am_data['attributes'] = new_attrs
+
+        new_insts = deepcopy(old_insts)
+
+        for inst_name, val in new_insts.items():
+            append_val = append_insts.get(inst_name)
+            val.extend(append_val)
+
+        new_am_data['instances'] = new_insts
+
+        return new_am_data
 
     def _am_data_to_df(self, data):
         """
