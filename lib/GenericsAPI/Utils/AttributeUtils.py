@@ -12,6 +12,7 @@ from installed_clients.DataFileUtilClient import DataFileUtil
 from installed_clients.KBaseSearchEngineClient import KBaseSearchEngine
 from installed_clients.WorkspaceClient import Workspace as workspaceService
 from GenericsAPI.Utils.DataUtil import DataUtil
+from installed_clients.KBaseReportClient import KBaseReport
 
 
 class AttributesUtil:
@@ -104,6 +105,9 @@ class AttributesUtil:
         old_am_name = old_am_info[1]
         old_am_data = old_am_obj['data']
 
+        print('fdsafds')
+        print(old_am_info)
+
         new_am_data = self._check_and_append_am_data(old_am_data, append_am_data)
 
         if not new_am_name:
@@ -119,6 +123,62 @@ class AttributesUtil:
             }]
         })[0]
         return {"attribute_mapping_ref": "%s/%s/%s" % (info[6], info[0], info[4])}
+
+    def update_matrix_attribute_mapping(self, params):
+
+        dimension = params.get('dimension')
+        if dimension not in ['col', 'row']:
+            raise ValueError('Please use "col" or "row" for input dimension')
+
+        workspace_name = params.get('workspace_name')
+
+        if not isinstance(workspace_name, int):
+            workspace_id = self.dfu.ws_name_to_id(workspace_name)
+        else:
+            workspace_id = workspace_name
+
+        old_matrix_ref = params.get('input_matrix_ref')
+        old_matrix_obj = self.dfu.get_objects({'object_refs': [old_matrix_ref]})['data'][0]
+        old_matrix_info = old_matrix_obj['info']
+        old_matrix_data = old_matrix_obj['data']
+
+        old_am_ref = old_matrix_data.get('{}_attributemapping_ref'.format(dimension))
+
+        if not old_am_ref:
+            raise ValueError('Matrix object does not have {} attribute mapping'.format(dimension))
+
+        new_am_ref = self.append_file_to_attribute_mapping(
+                                            params['staging_file_subdir_path'], old_am_ref,
+                                            workspace_id,
+                                            params['output_am_obj_name'])['attribute_mapping_ref']
+
+        old_matrix_data['{}_attributemapping_ref'.format(dimension)] = new_am_ref
+
+        info = self.dfu.save_objects({
+            "id": workspace_id,
+            "objects": [{
+                "type": old_matrix_info[2],
+                "data": old_matrix_data,
+                "name": params['output_matrix_obj_name']
+            }]
+        })[0]
+
+        new_attribute_mapping_ref = "%s/%s/%s" % (info[6], info[0], info[4])
+
+        objects_created = [{'ref': new_am_ref, 'description': 'Updated Attribute Mapping'},
+                           {'ref': new_attribute_mapping_ref, 'description': 'Updated Matrix'}]
+
+        report_params = {'message': '',
+                         'objects_created': objects_created,
+                         'workspace_name': workspace_name,
+                         'report_object_name': 'import_matrix_from_biom_' + str(uuid.uuid4())}
+
+        kbase_report_client = KBaseReport(self.callback_url, token=self.token)
+        output = kbase_report_client.create_extended_report(report_params)
+
+        return {'new_matrix_obj_ref': new_am_ref,
+                'new_attribute_mapping_ref': new_attribute_mapping_ref,
+                'report_name': output['name'], 'report_ref': output['ref']}
 
     def _check_and_append_am_data(self, old_am_data, append_am_data):
 
