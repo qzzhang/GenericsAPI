@@ -1,0 +1,65 @@
+name     : Update Matrix Attribute Mapping
+subtitle : Append attribute mapping information retrieved from file to existing matrix attribute mapping
+tooltip  : Append attribute mapping information retrieved from file to existing matrix attribute mapping
+
+icon: data-blue.png
+
+screenshots :
+    []
+
+suggestions :
+    apps:
+        related :
+            []
+        next :
+            []
+    methods:
+        related :
+            []
+        next :
+            []
+
+parameters :
+
+    input_matrix_ref:
+        ui-name: |
+            Input Matrix
+        short-hint : |
+            Matrix reference whose attribute mapping needs to be updated
+        long-hint  : |
+            Matrix reference whose attribute mapping needs to be updated
+
+    staging_file_subdir_path :
+        ui-name: |
+            Attribute Mapping File Path
+        short-hint : |
+            File with tabular Attribute Mapping data
+        long-hint  : |
+            Recognized extensions for the input file are .tsv or .xlsx
+
+    dimension:
+        ui-name: |
+            Append Attribute Mapping Data To
+        short-hint : |
+            Append Attribute Mapping data to column or row attribute mapping
+        long-hint  : |
+            Append Attribute Mapping data to column or row attribute mapping
+
+    output_am_obj_name:
+        ui-name: |
+            Output Attribute Mapping Object Name
+        short-hint : |
+            Newly created output Attribute Mapping object name
+        long-hint  : |
+            Newly created output Attribute Mapping object name
+
+    output_matrix_obj_name:
+        ui-name: |
+            Output Matrix Object Name
+        short-hint : |
+            Newly created output Matrix object name
+        long-hint  : |
+            Newly created output Matrix object name
+
+description : |
+    <p> Append attribute mapping information retrieved from file to existing matrix attribute mapping </p>

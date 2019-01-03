@@ -31,7 +31,7 @@ class GenericsAPI:
     ######################################### noqa
     VERSION = "0.0.1"
     GIT_URL = "git@github.com:Tianhao-Gu/GenericsAPI.git"
-    GIT_COMMIT_HASH = "46c216837ecbee6629e886c61b33b9e17565d5e2"
+    GIT_COMMIT_HASH = "463c7eb6a3a81f3f5576fe6215952de519ce26cd"
 
     #BEGIN_CLASS_HEADER
     #END_CLASS_HEADER
@@ -349,8 +349,8 @@ class GenericsAPI:
         :param params: instance of type "UpdateMatrixAMParams" -> structure:
            parameter "staging_file_subdir_path" of String, parameter
            "dimension" of String, parameter "input_matrix_ref" of type
-           "obj_ref" (An X/Y/Z style reference), parameter "output_ws_id" of
-           String, parameter "output_am_obj_name" of String, parameter
+           "obj_ref" (An X/Y/Z style reference), parameter "workspace_name"
+           of String, parameter "output_am_obj_name" of String, parameter
            "output_matrix_obj_name" of String
         :returns: instance of type "UpdateMatrixAMOutput" -> structure:
            parameter "report_name" of String, parameter "report_ref" of

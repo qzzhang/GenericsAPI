@@ -218,7 +218,7 @@ module GenericsAPI {
         string staging_file_subdir_path;
         string dimension;
         obj_ref input_matrix_ref;
-        string output_ws_id;
+        string workspace_name;
         string output_am_obj_name;
         string output_matrix_obj_name;
     } UpdateMatrixAMParams;
