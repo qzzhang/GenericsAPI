@@ -129,6 +129,17 @@ class AttributesUtil:
         append_attrs = append_am_data.get('attributes')
         append_insts = append_am_data.get('instances')
 
+        # checking duplicate attributes
+        old_attrs_names = [old_attr.get('attribute') for old_attr in old_attrs]
+        append_attrs_names = [append_attr.get('attribute') for append_attr in append_attrs]
+
+        duplicate_attrs = set(old_attrs_names).intersection(append_attrs_names)
+
+        if duplicate_attrs:
+            error_msg = 'Duplicate attribute mappings: [{}]'.format(duplicate_attrs)
+            raise ValueError(error_msg)
+
+        # checking missing instances
         missing_inst = old_insts.keys() - append_insts.keys()
 
         if missing_inst:
