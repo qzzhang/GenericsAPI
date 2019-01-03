@@ -6,6 +6,7 @@ import time
 import unittest
 import uuid
 from configparser import ConfigParser
+from mock import patch
 
 import pandas as pd
 
@@ -173,6 +174,13 @@ class AttributeUtilsTest(unittest.TestCase):
     def getContext(self):
         return self.__class__.ctx
 
+    def mock_download_staging_file(params):
+        print('Mocking DataFileUtilClient.download_staging_file')
+
+        filename = params.get('staging_file_subdir_path')
+
+        return {'copy_file_path': os.path.join("data", filename)}
+
     # @unittest.skip("Only passes on CI")
     def test_add_ontology_info(self):
         factor = {'attribute': 'stalk development', "attribute_ont_id": "GO:0031150",
@@ -289,6 +297,39 @@ class AttributeUtilsTest(unittest.TestCase):
         self.assertEqual(len(data['attributes']), 2)
         self.assertEqual(len(data['instances']), 13980)
         self.assertIn('AT1G01070', data['instances'])
+
+    @patch.object(DataFileUtil, "download_staging_file", side_effect=mock_download_staging_file)
+    def test_append_file_to_attribute_mapping(self, download_staging_file):
+
+        with self.assertRaises(ValueError) as context:
+            self.serviceUtils.append_file_to_attribute_mapping('AM2.tsv',
+                                                               self.attribute_mapping_ref,
+                                                               self.getWsId())
+            self.assertIn('Appended attribute mapping misses', str(context.exception.args))
+
+        with self.assertRaises(ValueError) as context:
+            self.serviceUtils.append_file_to_attribute_mapping('AM1.tsv',
+                                                               self.attribute_mapping_ref,
+                                                               self.getWsId())
+            self.assertIn('Duplicate attribute mappings', str(context.exception.args))
+
+        new_am_name = 'append_file_am'
+        ret = self.serviceUtils.append_file_to_attribute_mapping('AM1_append.tsv',
+                                                                 self.attribute_mapping_ref,
+                                                                 self.getWsId(),
+                                                                 new_am_name)
+
+        assert ret and ('attribute_mapping_ref' in ret)
+
+        am_obj = self.dfu.get_objects({'object_refs': [ret['attribute_mapping_ref']]})['data'][0]
+
+        self.assertEqual(am_obj['info'][1], new_am_name)
+
+        new_attributes = am_obj['data']['attributes']
+        self.assertEqual(len(new_attributes), 4)
+        expected_attrs = ['Time series design', 'Treatment with Sirolimus',
+                          'append Time series design', 'append Treatment with Sirolimus']
+        self.assertCountEqual([x.get('attribute') for x in new_attributes], expected_attrs)
 
     def test_make_tsv(self):
         params = {'input_ref': self.attribute_mapping_ref, 'destination_dir': self.scratch}

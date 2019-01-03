@@ -121,7 +121,9 @@ class AttributesUtil:
         return {"attribute_mapping_ref": "%s/%s/%s" % (info[6], info[0], info[4])}
 
     def _check_and_append_am_data(self, old_am_data, append_am_data):
-        new_am_data = dict()
+
+        exclude_keys = {'attributes', 'instances'}
+        new_am_data = {k: old_am_data[k] for k in set(list(old_am_data.keys())) - exclude_keys}
 
         old_attrs = old_am_data.get('attributes')
         old_insts = old_am_data.get('instances')
