@@ -190,8 +190,10 @@ class PCAUtil:
             raise ValueError('Number of components should be less than min(n_samples, n_features)')
 
         # normalize sample
-        logging.info("Standardizing the matrix")
-        s_values = StandardScaler().fit_transform(data_df.values)
+        # logging.info("Standardizing the matrix")
+        # s_values = StandardScaler().fit_transform(data_df.values)
+        # skip normalizing sample
+        s_values = data_df.values
 
         # Projection to ND
         pca = PCA(n_components=n_components, whiten=True)
@@ -217,7 +219,7 @@ class PCAUtil:
         rotation_matrix_df.fillna(0, inplace=True)
 
         return (rotation_matrix_df, components_df, explained_variance, explained_variance_ratio,
-               singular_values)
+                singular_values)
 
     def _generate_pca_html_report(self, pca_plots, n_components):
 
