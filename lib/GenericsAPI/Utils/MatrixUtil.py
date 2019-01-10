@@ -472,7 +472,7 @@ class MatrixUtil:
 
         new_matrix_obj_ref = "%s/%s/%s" % (info[6], info[0], info[4])
 
-        objects_created = [{'ref': new_matrix_obj_ref, 'description': 'Updated Matrix'}]
+        objects_created = [{'ref': new_matrix_obj_ref, 'description': 'Standardized Matrix'}]
 
         report_params = {'message': '',
                          'objects_created': objects_created,
