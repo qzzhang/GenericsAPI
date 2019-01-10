@@ -400,6 +400,8 @@ class MatrixUtil:
 
     def _standardize_df(self, df, with_mean=True, with_std=True):
 
+        df.fillna(0, inplace=True)
+
         x_train = df.values
 
         scaler = preprocessing.StandardScaler(with_mean=with_mean, with_std=with_std).fit(x_train)

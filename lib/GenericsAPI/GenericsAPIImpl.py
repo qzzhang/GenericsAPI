@@ -20,7 +20,7 @@ class GenericsAPI:
     GenericsAPI
 
     Module Description:
-    
+
     '''
 
     ######## WARNING FOR GEVENT USERS ####### noqa
@@ -339,6 +339,7 @@ class GenericsAPI:
         # ctx is the context object
         # return variables are: returnVal
         #BEGIN standardize_matrix
+        returnVal = self.matrix_util.standardize_matrix(params)
         #END standardize_matrix
 
         # At some point might do deeper type checking...

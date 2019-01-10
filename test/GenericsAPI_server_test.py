@@ -256,6 +256,23 @@ class GenericsAPITest(unittest.TestCase):
 
         return list(df.keys())
 
+    def test_standardize_matrix(self):
+        self.start_test()
+        params = {'input_matrix_ref': self.expression_matrix_ref,
+                  'workspace_name': self.wsName,
+                  'with_mean': 1,
+                  'with_std': 1,
+                  'new_matrix_name': 'standardized_test_matrix'}
+        returnVal = self.getImpl().standardize_matrix(self.ctx, params)[0]
+        self.assertTrue('report_name' in returnVal)
+        self.assertTrue('report_ref' in returnVal)
+        self.assertTrue('new_matrix_obj_ref' in returnVal)
+
+        new_matrix_obj_ref = returnVal.get('new_matrix_obj_ref')
+        standardized_matrix = self.dfu.get_objects(
+                                      {"object_refs": [new_matrix_obj_ref]})['data'][0]
+        standardized_data = standardized_matrix.get('data')
+
     def test_bad_fetch_data_params(self):
         self.start_test()
         invalidate_params = {'missing_obj_ref': 'obj_ref'}
