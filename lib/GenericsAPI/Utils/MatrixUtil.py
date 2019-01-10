@@ -400,6 +400,8 @@ class MatrixUtil:
 
     def _standardize_df(self, df, with_mean=True, with_std=True):
 
+        logging.info("Standardizing matrix data")
+
         df.fillna(0, inplace=True)
 
         x_train = df.values
@@ -458,6 +460,7 @@ class MatrixUtil:
 
         input_matrix_data['data'] = new_matrix_data
 
+        logging.info("Saving new standardized matrix object")
         info = self.dfu.save_objects({
             "id": workspace_id,
             "objects": [{
