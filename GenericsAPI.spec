@@ -195,6 +195,31 @@ module GenericsAPI {
   /* filter_matrix: create sub-matrix based on input filter_ids*/
   funcdef filter_matrix (MatrixFilterParams params) returns (MatrixFilterOutput returnVal) authentication required;
 
+  /* Input of the standardize_matrix function
+    input_matrix_ref: object reference of a matrix
+    workspace_name: workspace name objects to be saved to
+    with_mean: center data before scaling
+    with_std: scale data to unit variance
+    new_matrix_name: name of newly created matrix object
+  */
+  typedef structure {
+      obj_ref input_matrix_ref;
+      workspace_name workspace_name;
+      boolean with_mean;
+      boolean with_std;
+      string new_matrix_name;
+  } StandardizeMatrixParams;
+
+  typedef structure {
+      string report_name;
+      string report_ref;
+      obj_ref new_matrix_obj_ref;
+  } StandardizeMatrixOutput;
+
+  /* standardize_matrix: standardize a matrix*/
+  funcdef standardize_matrix (StandardizeMatrixParams params) returns (StandardizeMatrixOutput returnVal) authentication required;
+
+
   /* ATTRIBUTE MAPPING */
 
     /*

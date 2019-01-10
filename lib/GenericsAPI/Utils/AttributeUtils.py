@@ -160,10 +160,10 @@ class AttributesUtil:
             }]
         })[0]
 
-        new_attribute_mapping_ref = "%s/%s/%s" % (info[6], info[0], info[4])
+        new_matrix_obj_ref = "%s/%s/%s" % (info[6], info[0], info[4])
 
         objects_created = [{'ref': new_am_ref, 'description': 'Updated Attribute Mapping'},
-                           {'ref': new_attribute_mapping_ref, 'description': 'Updated Matrix'}]
+                           {'ref': new_matrix_obj_ref, 'description': 'Updated Matrix'}]
 
         report_params = {'message': '',
                          'objects_created': objects_created,
@@ -173,8 +173,8 @@ class AttributesUtil:
         kbase_report_client = KBaseReport(self.callback_url, token=self.token)
         output = kbase_report_client.create_extended_report(report_params)
 
-        return {'new_matrix_obj_ref': new_am_ref,
-                'new_attribute_mapping_ref': new_attribute_mapping_ref,
+        return {'new_matrix_obj_ref': new_matrix_obj_ref,
+                'new_attribute_mapping_ref': new_am_ref,
                 'report_name': output['name'], 'report_ref': output['ref']}
 
     def _check_and_append_am_data(self, old_am_data, append_am_data):

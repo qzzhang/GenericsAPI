@@ -5,10 +5,12 @@ import os
 import re
 import shutil
 import uuid
+import time
 
 import pandas as pd
 from openpyxl import load_workbook
 from xlrd.biffh import XLRDError
+from sklearn import preprocessing
 
 from installed_clients.DataFileUtilClient import DataFileUtil
 from GenericsAPI.Utils.AttributeUtils import AttributesUtil
@@ -396,6 +398,22 @@ class MatrixUtil:
 
         return filtered_value_data
 
+    def _standardize_df(self, df, with_mean=True, with_std=True):
+
+        logging.info("Standardizing matrix data")
+
+        df.fillna(0, inplace=True)
+
+        x_train = df.values
+
+        scaler = preprocessing.StandardScaler(with_mean=with_mean, with_std=with_std).fit(x_train)
+
+        standardized_values = scaler.transform(x_train)
+
+        standardize_df = pd.DataFrame(index=df.index, columns=df.columns, data=standardized_values)
+
+        return standardize_df
+
     def __init__(self, config):
         self.callback_url = config['SDK_CALLBACK_URL']
         self.scratch = config['scratch']
@@ -405,6 +423,67 @@ class MatrixUtil:
         self.attr_util = AttributesUtil(config)
         self.matrix_types = [x.split(".")[1].split('-')[0]
                              for x in self.data_util.list_generic_types()]
+
+    def standardize_matrix(self, params):
+        """
+        standardize a matrix
+        """
+
+        input_matrix_ref = params.get('input_matrix_ref')
+        workspace_name = params.get('workspace_name')
+        new_matrix_name = params.get('new_matrix_name')
+        with_mean = params.get('with_mean', 1)
+        with_std = params.get('with_std', 1)
+
+        if not isinstance(workspace_name, int):
+            workspace_id = self.dfu.ws_name_to_id(workspace_name)
+        else:
+            workspace_id = workspace_name
+
+        input_matrix_obj = self.dfu.get_objects({'object_refs': [input_matrix_ref]})['data'][0]
+        input_matrix_info = input_matrix_obj['info']
+        input_matrix_name = input_matrix_info[1]
+        input_matrix_data = input_matrix_obj['data']
+
+        if not new_matrix_name:
+            current_time = time.localtime()
+            new_matrix_name = input_matrix_name + time.strftime('_%H_%M_%S_%Y_%m_%d', current_time)
+
+        data_matrix = self.data_util.fetch_data({'obj_ref': input_matrix_ref}).get('data_matrix')
+        df = pd.read_json(data_matrix)
+
+        standardize_df = self._standardize_df(df, with_mean, with_std)
+
+        new_matrix_data = {'row_ids': df.index.tolist(),
+                           'col_ids': df.columns.tolist(),
+                           'values': standardize_df.values.tolist()}
+
+        input_matrix_data['data'] = new_matrix_data
+
+        logging.info("Saving new standardized matrix object")
+        info = self.dfu.save_objects({
+            "id": workspace_id,
+            "objects": [{
+                "type": input_matrix_info[2],
+                "data": input_matrix_data,
+                "name": new_matrix_name
+            }]
+        })[0]
+
+        new_matrix_obj_ref = "%s/%s/%s" % (info[6], info[0], info[4])
+
+        objects_created = [{'ref': new_matrix_obj_ref, 'description': 'Updated Matrix'}]
+
+        report_params = {'message': '',
+                         'objects_created': objects_created,
+                         'workspace_name': workspace_name,
+                         'report_object_name': 'import_matrix_from_biom_' + str(uuid.uuid4())}
+
+        kbase_report_client = KBaseReport(self.callback_url, token=self.token)
+        output = kbase_report_client.create_extended_report(report_params)
+
+        return {'new_matrix_obj_ref': new_matrix_obj_ref,
+                'report_name': output['name'], 'report_ref': output['ref']}
 
     def filter_matrix(self, params):
         """

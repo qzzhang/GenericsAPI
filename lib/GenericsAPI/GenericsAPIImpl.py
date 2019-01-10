@@ -20,7 +20,7 @@ class GenericsAPI:
     GenericsAPI
 
     Module Description:
-    
+
     '''
 
     ######## WARNING FOR GEVENT USERS ####### noqa
@@ -31,7 +31,7 @@ class GenericsAPI:
     ######################################### noqa
     VERSION = "0.0.1"
     GIT_URL = "git@github.com:Tianhao-Gu/GenericsAPI.git"
-    GIT_COMMIT_HASH = "463c7eb6a3a81f3f5576fe6215952de519ce26cd"
+    GIT_COMMIT_HASH = "3d84abeab352ce1e8a467bf5ae28ada130033970"
 
     #BEGIN_CLASS_HEADER
     #END_CLASS_HEADER
@@ -313,6 +313,38 @@ class GenericsAPI:
         # At some point might do deeper type checking...
         if not isinstance(returnVal, dict):
             raise ValueError('Method filter_matrix return value ' +
+                             'returnVal is not type dict as required.')
+        # return the results
+        return [returnVal]
+
+    def standardize_matrix(self, ctx, params):
+        """
+        standardize_matrix: standardize a matrix
+        :param params: instance of type "StandardizeMatrixParams" (Input of
+           the standardize_matrix function input_matrix_ref: object reference
+           of a matrix workspace_name: workspace name objects to be saved to
+           with_mean: center data before scaling with_std: scale data to unit
+           variance new_matrix_name: name of newly created matrix object) ->
+           structure: parameter "input_matrix_ref" of type "obj_ref" (An
+           X/Y/Z style reference), parameter "workspace_name" of type
+           "workspace_name" (workspace name of the object), parameter
+           "with_mean" of type "boolean" (A boolean - 0 for false, 1 for
+           true.), parameter "with_std" of type "boolean" (A boolean - 0 for
+           false, 1 for true.), parameter "new_matrix_name" of String
+        :returns: instance of type "StandardizeMatrixOutput" -> structure:
+           parameter "report_name" of String, parameter "report_ref" of
+           String, parameter "new_matrix_obj_ref" of type "obj_ref" (An X/Y/Z
+           style reference)
+        """
+        # ctx is the context object
+        # return variables are: returnVal
+        #BEGIN standardize_matrix
+        returnVal = self.matrix_util.standardize_matrix(params)
+        #END standardize_matrix
+
+        # At some point might do deeper type checking...
+        if not isinstance(returnVal, dict):
+            raise ValueError('Method standardize_matrix return value ' +
                              'returnVal is not type dict as required.')
         # return the results
         return [returnVal]
