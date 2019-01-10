@@ -1,0 +1,56 @@
+name     : Standardize Matrix
+subtitle : Create a new standardization matrix from input matrix
+tooltip  : Create a new standardization matrix from input matrix
+
+icon: data-blue.png
+
+screenshots :
+    []
+
+suggestions :
+    apps:
+        related :
+            []
+        next :
+            []
+    methods:
+        related :
+            []
+        next :
+            []
+
+parameters :
+    input_matrix_ref :
+        ui-name: |
+            Input Matrix
+        short-hint : |
+            Input matrix whose data needs to be standardized
+        long-hint  : |
+            Input matrix whose data needs to be standardized
+
+    new_matrix_name:
+        ui-name: |
+            Standardized Matrix Name
+        short-hint : |
+            Output standardized matrix name
+        long-hint  : |
+            Output standardized matrix name
+
+    with_mean:
+        ui-name: |
+            Center The Data Before Scaling
+        short-hint : |
+            calculated standard score (z = (x - u) / s) where u is the mean of the training samples or zero if this option is turned off
+        long-hint  : |
+            calculated standard score (z = (x - u) / s) where u is the mean of the training samples or zero if this option is turned off
+
+    with_std:
+        ui-name: |
+            Scale The Data To Unit Variance
+        short-hint : |
+            calculated standard score (z = (x - u) / s) where s is the standard deviation of the training samples or one if this option is turned off
+        long-hint  : |
+            calculated standard score (z = (x - u) / s) where s is the standard deviation of the training samples or one if this option is turned off
+
+description : |
+    <p> Create a new standardization matrix from input matrix </p>
