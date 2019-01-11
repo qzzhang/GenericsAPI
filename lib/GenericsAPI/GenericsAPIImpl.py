@@ -20,7 +20,7 @@ class GenericsAPI:
     GenericsAPI
 
     Module Description:
-
+    
     '''
 
     ######## WARNING FOR GEVENT USERS ####### noqa
@@ -31,7 +31,7 @@ class GenericsAPI:
     ######################################### noqa
     VERSION = "0.0.1"
     GIT_URL = "git@github.com:Tianhao-Gu/GenericsAPI.git"
-    GIT_COMMIT_HASH = "3d84abeab352ce1e8a467bf5ae28ada130033970"
+    GIT_COMMIT_HASH = "54179bca9bdb079eeddc9cddde793d98a3d4800b"
 
     #BEGIN_CLASS_HEADER
     #END_CLASS_HEADER
