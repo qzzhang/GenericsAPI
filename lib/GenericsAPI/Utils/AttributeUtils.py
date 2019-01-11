@@ -129,17 +129,17 @@ class AttributesUtil:
 
         workspace_name = params.get('workspace_name')
 
-        if not isinstance(workspace_name, int):
-            workspace_id = self.dfu.ws_name_to_id(workspace_name)
-        else:
-            workspace_id = workspace_name
-
         old_matrix_ref = params.get('input_matrix_ref')
         old_matrix_obj = self.dfu.get_objects({'object_refs': [old_matrix_ref]})['data'][0]
         old_matrix_info = old_matrix_obj['info']
         old_matrix_data = old_matrix_obj['data']
 
         old_am_ref = old_matrix_data.get('{}_attributemapping_ref'.format(dimension))
+
+        if not isinstance(workspace_name, int):
+            workspace_id = self.dfu.ws_name_to_id(workspace_name)
+        else:
+            workspace_id = workspace_name
 
         if not old_am_ref:
             raise ValueError('Matrix object does not have {} attribute mapping'.format(dimension))
