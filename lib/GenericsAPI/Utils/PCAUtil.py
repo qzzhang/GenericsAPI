@@ -230,6 +230,9 @@ class PCAUtil:
         self._mkdir_p(output_directory)
         result_file_path = os.path.join(output_directory, 'pca_report.html')
 
+        print('fdsafds')
+        print(output_directory)
+
         visualization_content = ''
 
         for pca_plot in pca_plots:
@@ -407,8 +410,65 @@ class PCAUtil:
 
         traces = []
 
-        if 'instance' not in plot_pca_matrix.columns:
-            # no associated attribute mapping
+        if 'attribute_value_color' in plot_pca_matrix.columns and 'attribute_value_size' in plot_pca_matrix.columns:
+
+            maximum_marker_size = 10
+            sizeref = 2.*float(max(plot_pca_matrix['attribute_value_size']))/(maximum_marker_size**2)
+
+            for name in set(plot_pca_matrix.attribute_value_color):
+                attribute_value_size = plot_pca_matrix.loc[plot_pca_matrix['attribute_value_color'].eq(name)].attribute_value_size
+                size_list = list(map(abs, list(map(float, attribute_value_size))))
+                for idx, val in enumerate(size_list):
+                    if val == 0:
+                        size_list[idx] = sys.float_info.min
+                trace = go.Scatter(
+                    x=list(plot_pca_matrix.loc[plot_pca_matrix['attribute_value_color'].eq(name)][components_x]),
+                    y=list(plot_pca_matrix.loc[plot_pca_matrix['attribute_value_color'].eq(name)][components_y]),
+                    mode='markers',
+                    name=name,
+                    text=list(plot_pca_matrix.loc[plot_pca_matrix['attribute_value_color'].eq(name)].index),
+                    textposition='bottom center',
+                    marker=go.Marker(symbol='circle', sizemode='area', sizeref=sizeref,
+                                     size=size_list, sizemin=2,
+                                     line=go.Line(color='rgba(217, 217, 217, 0.14)', width=0.5),
+                                     opacity=0.8))
+                traces.append(trace)
+        elif 'attribute_value_color' in plot_pca_matrix.columns:
+            for name in set(plot_pca_matrix.attribute_value_color):
+                trace = go.Scatter(
+                    x=list(plot_pca_matrix.loc[plot_pca_matrix['attribute_value_color'].eq(name)][components_x]),
+                    y=list(plot_pca_matrix.loc[plot_pca_matrix['attribute_value_color'].eq(name)][components_y]),
+                    mode='markers',
+                    name=name,
+                    text=list(plot_pca_matrix.loc[plot_pca_matrix['attribute_value_color'].eq(name)].index),
+                    textposition='bottom center',
+                    marker=go.Marker(size=10, opacity=0.8, line=go.Line(color='rgba(217, 217, 217, 0.14)',
+                                                                        width=0.5)))
+                traces.append(trace)
+        elif 'attribute_value_size' in plot_pca_matrix.columns:
+
+            maximum_marker_size = 10
+            sizeref = 2.*float(max(plot_pca_matrix['attribute_value_size']))/(maximum_marker_size**2)
+
+            for name in set(plot_pca_matrix.instance):
+                attribute_value_size = plot_pca_matrix.loc[plot_pca_matrix['instance'].eq(name)].attribute_value_size
+                size_list = list(map(abs, list(map(float, attribute_value_size))))
+                for idx, val in enumerate(size_list):
+                    if val == 0:
+                        size_list[idx] = sys.float_info.min
+                trace = go.Scatter(
+                    x=list(plot_pca_matrix.loc[plot_pca_matrix['instance'].eq(name)][components_x]),
+                    y=list(plot_pca_matrix.loc[plot_pca_matrix['instance'].eq(name)][components_y]),
+                    mode='markers',
+                    name=name,
+                    text=list(plot_pca_matrix.loc[plot_pca_matrix['instance'].eq(name)].index),
+                    textposition='bottom center',
+                    marker=go.Marker(symbol='circle', sizemode='area', sizeref=sizeref,
+                                     size=size_list, sizemin=2,
+                                     line=go.Line(color='rgba(217, 217, 217, 0.14)', width=0.5),
+                                     opacity=0.8))
+                traces.append(trace)
+        else:
             trace = go.Scatter(
                 x=list(plot_pca_matrix[components_x]),
                 y=list(plot_pca_matrix[components_y]),
@@ -418,77 +478,6 @@ class PCAUtil:
                 marker=go.Marker(size=10, opacity=0.8,
                                  line=go.Line(color='rgba(217, 217, 217, 0.14)', width=0.5)))
             traces.append(trace)
-        else:
-            if 'attribute_value_color' in plot_pca_matrix.columns and 'attribute_value_size' in plot_pca_matrix.columns:
-
-                maximum_marker_size = 10
-                sizeref = 2.*float(max(plot_pca_matrix['attribute_value_size']))/(maximum_marker_size**2)
-
-                for name in set(plot_pca_matrix.attribute_value_color):
-                    attribute_value_size = plot_pca_matrix.loc[plot_pca_matrix['attribute_value_color'].eq(name)].attribute_value_size
-                    size_list = list(map(abs, list(map(float, attribute_value_size))))
-                    for idx, val in enumerate(size_list):
-                        if val == 0:
-                            size_list[idx] = sys.float_info.min
-                    trace = go.Scatter(
-                        x=list(plot_pca_matrix.loc[plot_pca_matrix['attribute_value_color'].eq(name)][components_x]),
-                        y=list(plot_pca_matrix.loc[plot_pca_matrix['attribute_value_color'].eq(name)][components_y]),
-                        mode='markers',
-                        name=name,
-                        text=list(plot_pca_matrix.loc[plot_pca_matrix['attribute_value_color'].eq(name)].index),
-                        textposition='bottom center',
-                        marker=go.Marker(symbol='circle', sizemode='area', sizeref=sizeref,
-                                         size=size_list, sizemin=2,
-                                         line=go.Line(color='rgba(217, 217, 217, 0.14)', width=0.5),
-                                         opacity=0.8))
-                    traces.append(trace)
-            elif 'attribute_value_color' in plot_pca_matrix.columns:
-                for name in set(plot_pca_matrix.attribute_value_color):
-                    trace = go.Scatter(
-                        x=list(plot_pca_matrix.loc[plot_pca_matrix['attribute_value_color'].eq(name)][components_x]),
-                        y=list(plot_pca_matrix.loc[plot_pca_matrix['attribute_value_color'].eq(name)][components_y]),
-                        mode='markers',
-                        name=name,
-                        text=list(plot_pca_matrix.loc[plot_pca_matrix['attribute_value_color'].eq(name)].index),
-                        textposition='bottom center',
-                        marker=go.Marker(size=10, opacity=0.8, line=go.Line(color='rgba(217, 217, 217, 0.14)',
-                                                                            width=0.5)))
-                    traces.append(trace)
-            elif 'attribute_value_size' in plot_pca_matrix.columns:
-
-                maximum_marker_size = 10
-                sizeref = 2.*float(max(plot_pca_matrix['attribute_value_size']))/(maximum_marker_size**2)
-
-                for name in set(plot_pca_matrix.instance):
-                    attribute_value_size = plot_pca_matrix.loc[plot_pca_matrix['instance'].eq(name)].attribute_value_size
-                    size_list = list(map(abs, list(map(float, attribute_value_size))))
-                    for idx, val in enumerate(size_list):
-                        if val == 0:
-                            size_list[idx] = sys.float_info.min
-                    trace = go.Scatter(
-                        x=list(plot_pca_matrix.loc[plot_pca_matrix['instance'].eq(name)][components_x]),
-                        y=list(plot_pca_matrix.loc[plot_pca_matrix['instance'].eq(name)][components_y]),
-                        mode='markers',
-                        name=name,
-                        text=list(plot_pca_matrix.loc[plot_pca_matrix['instance'].eq(name)].index),
-                        textposition='bottom center',
-                        marker=go.Marker(symbol='circle', sizemode='area', sizeref=sizeref,
-                                         size=size_list, sizemin=2,
-                                         line=go.Line(color='rgba(217, 217, 217, 0.14)', width=0.5),
-                                         opacity=0.8))
-                    traces.append(trace)
-            else:
-                for name in set(plot_pca_matrix.instance):
-                    trace = go.Scatter(
-                        x=list(plot_pca_matrix.loc[plot_pca_matrix['instance'].eq(name)][components_x]),
-                        y=list(plot_pca_matrix.loc[plot_pca_matrix['instance'].eq(name)][components_y]),
-                        mode='markers',
-                        name=name,
-                        text=list(plot_pca_matrix.loc[plot_pca_matrix['instance'].eq(name)].index),
-                        textposition='bottom center',
-                        marker=go.Marker(size=10, opacity=0.8, line=go.Line(color='rgba(217, 217, 217, 0.14)',
-                                                                            width=0.5)))
-                    traces.append(trace)
 
         return traces
 
