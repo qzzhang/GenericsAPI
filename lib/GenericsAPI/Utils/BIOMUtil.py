@@ -419,7 +419,9 @@ class BiomUtil:
         if description:
             amplicon_set_data['description'] = description
 
-        amplicon_set_data['amplicon_matrix_ref'] = matrix_obj_ref
+        matrix_obj_ref_array = matrix_obj_ref.split('/')
+        amplicon_set_data['amplicon_matrix_ref'] = '{}/{}'.format(matrix_obj_ref_array[0],
+                                                                  matrix_obj_ref_array[1])
 
         return amplicon_set_data
 
@@ -738,6 +740,14 @@ class BiomUtil:
                                                 'obj_type': 'KBaseExperiments.AmpliconSet',
                                                 'obj_name': amplicon_set_name,
                                                 'data': amplicon_set_data,
+                                                'workspace_name': workspace_id})['obj_ref']
+
+        logging.info('start resaving Matrix object with amplicon set: {}'.format(matrix_name))
+        amplicon_data['amplicon_set_ref'] = '{}/{}'.format(workspace_id, amplicon_set_name)
+        matrix_obj_ref = self.data_util.save_object({
+                                                'obj_type': 'KBaseMatrices.{}'.format(obj_type),
+                                                'obj_name': matrix_name,
+                                                'data': amplicon_data,
                                                 'workspace_name': workspace_id})['obj_ref']
 
         returnVal = {'matrix_obj_ref': matrix_obj_ref,
