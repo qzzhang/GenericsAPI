@@ -5,6 +5,7 @@ import unittest
 import time
 import shutil
 import uuid
+from mock import patch
 
 import pandas as pd
 import numpy as np
@@ -139,6 +140,38 @@ class CorrUtilTest(unittest.TestCase):
         self.__class__.expr_matrix_ref_2 = expr_matrix_ref_2
         print('Loaded ExpressionMatrix: ' + expr_matrix_ref_2)
         return expr_matrix_ref_2
+
+    def mock_download_staging_file(params):
+        print('Mocking DataFileUtilClient.download_staging_file')
+        print(params)
+
+        file_path = params.get('staging_file_subdir_path')
+
+        return {'copy_file_path': file_path}
+
+    @patch.object(DataFileUtil, "download_staging_file", side_effect=mock_download_staging_file)
+    def loadAmpliconMatrix(self, download_staging_file):
+        if hasattr(self.__class__, 'amplicon_matrix_ref'):
+            return self.__class__.amplicon_matrix_ref
+
+        params = {'obj_type': 'AmpliconMatrix',
+                  'matrix_name': 'test_AmpliconMatrix',
+                  'workspace_name': self.wsName,
+                  "biom_fasta": {
+                        "biom_file_biom_fasta": os.path.join('data', 'phyloseq_test.biom'),
+                        "fasta_file_biom_fasta": os.path.join('data', 'phyloseq_test.fa')
+                        },
+                  'scale': 'raw',
+                  'description': "OTU data",
+                  'amplicon_set_name': 'test_AmpliconSet'
+                  }
+        returnVal = self.getImpl().import_matrix_from_biom(self.ctx, params)[0]
+
+        amplicon_matrix_ref = returnVal['matrix_obj_ref']
+
+        self.__class__.amplicon_matrix_ref = amplicon_matrix_ref
+        print('Loaded AmpliconMatrix: ' + amplicon_matrix_ref)
+        return amplicon_matrix_ref
 
     def loadCorrData(self):
         if hasattr(self.__class__, 'corr_data'):
@@ -284,6 +317,38 @@ class CorrUtilTest(unittest.TestCase):
                              'corr_matrix_name': 'corr_matrix_name'}
         error_msg = '"workspace_name" parameter is required, but missing'
         self.fail_compute_correlation_across_matrices(invalidate_params, error_msg)
+
+    def test_compute_correlation_across_matrices_amplicon_matrix_ok(self):
+        self.start_test()
+        expr_matrix_ref = self.loadAmpliconMatrix()
+        expr_matrix_ref_2 = self.loadAmpliconMatrix()
+
+        params = {'matrix_ref_1': expr_matrix_ref,
+                  'matrix_ref_2': expr_matrix_ref_2,
+                  'workspace_name': self.wsName,
+                  'corr_matrix_name': 'test_corr_matrix',
+                  'plot_corr_matrix': True,
+                  'compute_significance': True}
+
+        ret = self.getImpl().compute_correlation_across_matrices(self.ctx, params)[0]
+
+        self.assertIn('corr_matrix_obj_ref', ret)
+        corr_matrix_obj_ref = ret.get('corr_matrix_obj_ref')
+
+        res = self.dfu.get_objects({'object_refs': [corr_matrix_obj_ref]})['data'][0]
+        obj_data = res['data']
+
+        self.assertEqual(obj_data.get('correlation_parameters').get('method'), 'pearson')
+
+        expected_index = ['g__Escherichia_GG_OTU_1', 'g__Dolichospermum_GG_OTU_2',
+                          'g__Methanosarcina_GG_OTU_3', 'g__Halanaerobium_GG_OTU_4',
+                          'g__Escherichia_GG_OTU_5']
+
+        self.assertCountEqual(obj_data.get('coefficient_data').get('row_ids'), expected_index)
+        self.assertCountEqual(obj_data.get('coefficient_data').get('col_ids'), expected_index)
+
+        self.assertCountEqual(obj_data.get('significance_data').get('row_ids'), expected_index)
+        self.assertCountEqual(obj_data.get('significance_data').get('col_ids'), expected_index)
 
     def test_compute_correlation_across_matrices_ok(self):
         self.start_test()
