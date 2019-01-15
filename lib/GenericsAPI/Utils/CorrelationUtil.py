@@ -253,7 +253,7 @@ class CorrelationUtil:
                          'workspace_name': workspace_name,
                          'html_links': output_html_files,
                          'direct_html_link_index': 0,
-                         'html_window_height': 333,
+                         'html_window_height': 666,
                          'report_object_name': 'compute_correlation_matrix_' + str(uuid.uuid4())}
 
         kbase_report_client = KBaseReport(self.callback_url, token=self.token)
@@ -268,9 +268,17 @@ class CorrelationUtil:
         _corr_for_matrix: compute correlation matrix df for KBaseMatrices object
         """
 
-        data_matrix = self.data_util.fetch_data({'obj_ref': input_obj_ref}).get('data_matrix')
+        res = self.dfu.get_objects({'object_refs': [input_obj_ref]})['data'][0]
+        obj_type = res['info'][2]
+        obj_data = res['data']
 
+        data_matrix = self.data_util.fetch_data({'obj_ref': input_obj_ref}).get('data_matrix')
         data_df = pd.read_json(data_matrix)
+
+        if "AmpliconMatrix" in obj_type:
+                amplicon_set_ref = obj_data.get('amplicon_set_ref')
+                if amplicon_set_ref:
+                    data_df = self._update_taxonomy_index(data_df, amplicon_set_ref)
 
         corr_df = self.df_to_corr(data_df, method=method, dimension=dimension)
 
