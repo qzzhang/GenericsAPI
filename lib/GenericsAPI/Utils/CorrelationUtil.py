@@ -393,16 +393,54 @@ class CorrelationUtil:
 
         writer.close()
 
+    def _update_taxonomy_index(self, data_df, amplicon_set_ref):
+
+        logging.info('start updating index with taxonomy info from AmpliconSet')
+
+        amplicon_set_data = self.dfu.get_objects(
+                                            {'object_refs': [amplicon_set_ref]})['data'][0]['data']
+
+        amplicons = amplicon_set_data.get('amplicons')
+
+        index = data_df.index.values
+
+        replace_index = list()
+
+        for idx in index:
+            try:
+                lineage = amplicons.get('idx').get('taxonomy').get('lineage')
+            except Exception:
+                pass
+
+            if lineage:
+                if len(lineage) == 1:
+                    replace_index.append(lineage[0])
+                else:
+                    replace_index.append(lineage[-2])
+            else:
+                replace_index.append(idx)
+
+        for idx, val in enumerate(replace_index):
+            index[idx] = val
+
+        return data_df
+
     def _fetch_matrix_data(self, matrix_ref):
 
         logging.info('start fectching matrix data')
 
         res = self.dfu.get_objects({'object_refs': [matrix_ref]})['data'][0]
         obj_type = res['info'][2]
+        obj_data = res['data']
 
         if "KBaseMatrices" in obj_type:
             data_matrix = self.data_util.fetch_data({'obj_ref': matrix_ref}).get('data_matrix')
             data_df = pd.read_json(data_matrix)
+            if "AmpliconMatrix" in obj_type:
+                amplicon_set_ref = obj_data.get('amplicon_set_ref')
+                if amplicon_set_ref:
+                    data_df = self._update_taxonomy_index(data_df, amplicon_set_ref)
+
             return data_df
         else:
             err_msg = 'Ooops! [{}] is not supported.\n'.format(obj_type)
