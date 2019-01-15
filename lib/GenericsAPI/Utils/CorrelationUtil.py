@@ -66,20 +66,21 @@ class CorrelationUtil:
         _build_table_content: generate HTML table content for FloatMatrix2D object
         """
 
-        table_content = """\n<table>\n"""
+        table_content = """\n<table class="table table-bordered table-striped">\n"""
 
         row_ids = matrix_2D.get('row_ids')
         col_ids = matrix_2D.get('col_ids')
         values = matrix_2D.get('values')
 
         # build header row
-        table_content += """\n<tr>\n"""
+        table_content += """\n<thead>\n<tr>\n"""
         table_content += """\n <td></td>\n"""
         for col_id in col_ids:
             table_content += """\n <td>{}</td>\n""".format(col_id)
-        table_content += """\n</tr>\n"""
+        table_content += """\n</tr>\n</thead>\n"""
 
         # build body rows
+        table_content += """\n<tbody>\n"""
         for idx, value in enumerate(values):
             table_content += """\n<tr>\n"""
 
@@ -90,7 +91,7 @@ class CorrelationUtil:
 
             table_content += """\n</tr>\n"""
 
-        table_content += """\n</table>\n"""
+        table_content += """\n</tbody>\n</table>\n"""
 
         return table_content
 
@@ -211,6 +212,9 @@ class CorrelationUtil:
         output_directory = os.path.join(self.scratch, str(uuid.uuid4()))
         self._mkdir_p(output_directory)
         result_file_path = os.path.join(output_directory, 'corr_report.html')
+
+        print('fdasfdsafdsa')
+        print(output_directory)
 
         visualization_content = self._generate_visualization_content(output_directory,
                                                                      corr_matrix_obj_ref,

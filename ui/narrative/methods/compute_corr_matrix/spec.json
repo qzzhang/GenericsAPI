@@ -27,9 +27,9 @@
       "allow_multiple" : false,
       "default_values" : ["pearson"],
       "field_type" : "dropdown",
-      "dropdown_options": 
+      "dropdown_options":
       {
-        "options": 
+        "options":
         [
           {
               "display": "Pearson",
@@ -53,9 +53,9 @@
       "allow_multiple" : false,
       "default_values" : ["row"],
       "field_type" : "dropdown",
-      "dropdown_options": 
+      "dropdown_options":
       {
-        "options": 
+        "options":
         [
           {
               "display": "row",
@@ -67,18 +67,6 @@
           }
         ]
       }
-    },
-    {
-      "id": "plot_corr_matrix",
-      "optional":false,
-      "advanced":true,
-      "allow_multiple":false,
-      "default_values":[1],
-      "field_type" : "checkbox",
-      "checkbox_options":{
-        "checked_value": 1,
-        "unchecked_value": 0
-        }
     },
     {
       "id": "compute_significance",
@@ -129,7 +117,7 @@
           "target_property" : "dimension"
         },
         {
-          "input_parameter" : "plot_corr_matrix",
+          "constant_value": "0",
           "target_property" : "plot_corr_matrix"
         },
         {

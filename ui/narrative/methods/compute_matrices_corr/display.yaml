@@ -44,14 +44,6 @@ parameters :
         long-hint  : |
             Correlation method, one of ['pearson', 'kendall', 'spearman']
 
-    plot_corr_matrix:
-        ui-name: |
-            Plot Correlation Matrix Heatmap
-        short-hint : |
-            Plot correlation matrix in report
-        long-hint  : |
-            Plot correlation matrix in report
-
     compute_significance:
         ui-name: |
             Compute Significance
