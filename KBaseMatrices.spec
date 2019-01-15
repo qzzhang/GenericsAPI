@@ -348,7 +348,7 @@ module KBaseMatrices{
 
       @optional description row_normalization col_normalization
       @optional col_mapping row_mapping col_attributemapping_ref row_attributemapping_ref
-      @optional attributes search_attributes sequence_mapping reads_set_ref
+      @optional attributes search_attributes sequence_mapping reads_set_ref amplicon_set_ref
 
       @metadata ws scale
       @metadata ws row_normalization
@@ -372,5 +372,6 @@ module KBaseMatrices{
       ws_ref reads_set_ref;
       mapping<string, string> sequence_mapping;
       FloatMatrix2D data;
+      ws_ref amplicon_set_ref;
     } AmpliconMatrix;
 };
