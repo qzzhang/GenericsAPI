@@ -560,7 +560,7 @@ class CorrelationUtil:
                                x=corr_df.columns,
                                y=corr_df.index)
             data = [trace]
-        except:
+        except Exception:
             err_msg = 'Running plotly_corr_matrix returned an error:\n{}\n'.format(
                                                                     traceback.format_exc())
             raise ValueError(err_msg)
@@ -590,11 +590,7 @@ class CorrelationUtil:
                        fontstyle='italic')
             plt.yticks(list(range(len(corr_df.columns))), corr_df.columns, fontstyle='italic')
             plt.colorbar(cax)
-
-            # ax = plt.gca()
-            # for (i, j), z in np.ndenumerate(corr_df):
-            #     ax.text(j, i, '{:0.1f}'.format(z), ha='center', va='center', color='white')
-        except:
+        except Exception:
             err_msg = 'Running plot_corr_matrix returned an error:\n{}\n'.format(
                                                                     traceback.format_exc())
             raise ValueError(err_msg)
@@ -636,7 +632,7 @@ class CorrelationUtil:
             # Hide all ticks
             [s.set_xticks(()) for s in sm.reshape(-1)]
             [s.set_yticks(()) for s in sm.reshape(-1)]
-        except:
+        except Exception:
             err_msg = 'Running scatter_matrix returned an error:\n{}\n'.format(
                                                                     traceback.format_exc())
             raise ValueError(err_msg)
@@ -653,14 +649,13 @@ class CorrelationUtil:
         matrix_ref_2: object reference of a matrix
         workspace_name: workspace name objects to be saved to
         corr_matrix_name: correlation matrix object name
-        dimension: compute correlation on column or row, one of ['col', 'row']
         method: correlation method, one of ['pearson', 'kendall', 'spearman']
         plot_corr_matrix: plot correlation matrix in report, default False
         compute_significance: also compute Significance in addition to correlation matrix
         """
 
         logging.info('--->\nrunning CorrelationUtil.compute_correlation_across_matrices\n' +
-            'params:\n{}'.format(json.dumps(params, indent=1)))
+                     'params:\n{}'.format(json.dumps(params, indent=1)))
 
         self._validate_compute_correlation_across_matrices_params(params)
 
@@ -674,7 +669,6 @@ class CorrelationUtil:
             err_msg = 'Input correlation method [{}] is not available.\n'.format(method)
             err_msg += 'Please choose one of {}'.format(CORR_METHOD)
             raise ValueError(err_msg)
-        dimension = params.get('dimension', 'row')
         plot_corr_matrix = params.get('plot_corr_matrix', False)
         compute_significance = params.get('compute_significance', False)
 
@@ -713,7 +707,7 @@ class CorrelationUtil:
         """
 
         logging.info('--->\nrunning CorrelationUtil.compute_correlation_matrix\n' +
-            'params:\n{}'.format(json.dumps(params, indent=1)))
+                     'params:\n{}'.format(json.dumps(params, indent=1)))
 
         self._validate_compute_corr_matrix_params(params)
 

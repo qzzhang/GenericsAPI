@@ -111,7 +111,41 @@ div.desc {
             'dom': "<'row'<'col-sm-6'B><'col-sm-6'f>>t<'row'<'col-sm-4'i><'col-sm-8'p>>",
             'buttons': ['copy', 'csv', 'print'],
             'scrollY': '50vh',
-            'scrollX': true
+            'scrollX': true,
+            'columnDefs': [{
+                'targets': [0],
+                'createdCell': function (td, cellData, rowData, row, col) {
+                    $(td).css('background-color', 'white');
+                }
+            },{
+                'targets': '_all',
+                'createdCell': function (td, cellData, rowData, row, col) {
+
+                    var cellData = parseFloat(cellData)
+
+                    if ( cellData >= 0.7 ) {
+                        $(td).css('background-color', '#5c1e19');
+                    } else if ( 0.5 <= cellData && cellData < 0.7) {
+                        $(td).css('background-color', '#932f28');
+                    } else if ( 0.3 <= cellData && cellData < 0.5) {
+                        $(td).css('background-color', '#d05a52');
+                    } else if ( 0.1 <= cellData && cellData < 0.3) {
+                        $(td).css('background-color', '#f3d6d4');
+                    } else if ( -0.1 <= cellData && cellData < 0.1) {
+                        $(td).css('background-color', '#f3f6fb');
+                    } else if ( -0.3 <= cellData && cellData < -0.1) {
+                        $(td).css('background-color', '#afc3e1');
+                    } else if ( -0.5 <= cellData && cellData < -0.3 ) {
+                        $(td).css('background-color', '#5e87c4');
+                    } else if ( -0.7 <= cellData && cellData < -0.5 ) {
+                        $(td).css('background-color', '#335589');
+                    } else if ( cellData < -0.7 ) {
+                        $(td).css('background-color', '#203556');
+                    } else {
+                        $(td).css('background-color', 'white');
+                    }
+                }
+            }]
         });
     } );
 </script>
