@@ -407,8 +407,9 @@ class CorrelationUtil:
         replace_index = list()
 
         for idx in index:
+            lineage = None
             try:
-                lineage = amplicons.get('idx').get('taxonomy').get('lineage')
+                lineage = amplicons.get(idx).get('taxonomy').get('lineage')
             except Exception:
                 pass
 
