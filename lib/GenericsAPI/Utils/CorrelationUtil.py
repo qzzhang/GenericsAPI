@@ -213,9 +213,6 @@ class CorrelationUtil:
         self._mkdir_p(output_directory)
         result_file_path = os.path.join(output_directory, 'corr_report.html')
 
-        print('fdasfdsafdsa')
-        print(output_directory)
-
         visualization_content = self._generate_visualization_content(output_directory,
                                                                      corr_matrix_obj_ref,
                                                                      corr_matrix_plot_path,
