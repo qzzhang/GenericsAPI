@@ -415,9 +415,9 @@ class CorrelationUtil:
 
             if lineage:
                 if len(lineage) == 1:
-                    replace_index.append(lineage[0])
+                    replace_index.append(lineage[0] + '_' + idx)
                 else:
-                    replace_index.append(lineage[-2])
+                    replace_index.append(lineage[-2] + '_' + idx)
             else:
                 replace_index.append(idx)
 
