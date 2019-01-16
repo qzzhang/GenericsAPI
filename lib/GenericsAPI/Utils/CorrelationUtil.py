@@ -545,7 +545,7 @@ class CorrelationUtil:
             err_msg += 'Please choose either "col" or "row"'
             raise ValueError(err_msg)
 
-        corr_df = df.corr(method=method)
+        corr_df = df.corr(method=method).round(4)
 
         return corr_df
 
