@@ -61,12 +61,45 @@ class CorrelationUtil:
             if p not in params:
                 raise ValueError('"{}" parameter is required, but missing'.format(p))
 
-    def _build_table_content(self, matrix_2D):
+    def _build_table_content(self, matrix_2D, type='corr'):
         """
         _build_table_content: generate HTML table content for FloatMatrix2D object
         """
 
-        table_content = """\n<table class="table table-bordered table-striped">\n"""
+        table_content = """\n"""
+
+        if type == 'corr':
+            table_content += """\n<div id="corr_search">
+                                <table border="0" cellspacing="5" cellpadding="5">
+                                    <tbody><tr>
+                                            <td>Column Search:</td>
+                                            <td><input type="text" id="col_search" name="col_search"></td>
+                                        </tr>
+                                        <tr>
+                                            <td>Row Search:</td>
+                                            <td><input type="text" id="row_search" name="row_search"></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>\n"""
+            table_content += """\n<table class="display" style="width:100%">\n"""
+        elif type == 'sig':
+            table_content += """\n<div id="sig_search">
+                                <table border="0" cellspacing="5" cellpadding="5">
+                                    <tbody><tr>
+                                            <td>Column Search:</td>
+                                            <td><input type="text" id="sig_col_search" name="col_search"></td>
+                                        </tr>
+                                        <tr>
+                                            <td>Row Search:</td>
+                                            <td><input type="text" id="sig_row_search" name="row_search"></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>\n"""
+            table_content += """\n<table class="sig_display" style="width:100%">\n"""
+        else:
+            raise ValueError('Unexpected type for _build_table_content')
 
         row_ids = matrix_2D.get('row_ids')
         col_ids = matrix_2D.get('col_ids')
@@ -95,6 +128,144 @@ class CorrelationUtil:
 
         return table_content
 
+    def _build_script_content(self, type):
+        script_content = """\n"""
+        if type == 'sig':
+            script_content += """
+            \n<script>
+            $.fn.dataTable.ext.search.push(
+                function(settings, data, dataIndex) {
+                    var search_text= $('#sig_row_search').val().toUpperCase();
+                    var row_name = data[0].toUpperCase();
+
+                    if ((row_name.indexOf(search_text) > -1)) {
+                        return true;
+                    }
+                    return false;
+                }
+            );
+
+            $(document).ready( function ()
+            {
+                var table = $('.sig_display').DataTable(
+                {
+                    'dom': "<'row'<'col-sm-6'B>>t<'row'<'col-sm-4'i><'col-sm-8'p>>",
+                    'buttons': [
+                        {
+                            extend: 'copy',
+                            exportOptions:
+                            {
+                                columns: ':visible'
+                            }
+                        },
+                        {
+                            extend: 'csv',
+                            exportOptions:
+                            {
+                                columns: ':visible'
+                            }
+                        }
+                    ],
+                    'scrollY': '50vh',
+                    'scrollX': true,
+                    'scrollCollapse': true,
+                    'fixedColumns':
+                    {
+                        'leftColumns': 1
+                    },
+                    'columnDefs': [
+                    {
+                        'targets': [0],
+                        'searchable': true,
+                        'createdCell': function (td, cellData, rowData, row, col)
+                        {
+                            $(td).css('font-weight', 'bold');
+                        }
+                    },
+                    {
+                        'targets': '_all',
+                        'searchable': false,
+                        'createdCell': function (td, cellData, rowData, row, col)
+                        {
+                            var cellData = parseFloat(cellData)
+
+                            if ( cellData >= 0.7 )
+                            {
+                                $(td).css('background-color', '#5c1e19');
+                                $(td).css('color', 'white');
+                            } else if ( 0.5 <= cellData && cellData < 0.7)
+                            {
+                                $(td).css('background-color', '#932f28');
+                                $(td).css('color', 'white');
+                            } else if ( 0.3 <= cellData && cellData < 0.5)
+                            {
+                                $(td).css('background-color', '#d05a52');
+                                $(td).css('color', 'white');
+                            } else if ( 0.1 <= cellData && cellData < 0.3)
+                            {
+                                $(td).css('background-color', '#f3d6d4');
+                                $(td).css('color', 'white');
+                            } else if ( -0.1 <= cellData && cellData < 0.1)
+                            {
+                                $(td).css('background-color', 'lightgrey');
+                                $(td).css('color', 'white');
+                            } else if ( -0.3 <= cellData && cellData < -0.1)
+                            {
+                                $(td).css('background-color', '#afc3e1');
+                                $(td).css('color', 'white');
+                            } else if ( -0.5 <= cellData && cellData < -0.3 )
+                            {
+                                $(td).css('background-color', '#5e87c4');
+                                $(td).css('color', 'white');
+                            } else if ( -0.7 <= cellData && cellData < -0.5 )
+                            {
+                                $(td).css('background-color', '#335589');
+                                $(td).css('color', 'white');
+                            } else if ( cellData < -0.7 )
+                            {
+                                $(td).css('background-color', '#203556');
+                                $(td).css('color', 'white');
+                            } else
+                            {
+                                $(td).css('background-color', 'white');
+                            }
+                        }
+                    }]
+                });
+
+                $('#sig_col_search').keyup(function() {
+                    // search each column header
+                    var search_text= document.getElementById('sig_col_search').value.toUpperCase();
+                    table.columns().every( function () {
+                        var that = this;
+                        var visIdx = that.index();
+                        if (visIdx != 0) {
+                            if (search_text.length == 0) {
+                                that.visible(true)
+                            } else {
+                                var title = that.header().innerHTML.toUpperCase();
+                                if (title.indexOf(search_text) > -1) {
+                                    that.visible(true)
+                                }
+                                else {
+                                    that.visible(false)
+                                }
+                            }
+                        }
+                    });
+                });
+
+                $('#sig_row_search').keyup( function() {
+                    table.draw();
+                });
+            });
+            </script>\n
+            """
+        else:
+            raise ValueError('Unexpected type for _build_script_content')
+
+        return script_content
+
     def _generate_visualization_content(self, output_directory, corr_matrix_obj_ref,
                                         corr_matrix_plot_path, scatter_plot_path):
 
@@ -120,17 +291,19 @@ class CorrelationUtil:
             <button class="tablinks" onclick="openTab(event, 'CorrelationMatrix')" id="defaultOpen">Correlation Matrix</button>
         """
 
-        corr_table_content = self._build_table_content(coefficient_data)
+        corr_table_content = self._build_table_content(coefficient_data, type='corr')
         tab_content += """
         <div id="CorrelationMatrix" class="tabcontent">{}</div>""".format(corr_table_content)
 
+        sig_scritp_content = ''
         if significance_data:
             tab_def_content += """
             <button class="tablinks" onclick="openTab(event, 'SignificanceMatrix')">Significance Matrix</button>
             """
-            sig_table_content = self._build_table_content(significance_data)
+            sig_table_content = self._build_table_content(significance_data, type='sig')
             tab_content += """
             <div id="SignificanceMatrix" class="tabcontent">{}</div>""".format(sig_table_content)
+            sig_scritp_content = self._build_script_content('sig')
 
         if corr_matrix_plot_path:
             tab_def_content += """
@@ -197,7 +370,7 @@ class CorrelationUtil:
 
         tab_def_content += """</div>"""
 
-        return tab_def_content + tab_content
+        return tab_def_content + tab_content, sig_scritp_content
 
     def _generate_corr_html_report(self, corr_matrix_obj_ref, corr_matrix_plot_path,
                                    scatter_plot_path):
@@ -213,7 +386,11 @@ class CorrelationUtil:
         self._mkdir_p(output_directory)
         result_file_path = os.path.join(output_directory, 'corr_report.html')
 
-        visualization_content = self._generate_visualization_content(output_directory,
+        print('corr_report_output_dir')
+        print(output_directory)
+
+        visualization_content, script_content = self._generate_visualization_content(
+                                                                     output_directory,
                                                                      corr_matrix_obj_ref,
                                                                      corr_matrix_plot_path,
                                                                      scatter_plot_path)
@@ -223,6 +400,8 @@ class CorrelationUtil:
                       'r') as report_template_file:
                 report_template = report_template_file.read()
                 report_template = report_template.replace('<p>Visualization_Content</p>',
+                                                          visualization_content)
+                report_template = report_template.replace('<script> sig_script </script>',
                                                           visualization_content)
                 result_file.write(report_template)
 
