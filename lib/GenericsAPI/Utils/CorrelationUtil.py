@@ -399,7 +399,7 @@ class CorrelationUtil:
                 report_template = report_template.replace('<p>Visualization_Content</p>',
                                                           visualization_content)
                 report_template = report_template.replace('<script> sig_script </script>',
-                                                          visualization_content)
+                                                          script_content)
                 result_file.write(report_template)
 
         report_shock_id = self.dfu.file_to_shock({'file_path': output_directory,
