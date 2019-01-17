@@ -179,7 +179,7 @@ class CorrelationUtil:
                         'searchable': true,
                         'createdCell': function (td, cellData, rowData, row, col)
                         {
-                            $(td).css('font-weight', 'normal');
+                            $(td).css('font-weight', 'bold');
                         }
                     },
                     {
