@@ -20,7 +20,7 @@ class GenericsAPI:
     GenericsAPI
 
     Module Description:
-
+    
     '''
 
     ######## WARNING FOR GEVENT USERS ####### noqa
@@ -29,9 +29,9 @@ class GenericsAPI:
     # state. A method could easily clobber the state set by another while
     # the latter method is running.
     ######################################### noqa
-    VERSION = "0.0.1"
+    VERSION = "1.0.0"
     GIT_URL = "git@github.com:Tianhao-Gu/GenericsAPI.git"
-    GIT_COMMIT_HASH = "54179bca9bdb079eeddc9cddde793d98a3d4800b"
+    GIT_COMMIT_HASH = "4f2c03e9c6fa9e528c5529bad1ba692a636339b5"
 
     #BEGIN_CLASS_HEADER
     #END_CLASS_HEADER
