@@ -598,10 +598,14 @@ class CorrelationUtil:
                 pass
 
             if lineage:
-                if len(lineage) == 1:
-                    replace_index.append(lineage[0] + '_' + idx)
-                else:
-                    replace_index.append(lineage[-2] + '_' + idx)
+                scientific_name = None
+                for item in lineage[::-1]:
+                    scientific_name = item.split('__')[-1]
+                    if scientific_name:
+                        replace_index.append(scientific_name + '_' + idx)
+                        break
+                if not scientific_name:
+                    replace_index.append(idx)
             else:
                 replace_index.append(idx)
 
