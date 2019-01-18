@@ -12,7 +12,7 @@ from __future__ import print_function
 try:
     # baseclient and this client are in a package
     from .baseclient import BaseClient as _BaseClient  # @UnusedImport
-except ImportError:
+except:
     # no they aren't
     from baseclient import BaseClient as _BaseClient  # @Reimport
 
@@ -99,8 +99,9 @@ class KBaseSearchEngine(object):
            search_types method.) -> structure: parameter "type_to_count" of
            mapping from String to Long, parameter "search_time" of Long
         """
-        return self._client.call_method('KBaseSearchEngine.search_types',
-                                        [params], self._service_ver, context)
+        return self._client.call_method(
+            'KBaseSearchEngine.search_types',
+            [params], self._service_ver, context)
 
     def search_objects(self, params, context=None):
         """
@@ -388,8 +389,9 @@ class KBaseSearchEngine(object):
            metadata about an object. Arbitrary key-value pairs provided by
            the user.) -> mapping from String to String
         """
-        return self._client.call_method('KBaseSearchEngine.search_objects',
-                                        [params], self._service_ver, context)
+        return self._client.call_method(
+            'KBaseSearchEngine.search_objects',
+            [params], self._service_ver, context)
 
     def get_objects(self, params, context=None):
         """
@@ -634,8 +636,9 @@ class KBaseSearchEngine(object):
            key-value pairs provided by the user.) -> mapping from String to
            String
         """
-        return self._client.call_method('KBaseSearchEngine.get_objects',
-                                        [params], self._service_ver, context)
+        return self._client.call_method(
+            'KBaseSearchEngine.get_objects',
+            [params], self._service_ver, context)
 
     def list_types(self, params, context=None):
         """
@@ -662,8 +665,9 @@ class KBaseSearchEngine(object):
            "boolean" (A boolean. 0 = false, other = true.), parameter
            "link_key" of String
         """
-        return self._client.call_method('KBaseSearchEngine.list_types',
-                                        [params], self._service_ver, context)
+        return self._client.call_method(
+            'KBaseSearchEngine.list_types',
+            [params], self._service_ver, context)
 
     def status(self, context=None):
         return self._client.call_method('KBaseSearchEngine.status',

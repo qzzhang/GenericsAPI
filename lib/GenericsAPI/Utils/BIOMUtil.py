@@ -6,12 +6,14 @@ import uuid
 import biom
 import pandas as pd
 from Bio import SeqIO
+import csv
 
 from installed_clients.DataFileUtilClient import DataFileUtil
 from GenericsAPI.Utils.AttributeUtils import AttributesUtil
 from GenericsAPI.Utils.DataUtil import DataUtil
 from GenericsAPI.Utils.MatrixUtil import MatrixUtil
 from installed_clients.KBaseReportClient import KBaseReport
+from installed_clients.KBaseSearchEngineClient import KBaseSearchEngine
 
 TYPE_ATTRIBUTES = {'description', 'scale', 'row_normalization', 'col_normalization'}
 SCALE_TYPES = {'raw', 'ln', 'log2', 'log10'}
@@ -133,6 +135,60 @@ class BiomUtil:
         else:
             return None
 
+    def _search_taxon(self, scientific_name):
+        """
+        logic borrowed from: GFU.GenomeInterface
+        https://github.com/kbaseapps/GenomeFileUtil/blob/master/lib/GenomeFileUtil/core/GenomeInterface.py#L216
+        """
+        taxonomy_ref = None
+
+        search_params = {
+            "object_types": ["taxon"],
+            "match_filter": {
+                "lookup_in_keys": {
+                    "scientific_name": {"value": scientific_name}},
+                "exclude_subobjects": 1
+            },
+            "access_filter": {
+                "with_private": 0,
+                "with_public": 1
+            },
+            "sorting_rules": [{
+                "is_object_property": 0,
+                "property": "timestamp",
+                "ascending": 0
+            }]
+        }
+
+        objects = self.kbse.search_objects(search_params)['objects']
+
+        if objects:
+            taxonomy_ref = '{}/{}'.format(self.taxon_wsname, objects[0].get('object_name'))
+        else:
+            search_params['match_filter']['lookup_in_keys'] = {
+                "aliases": {"value": scientific_name}
+            }
+            objects = self.kbse.search_objects(search_params)['objects']
+            if objects:
+                taxonomy_ref = '{}/{}'.format(self.taxon_wsname, objects[0].get('object_name'))
+
+        return taxonomy_ref
+
+    def _fetch_taxonomy_ref(self, lineage):
+
+        logging.info('start retrieving taxonomy ref from taxonomy service')
+
+        taxonomy_ref = None
+
+        for item in lineage[::-1]:
+            scientific_name = item.split('__')[-1]
+            if scientific_name:
+                taxonomy_ref = self._search_taxon(scientific_name)
+                if taxonomy_ref:
+                    return taxonomy_ref
+
+        return taxonomy_ref
+
     def _retrieve_tsv_amplicon_set_data(self, tsv_file):
         amplicons = dict()
 
@@ -157,9 +213,15 @@ class BiomUtil:
                                            'taxonomy')
 
             if isinstance(lineage, str):
-                lineage = list(set([x.strip() for x in lineage.split(',')]))
+                delimiter = csv.Sniffer().sniff(lineage).delimiter
+                lineage = list(set([x.strip() for x in lineage.split(delimiter)]))
             if lineage:
                 taxonomy.update({'lineage': lineage})
+
+            # retrieve 'taxonomy_ref' info
+            taxonomy_ref = self._fetch_taxonomy_ref(lineage)
+            if taxonomy_ref:
+                taxonomy.update({'taxonomy_ref': taxonomy_ref})
 
             # retrieve 'taxonomy_id' info
             taxonomy_id = self._retrieve_value([], df.loc[observation_id],
@@ -223,9 +285,15 @@ class BiomUtil:
             lineage = self._retrieve_value([], df.loc[observation_id],
                                            'taxonomy')
             if isinstance(lineage, str):
-                lineage = list(set([x.strip() for x in lineage.split(',')]))
+                delimiter = csv.Sniffer().sniff(lineage).delimiter
+                lineage = list(set([x.strip() for x in lineage.split(delimiter)]))
             if lineage:
                 taxonomy.update({'lineage': lineage})
+
+            # retrieve 'taxonomy_ref' info
+            taxonomy_ref = self._fetch_taxonomy_ref(lineage)
+            if taxonomy_ref:
+                taxonomy.update({'taxonomy_ref': taxonomy_ref})
 
             # retrieve 'taxonomy_id' info
             taxonomy_id = self._retrieve_value([], df.loc[observation_id],
@@ -284,8 +352,17 @@ class BiomUtil:
             # retrieve 'lineage'/'taxonomy' info
             lineage = self._retrieve_value(observation_metadata[index], [],
                                            'taxonomy')
+
+            if isinstance(lineage, str):
+                delimiter = csv.Sniffer().sniff(lineage).delimiter
+                lineage = list(set([x.strip() for x in lineage.split(delimiter)]))
             if lineage:
                 taxonomy.update({'lineage': lineage})
+
+            # retrieve 'taxonomy_ref' info
+            taxonomy_ref = self._fetch_taxonomy_ref(lineage)
+            if taxonomy_ref:
+                taxonomy.update({'taxonomy_ref': taxonomy_ref})
 
             # retrieve 'taxonomy_id' info
             taxonomy_id = self._retrieve_value(observation_metadata[index], [],
@@ -351,9 +428,15 @@ class BiomUtil:
                                            df.loc[observation_id],
                                            'taxonomy')
             if isinstance(lineage, str):
-                lineage += list(set([x.strip() for x in lineage.split(',')]))
+                delimiter = csv.Sniffer().sniff(lineage).delimiter
+                lineage = list(set([x.strip() for x in lineage.split(delimiter)]))
             if lineage:
                 taxonomy.update({'lineage': lineage})
+
+            # retrieve 'taxonomy_ref' info
+            taxonomy_ref = self._fetch_taxonomy_ref(lineage)
+            if taxonomy_ref:
+                taxonomy.update({'taxonomy_ref': taxonomy_ref})
 
             # retrieve 'taxonomy_id' info
             taxonomy_id = self._retrieve_value(observation_metadata[index],
@@ -679,6 +762,8 @@ class BiomUtil:
         self.matrix_util = MatrixUtil(config)
         self.matrix_types = [x.split(".")[1].split('-')[0]
                              for x in self.data_util.list_generic_types()]
+        self.taxon_wsname = config['taxon-workspace-name']
+        self.kbse = KBaseSearchEngine(config['search-url'])
 
     def import_matrix_from_biom(self, params):
         """
