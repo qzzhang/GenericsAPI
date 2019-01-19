@@ -861,10 +861,10 @@ class CorrelationUtil:
         plot_corr_matrix = params.get('plot_corr_matrix', False)
         compute_significance = params.get('compute_significance', False)
 
-        matrix_2_type = self.dfu.get_objects({'object_refs': [matrix_ref_2]})['data'][0]['info'][2]
+        matrix_1_type = self.dfu.get_objects({'object_refs': [matrix_ref_1]})['data'][0]['info'][2]
 
-        # making sure otu_ids are on the index side of table
-        if "AmpliconMatrix" in matrix_2_type:
+        # making sure otu_ids are on the column of table
+        if "AmpliconMatrix" in matrix_1_type:
             matrix_ref_1, matrix_ref_2 = matrix_ref_2, matrix_ref_1
 
         df1 = self._fetch_matrix_data(matrix_ref_1)
