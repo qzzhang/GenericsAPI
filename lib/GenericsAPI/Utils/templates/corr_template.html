@@ -118,7 +118,36 @@ $.fn.dataTable.ext.search.push(
         return false;
     }
 );
+$.fn.dataTable.ext.search.push(
+    function(settings, data, dataIndex) {
 
+        var max = parseFloat($('#max').val());
+        for (var i = 1; i < data.length; i++) {
+                var value = parseFloat(data[i]);
+                if (max < value)
+                    {
+                        return false;
+                    }
+            }
+
+        return true;
+    }
+);
+$.fn.dataTable.ext.search.push(
+    function(settings, data, dataIndex) {
+
+        var min = parseFloat($('#min').val());
+        for (var i = 1; i < data.length; i++) {
+                var value = parseFloat(data[i]);
+                if (min > value)
+                    {
+                        return false;
+                    }
+            }
+
+        return true;
+    }
+);
 $(document).ready( function ()
 {
     var table = $('.display').DataTable(
@@ -158,7 +187,7 @@ $(document).ready( function ()
         },
         {
             'targets': '_all',
-            'searchable': false,
+            'searchable': true,
             'createdCell': function (td, cellData, rowData, row, col)
             {
                 var cellData = parseFloat(cellData)
@@ -230,6 +259,14 @@ $(document).ready( function ()
     });
 
     $('#row_search').keyup( function() {
+        table.draw();
+    });
+
+    $('#max').keyup( function() {
+        table.draw();
+    });
+
+    $('#min').keyup( function() {
         table.draw();
     });
 });

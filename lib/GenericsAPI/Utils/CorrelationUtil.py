@@ -79,6 +79,14 @@ class CorrelationUtil:
                                             <td>Row Search:</td>
                                             <td><input type="text" id="row_search" name="row_search"></td>
                                         </tr>
+                                        <tr>
+                                            <td>Minimum Value:</td>
+                                            <td><input type="text" id="min" name="min"></td>
+                                        </tr>
+                                        <tr>
+                                            <td>Maximum Value:</td>
+                                            <td><input type="text" id="max" name="max"></td>
+                                        </tr>
                                     </tbody>
                                 </table>
                             </div>\n"""
@@ -93,6 +101,14 @@ class CorrelationUtil:
                                         <tr>
                                             <td>Row Search:</td>
                                             <td><input type="text" id="sig_row_search" name="row_search"></td>
+                                        </tr>
+                                        <tr>
+                                            <td>Minimum Value:</td>
+                                            <td><input type="text" id="sig_min" name="sig_min"></td>
+                                        </tr>
+                                        <tr>
+                                            <td>Maximum Value:</td>
+                                            <td><input type="text" id="sig_max" name="sig_max"></td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -132,134 +148,173 @@ class CorrelationUtil:
         script_content = """\n"""
         if type == 'sig':
             script_content += """
-            \n<script>
-            $.fn.dataTable.ext.search.push(
-                function(settings, data, dataIndex) {
-                    var search_text= $('#sig_row_search').val().toUpperCase();
-                    var row_name = data[0].toUpperCase();
+                \n<script>
+                $.fn.dataTable.ext.search.push(
+                    function(settings, data, dataIndex) {
+                        var search_text= $('#sig_row_search').val().toUpperCase();
+                        var row_name = data[0].toUpperCase();
 
-                    if ((row_name.indexOf(search_text) > -1)) {
+                        if ((row_name.indexOf(search_text) > -1)) {
+                            return true;
+                        }
+                        return false;
+                    }
+                );
+
+                $.fn.dataTable.ext.search.push(
+                    function(settings, data, dataIndex) {
+
+                        var max = parseFloat($('#sig_max').val());
+                        for (var i = 1; i < data.length; i++) {
+                                var value = parseFloat(data[i]);
+                                if (max < value)
+                                    {
+                                        return false;
+                                    }
+                            }
+
                         return true;
                     }
-                    return false;
-                }
-            );
+                );
+                $.fn.dataTable.ext.search.push(
+                    function(settings, data, dataIndex) {
 
-            $(document).ready( function ()
-            {
-                var table = $('.sig_display').DataTable(
+                        var min = parseFloat($('#sig_min').val());
+                        for (var i = 1; i < data.length; i++) {
+                                var value = parseFloat(data[i]);
+                                if (min > value)
+                                    {
+                                        return false;
+                                    }
+                            }
+
+                        return true;
+                    }
+                );
+
+                $(document).ready( function ()
                 {
-                    'dom': "<'row'<'col-sm-6'B>>t<'row'<'col-sm-4'i><'col-sm-8'p>>",
-                    'buttons': [
-                        {
-                            extend: 'copy',
-                            exportOptions:
+                    var table = $('.sig_display').DataTable(
+                    {
+                        'dom': "<'row'<'col-sm-6'B>>t<'row'<'col-sm-4'i><'col-sm-8'p>>",
+                        'buttons': [
                             {
-                                columns: ':visible'
+                                extend: 'copy',
+                                exportOptions:
+                                {
+                                    columns: ':visible'
+                                }
+                            },
+                            {
+                                extend: 'csv',
+                                exportOptions:
+                                {
+                                    columns: ':visible'
+                                }
+                            }
+                        ],
+                        'scrollY': '50vh',
+                        'scrollX': true,
+                        'scrollCollapse': true,
+                        'fixedColumns':
+                        {
+                            'leftColumns': 1
+                        },
+                        'columnDefs': [
+                        {
+                            'targets': [0],
+                            'searchable': true,
+                            'createdCell': function (td, cellData, rowData, row, col)
+                            {
+                                $(td).css('font-weight', 'normal');
                             }
                         },
                         {
-                            extend: 'csv',
-                            exportOptions:
+                            'targets': '_all',
+                            'searchable': true,
+                            'createdCell': function (td, cellData, rowData, row, col)
                             {
-                                columns: ':visible'
-                            }
-                        }
-                    ],
-                    'scrollY': '50vh',
-                    'scrollX': true,
-                    'scrollCollapse': true,
-                    'fixedColumns':
-                    {
-                        'leftColumns': 1
-                    },
-                    'columnDefs': [
-                    {
-                        'targets': [0],
-                        'searchable': true,
-                        'createdCell': function (td, cellData, rowData, row, col)
-                        {
-                            $(td).css('font-weight', 'normal');
-                        }
-                    },
-                    {
-                        'targets': '_all',
-                        'searchable': false,
-                        'createdCell': function (td, cellData, rowData, row, col)
-                        {
-                            var cellData = parseFloat(cellData)
+                                var cellData = parseFloat(cellData)
 
-                            if ( cellData >= 0.7 )
-                            {
-                                $(td).css('background-color', '#5c1e19');
-                                $(td).css('color', 'white');
-                            } else if ( 0.5 <= cellData && cellData < 0.7)
-                            {
-                                $(td).css('background-color', '#932f28');
-                                $(td).css('color', 'white');
-                            } else if ( 0.3 <= cellData && cellData < 0.5)
-                            {
-                                $(td).css('background-color', '#d05a52');
-                                $(td).css('color', 'white');
-                            } else if ( 0.1 <= cellData && cellData < 0.3)
-                            {
-                                $(td).css('background-color', '#f3d6d4');
-                                $(td).css('color', 'white');
-                            } else if ( -0.1 <= cellData && cellData < 0.1)
-                            {
-                                $(td).css('background-color', 'lightgrey');
-                                $(td).css('color', 'white');
-                            } else if ( -0.3 <= cellData && cellData < -0.1)
-                            {
-                                $(td).css('background-color', '#afc3e1');
-                                $(td).css('color', 'white');
-                            } else if ( -0.5 <= cellData && cellData < -0.3 )
-                            {
-                                $(td).css('background-color', '#5e87c4');
-                                $(td).css('color', 'white');
-                            } else if ( -0.7 <= cellData && cellData < -0.5 )
-                            {
-                                $(td).css('background-color', '#335589');
-                                $(td).css('color', 'white');
-                            } else if ( cellData < -0.7 )
-                            {
-                                $(td).css('background-color', '#203556');
-                                $(td).css('color', 'white');
-                            } else
-                            {
-                                $(td).css('background-color', 'white');
+                                if ( cellData >= 0.7 )
+                                {
+                                    $(td).css('background-color', '#5c1e19');
+                                    $(td).css('color', 'white');
+                                } else if ( 0.5 <= cellData && cellData < 0.7)
+                                {
+                                    $(td).css('background-color', '#932f28');
+                                    $(td).css('color', 'white');
+                                } else if ( 0.3 <= cellData && cellData < 0.5)
+                                {
+                                    $(td).css('background-color', '#d05a52');
+                                    $(td).css('color', 'white');
+                                } else if ( 0.1 <= cellData && cellData < 0.3)
+                                {
+                                    $(td).css('background-color', '#f3d6d4');
+                                    $(td).css('color', 'white');
+                                } else if ( -0.1 <= cellData && cellData < 0.1)
+                                {
+                                    $(td).css('background-color', 'lightgrey');
+                                    $(td).css('color', 'white');
+                                } else if ( -0.3 <= cellData && cellData < -0.1)
+                                {
+                                    $(td).css('background-color', '#afc3e1');
+                                    $(td).css('color', 'white');
+                                } else if ( -0.5 <= cellData && cellData < -0.3 )
+                                {
+                                    $(td).css('background-color', '#5e87c4');
+                                    $(td).css('color', 'white');
+                                } else if ( -0.7 <= cellData && cellData < -0.5 )
+                                {
+                                    $(td).css('background-color', '#335589');
+                                    $(td).css('color', 'white');
+                                } else if ( cellData < -0.7 )
+                                {
+                                    $(td).css('background-color', '#203556');
+                                    $(td).css('color', 'white');
+                                } else
+                                {
+                                    $(td).css('background-color', 'white');
+                                }
                             }
-                        }
-                    }]
-                });
+                        }]
+                    });
 
-                $('#sig_col_search').keyup(function() {
-                    // search each column header
-                    var search_text= document.getElementById('sig_col_search').value.toUpperCase();
-                    table.columns().every( function () {
-                        var that = this;
-                        var visIdx = that.index();
-                        if (visIdx != 0) {
-                            if (search_text.length == 0) {
-                                that.visible(true)
-                            } else {
-                                var title = that.header().innerHTML.toUpperCase();
-                                if (title.indexOf(search_text) > -1) {
+                    $('#sig_col_search').keyup(function() {
+                        // search each column header
+                        var search_text= document.getElementById('sig_col_search').value.toUpperCase();
+                        table.columns().every( function () {
+                            var that = this;
+                            var visIdx = that.index();
+                            if (visIdx != 0) {
+                                if (search_text.length == 0) {
                                     that.visible(true)
-                                }
-                                else {
-                                    that.visible(false)
+                                } else {
+                                    var title = that.header().innerHTML.toUpperCase();
+                                    if (title.indexOf(search_text) > -1) {
+                                        that.visible(true)
+                                    }
+                                    else {
+                                        that.visible(false)
+                                    }
                                 }
                             }
-                        }
+                        });
+                    });
+
+                    $('#sig_row_search').keyup( function() {
+                        table.draw();
+                    });
+
+                    $('#sig_min').keyup( function() {
+                        table.draw();
+                    });
+
+                    $('#sig_max').keyup( function() {
+                        table.draw();
                     });
                 });
-
-                $('#sig_row_search').keyup( function() {
-                    table.draw();
-                });
-            });
-            </script>\n
+                </script>\n
             """
         else:
             raise ValueError('Unexpected type for _build_script_content')
@@ -852,10 +907,10 @@ class CorrelationUtil:
         plot_corr_matrix = params.get('plot_corr_matrix', False)
         compute_significance = params.get('compute_significance', False)
 
-        matrix_2_type = self.dfu.get_objects({'object_refs': [matrix_ref_2]})['data'][0]['info'][2]
+        matrix_1_type = self.dfu.get_objects({'object_refs': [matrix_ref_1]})['data'][0]['info'][2]
 
-        # making sure otu_ids are on the index side of table
-        if "AmpliconMatrix" in matrix_2_type:
+        # making sure otu_ids are on the column side of table
+        if "AmpliconMatrix" in matrix_1_type:
             matrix_ref_1, matrix_ref_2 = matrix_ref_2, matrix_ref_1
 
         df1 = self._fetch_matrix_data(matrix_ref_1)
