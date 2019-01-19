@@ -61,7 +61,7 @@ class CorrelationUtil:
             if p not in params:
                 raise ValueError('"{}" parameter is required, but missing'.format(p))
 
-    def _build_table_content(self, matrix_2D, type='corr'):
+    def _build_table_content(self, matrix_2D, output_directory, type='corr'):
         """
         _build_table_content: generate HTML table content for FloatMatrix2D object
         """
@@ -113,18 +113,25 @@ class CorrelationUtil:
         table_content += """\n</tr>\n</thead>\n"""
 
         # build body rows
-        table_content += """\n<tbody>\n"""
+        data_array = []
         for idx, value in enumerate(values):
-            table_content += """\n<tr>\n"""
+            value_array = list()
+            value_array.append(row_ids[idx])
+            value_array.extend(value)
 
-            table_content += """\n <td>{}</td>\n""".format(row_ids[idx])
+            data_array.append(value_array)
 
-            for val in value:
-                table_content += """\n <td>{}</td>\n""".format(val)
+        if type == 'corr':
+            file_name = 'corr_data.json'
+        elif type == 'sig':
+            file_name = 'sig_data.json'
 
-            table_content += """\n</tr>\n"""
+        json_dict = {'data': data_array}
 
-        table_content += """\n</tbody>\n</table>\n"""
+        with open(os.path.join(output_directory, file_name), 'w') as fp:
+            json.dump(json_dict, fp)
+
+        table_content += """\n</table>\n"""
 
         return table_content
 
@@ -169,6 +176,8 @@ class CorrelationUtil:
                     'scrollY': '50vh',
                     'scrollX': true,
                     'scrollCollapse': true,
+                    'ajax': 'sig_data.json',
+                    'deferRender': true,
                     'fixedColumns':
                     {
                         'leftColumns': 1
@@ -291,7 +300,7 @@ class CorrelationUtil:
             <button class="tablinks" onclick="openTab(event, 'CorrelationMatrix')" id="defaultOpen">Correlation Matrix</button>
         """
 
-        corr_table_content = self._build_table_content(coefficient_data, type='corr')
+        corr_table_content = self._build_table_content(coefficient_data, output_directory, type='corr')
         tab_content += """
         <div id="CorrelationMatrix" class="tabcontent">{}</div>""".format(corr_table_content)
 
@@ -300,7 +309,7 @@ class CorrelationUtil:
             tab_def_content += """
             <button class="tablinks" onclick="openTab(event, 'SignificanceMatrix')">Significance Matrix</button>
             """
-            sig_table_content = self._build_table_content(significance_data, type='sig')
+            sig_table_content = self._build_table_content(significance_data, output_directory, type='sig')
             tab_content += """
             <div id="SignificanceMatrix" class="tabcontent">{}</div>""".format(sig_table_content)
             sig_scritp_content = self._build_script_content('sig')
