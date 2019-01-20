@@ -179,15 +179,16 @@ class BiomUtil:
         logging.info('start retrieving taxonomy ref from taxonomy service')
 
         taxonomy_ref = None
+        scientific_name = None
 
         for item in lineage[::-1]:
             scientific_name = item.split('__')[-1]
             if scientific_name:
                 taxonomy_ref = self._search_taxon(scientific_name)
                 if taxonomy_ref:
-                    return taxonomy_ref
+                    return taxonomy_ref, scientific_name
 
-        return taxonomy_ref
+        return taxonomy_ref, scientific_name
 
     def _retrieve_tsv_amplicon_set_data(self, tsv_file):
         amplicons = dict()
@@ -219,9 +220,10 @@ class BiomUtil:
                 taxonomy.update({'lineage': lineage})
 
             # retrieve 'taxonomy_ref' info
-            taxonomy_ref = self._fetch_taxonomy_ref(lineage)
+            taxonomy_ref, scientific_name = self._fetch_taxonomy_ref(lineage)
             if taxonomy_ref:
                 taxonomy.update({'taxonomy_ref': taxonomy_ref})
+                taxonomy.update({'scientific_name': scientific_name})
 
             # retrieve 'taxonomy_id' info
             taxonomy_id = self._retrieve_value([], df.loc[observation_id],
@@ -291,9 +293,10 @@ class BiomUtil:
                 taxonomy.update({'lineage': lineage})
 
             # retrieve 'taxonomy_ref' info
-            taxonomy_ref = self._fetch_taxonomy_ref(lineage)
+            taxonomy_ref, scientific_name = self._fetch_taxonomy_ref(lineage)
             if taxonomy_ref:
                 taxonomy.update({'taxonomy_ref': taxonomy_ref})
+                taxonomy.update({'scientific_name': scientific_name})
 
             # retrieve 'taxonomy_id' info
             taxonomy_id = self._retrieve_value([], df.loc[observation_id],
@@ -360,9 +363,10 @@ class BiomUtil:
                 taxonomy.update({'lineage': lineage})
 
             # retrieve 'taxonomy_ref' info
-            taxonomy_ref = self._fetch_taxonomy_ref(lineage)
+            taxonomy_ref, scientific_name = self._fetch_taxonomy_ref(lineage)
             if taxonomy_ref:
                 taxonomy.update({'taxonomy_ref': taxonomy_ref})
+                taxonomy.update({'scientific_name': scientific_name})
 
             # retrieve 'taxonomy_id' info
             taxonomy_id = self._retrieve_value(observation_metadata[index], [],
@@ -434,9 +438,10 @@ class BiomUtil:
                 taxonomy.update({'lineage': lineage})
 
             # retrieve 'taxonomy_ref' info
-            taxonomy_ref = self._fetch_taxonomy_ref(lineage)
+            taxonomy_ref, scientific_name = self._fetch_taxonomy_ref(lineage)
             if taxonomy_ref:
                 taxonomy.update({'taxonomy_ref': taxonomy_ref})
+                taxonomy.update({'scientific_name': scientific_name})
 
             # retrieve 'taxonomy_id' info
             taxonomy_id = self._retrieve_value(observation_metadata[index],
