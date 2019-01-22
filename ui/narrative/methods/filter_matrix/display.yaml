@@ -1,4 +1,4 @@
-name     : Filter Matrix
+name     : Reconstruct Matrix
 subtitle : Create a sub-matrix with given ids
 tooltip  : Create a sub-matrix with given ids
 
@@ -24,13 +24,21 @@ parameters :
         ui-name: |
             Matrix Object
         short-hint : |
-            One of ExpressionMatrix, FitnessMatrix, DifferentialExpressionMatrix Object
+            One of KBaseMatrices Object
         long-hint  : |
-            One of ExpressionMatrix, FitnessMatrix, DifferentialExpressionMatrix Object
+            One of KBaseMatrices Object
 
-    filter_ids:
+    dimension :
         ui-name: |
-            Filtering IDs
+            Remove IDs On
+        short-hint : |
+            Removed ids on column or row
+        long-hint  : |
+            Removed ids on column or row
+
+    remove_ids:
+        ui-name: |
+            IDs To Be Removed
         short-hint : |
             Column or Row IDs used to create sub-matrix object
         long-hint  : |
@@ -38,11 +46,11 @@ parameters :
 
     filtered_matrix_name:
         ui-name: |
-            Filtered Matrix Name
+            New Matrix Name
         short-hint : |
-            Filtered Matrix Name
+            New Matrix Name
         long-hint  : |
-            Filtered Matrix Name
+            New Matrix Name
 
 description : |
     <p> Create a sub-matrix with given ids. </p>
