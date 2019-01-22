@@ -218,12 +218,11 @@ class BiomUtil:
                 lineage = list(set([x.strip() for x in lineage.split(delimiter)]))
             if lineage:
                 taxonomy.update({'lineage': lineage})
-
-            # retrieve 'taxonomy_ref' info
-            taxonomy_ref, scientific_name = self._fetch_taxonomy_ref(lineage)
-            if taxonomy_ref:
-                taxonomy.update({'taxonomy_ref': taxonomy_ref})
-                taxonomy.update({'scientific_name': scientific_name})
+                # retrieve 'taxonomy_ref' info
+                taxonomy_ref, scientific_name = self._fetch_taxonomy_ref(lineage)
+                if taxonomy_ref:
+                    taxonomy.update({'taxonomy_ref': taxonomy_ref})
+                    taxonomy.update({'scientific_name': scientific_name})
 
             # retrieve 'taxonomy_id' info
             taxonomy_id = self._retrieve_value([], df.loc[observation_id],
@@ -291,12 +290,11 @@ class BiomUtil:
                 lineage = list(set([x.strip() for x in lineage.split(delimiter)]))
             if lineage:
                 taxonomy.update({'lineage': lineage})
-
-            # retrieve 'taxonomy_ref' info
-            taxonomy_ref, scientific_name = self._fetch_taxonomy_ref(lineage)
-            if taxonomy_ref:
-                taxonomy.update({'taxonomy_ref': taxonomy_ref})
-                taxonomy.update({'scientific_name': scientific_name})
+                # retrieve 'taxonomy_ref' info
+                taxonomy_ref, scientific_name = self._fetch_taxonomy_ref(lineage)
+                if taxonomy_ref:
+                    taxonomy.update({'taxonomy_ref': taxonomy_ref})
+                    taxonomy.update({'scientific_name': scientific_name})
 
             # retrieve 'taxonomy_id' info
             taxonomy_id = self._retrieve_value([], df.loc[observation_id],
@@ -361,12 +359,11 @@ class BiomUtil:
                 lineage = list(set([x.strip() for x in lineage.split(delimiter)]))
             if lineage:
                 taxonomy.update({'lineage': lineage})
-
-            # retrieve 'taxonomy_ref' info
-            taxonomy_ref, scientific_name = self._fetch_taxonomy_ref(lineage)
-            if taxonomy_ref:
-                taxonomy.update({'taxonomy_ref': taxonomy_ref})
-                taxonomy.update({'scientific_name': scientific_name})
+                # retrieve 'taxonomy_ref' info
+                taxonomy_ref, scientific_name = self._fetch_taxonomy_ref(lineage)
+                if taxonomy_ref:
+                    taxonomy.update({'taxonomy_ref': taxonomy_ref})
+                    taxonomy.update({'scientific_name': scientific_name})
 
             # retrieve 'taxonomy_id' info
             taxonomy_id = self._retrieve_value(observation_metadata[index], [],
@@ -436,12 +433,11 @@ class BiomUtil:
                 lineage = list(set([x.strip() for x in lineage.split(delimiter)]))
             if lineage:
                 taxonomy.update({'lineage': lineage})
-
-            # retrieve 'taxonomy_ref' info
-            taxonomy_ref, scientific_name = self._fetch_taxonomy_ref(lineage)
-            if taxonomy_ref:
-                taxonomy.update({'taxonomy_ref': taxonomy_ref})
-                taxonomy.update({'scientific_name': scientific_name})
+                # retrieve 'taxonomy_ref' info
+                taxonomy_ref, scientific_name = self._fetch_taxonomy_ref(lineage)
+                if taxonomy_ref:
+                    taxonomy.update({'taxonomy_ref': taxonomy_ref})
+                    taxonomy.update({'scientific_name': scientific_name})
 
             # retrieve 'taxonomy_id' info
             taxonomy_id = self._retrieve_value(observation_metadata[index],
