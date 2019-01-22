@@ -183,7 +183,10 @@ class CorrelationUtil:
                     'paging': true,
                     'processing': true,
                     'ajax': 'sig_data.json',
-                    'deferLoading': {},
+                    'deferLoading': """
+
+            script_content += """{}""".format(total_rec)
+            script_content += """,\n
                     'deferRender': true,
                     'fixedColumns':
                     {
@@ -276,7 +279,7 @@ class CorrelationUtil:
                 });
             });
             </script>\n
-            """.format(total_rec)
+            """
         elif type == 'corr':
             script_content += """
             \n<script>
@@ -319,7 +322,10 @@ class CorrelationUtil:
                     'paging': true,
                     'processing': true,
                     'ajax': 'corr_data.json',
-                    'deferLoading': {},
+                    'deferLoading': """
+
+            script_content += """{}""".format(total_rec)
+            script_content += """,\n
                     'deferRender': true,
                     'fixedColumns':
                     {
@@ -412,7 +418,7 @@ class CorrelationUtil:
                 });
             });
             </script>\n
-            """.format(total_rec)
+            """
         else:
             raise ValueError('Unexpected type for _build_script_content')
 
