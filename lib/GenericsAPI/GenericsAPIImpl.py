@@ -31,7 +31,7 @@ class GenericsAPI:
     ######################################### noqa
     VERSION = "1.0.0"
     GIT_URL = "git@github.com:Tianhao-Gu/GenericsAPI.git"
-    GIT_COMMIT_HASH = "4f2c03e9c6fa9e528c5529bad1ba692a636339b5"
+    GIT_COMMIT_HASH = "70e518644670ad45614bd0394d969763a1d8ae1f"
 
     #BEGIN_CLASS_HEADER
     #END_CLASS_HEADER
@@ -298,7 +298,8 @@ class GenericsAPI:
            matrix object) -> structure: parameter "matrix_obj_ref" of type
            "obj_ref" (An X/Y/Z style reference), parameter "workspace_name"
            of type "workspace_name" (workspace name of the object), parameter
-           "filter_ids" of String, parameter "filtered_matrix_name" of String
+           "filtered_matrix_name" of String, parameter "remove_ids" of
+           String, parameter "dimension" of String
         :returns: instance of type "MatrixFilterOutput" -> structure:
            parameter "report_name" of String, parameter "report_ref" of
            String, parameter "matrix_obj_refs" of list of type "obj_ref" (An

@@ -182,8 +182,9 @@ module GenericsAPI {
   typedef structure {
       obj_ref matrix_obj_ref;
       workspace_name workspace_name;
-      string filter_ids;
       string filtered_matrix_name;
+      string remove_ids;
+      string dimension;
   } MatrixFilterParams;
 
   typedef structure {

@@ -3,7 +3,7 @@
   "authors" : ["tgu2"],
   "contact" : "http://kbase.us/contact-us/",
   "visible" : true,
-  "categories" : ["inactive", "util"],
+  "categories" : ["active", "util"],
   "widgets": {
     "input": "kbaseNarrativeMethodInput",
     "output" : "no-display"
@@ -21,7 +21,29 @@
       }
     },
     {
-      "id" : "filter_ids",
+      "id" : "dimension",
+      "optional" : false,
+      "advanced" : true,
+      "allow_multiple" : false,
+      "default_values" : ["row"],
+      "field_type" : "dropdown",
+      "dropdown_options":
+      {
+        "options":
+        [
+          {
+              "display": "Row",
+              "value": "row"
+          },
+          {
+              "display": "Column",
+              "value": "col"
+          }
+        ]
+      }
+    },
+    {
+      "id" : "remove_ids",
       "optional" : false,
       "advanced" : false,
       "allow_multiple" : false,
@@ -60,8 +82,12 @@
           "target_type_transform": "resolved-ref"
         },
         {
-          "input_parameter" : "filter_ids",
-          "target_property" : "filter_ids"
+          "input_parameter" : "remove_ids",
+          "target_property" : "remove_ids"
+        },
+        {
+          "input_parameter" : "dimension",
+          "target_property" : "dimension"
         },
         {
           "input_parameter" : "filtered_matrix_name",

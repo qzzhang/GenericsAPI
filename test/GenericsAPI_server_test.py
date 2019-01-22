@@ -409,7 +409,8 @@ class GenericsAPITest(unittest.TestCase):
 
         params = {'matrix_obj_ref': self.expression_matrix_ref,
                   'workspace_name': self.wsName,
-                  'filter_ids': 'WRI_RS00065_CDS_1,WRI_RS00070_CDS_1',
+                  'remove_ids': 'WRI_RS00065_CDS_1,WRI_RS00070_CDS_1',
+                  'dimension': 'row',
                   'filtered_matrix_name': 'filtered_test_matrix_rows'}
         returnVal = self.getImpl().filter_matrix(self.ctx, params)[0]
         self.assertTrue('report_name' in returnVal)
@@ -421,7 +422,7 @@ class GenericsAPITest(unittest.TestCase):
             {"object_refs": [matrix_obj_ref]})['data'][0]
         matrix_data = matrix_source.get('data')
 
-        expected_ids = ['WRI_RS00065_CDS_1', 'WRI_RS00070_CDS_1']
+        expected_ids = ['WRI_RS00050_CDS_1']
         self.assertCountEqual(matrix_data['data']['row_ids'], expected_ids)
         self.assertCountEqual(list(matrix_data['row_mapping'].keys()), expected_ids)
         self.assertCountEqual(list(matrix_data['feature_mapping'].keys()), expected_ids)
@@ -432,7 +433,8 @@ class GenericsAPITest(unittest.TestCase):
 
         params = {'matrix_obj_ref': self.expression_matrix_ref,
                   'workspace_name': self.wsName,
-                  'filter_ids': 'instance 1, instance 3',
+                  'remove_ids': 'instance 1, instance 3',
+                  'dimension': 'col',
                   'filtered_matrix_name': 'filtered_test_matrix_cols'}
         returnVal = self.getImpl().filter_matrix(self.ctx, params)[0]
         self.assertTrue('report_name' in returnVal)
@@ -444,7 +446,7 @@ class GenericsAPITest(unittest.TestCase):
             {"object_refs": [matrix_obj_ref]})['data'][0]
         matrix_data = matrix_source.get('data')
 
-        expected_ids = ['instance_1', 'instance_3']
+        expected_ids = ['instance_2', 'instance_4']
         self.assertCountEqual(matrix_data['data']['col_ids'], expected_ids)
         self.assertCountEqual(list(matrix_data['col_mapping'].keys()), expected_ids)
         self.assertEqual(len(matrix_data['data']['values'][0]), len(expected_ids))

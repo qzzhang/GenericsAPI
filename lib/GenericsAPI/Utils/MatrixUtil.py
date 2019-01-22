@@ -367,7 +367,7 @@ class MatrixUtil:
         return report_output
 
     @staticmethod
-    def _filter_value_data(value_data, filter_ids):
+    def _filter_value_data(value_data, remove_ids, dimension):
         """Filters a value matrix based on column or row ids"""
         def _norm_id(_id):
             return _id.replace(" ", "_")
@@ -375,21 +375,15 @@ class MatrixUtil:
         val_df = pd.DataFrame(value_data['values'], index=value_data['row_ids'],
                               columns=value_data['col_ids'], dtype='object')
 
-        if filter_ids[0] in val_df.index:
-            filtered_df = val_df.filter(filter_ids, axis=0)
-
-        elif _norm_id(filter_ids[0]) in val_df.index:
-            filtered_df = val_df.filter([_norm_id(x) for x in filter_ids], axis=0)
-
-        elif filter_ids[0] in val_df.columns:
-            filtered_df = val_df.filter(filter_ids)
-
-        elif _norm_id(filter_ids[0]) in val_df.columns:
-            filtered_df = val_df.filter([_norm_id(x) for x in filter_ids])
-
+        if dimension == 'row':
+            filtered_df = val_df.drop(remove_ids, axis=0, errors='ignore')
+            filtered_df = val_df.filter([_norm_id(x) for x in remove_ids], axis=0, errors='ignore')
+        elif dimension == 'col':
+            filtered_df = val_df.drop(remove_ids, axis=1)
+            filtered_df = val_df.filter([_norm_id(x) for x in remove_ids], axis=1, errors='ignore')
         else:
-            raise ValueError("Unable to match {} to a row or column ID in this matrix"
-                             .format(filter_ids[0]))
+            raise ValueError('Unexpected dimension: {}'.format(dimension))
+
         filtered_value_data = {
             "values": filtered_df.values.tolist(),
             "col_ids": list(filtered_df.columns),
@@ -498,7 +492,8 @@ class MatrixUtil:
 
         matrix_obj_ref = params.get('matrix_obj_ref')
         workspace_name = params.get('workspace_name')
-        filter_ids = params.get('filter_ids')
+        remove_ids = params.get('remove_ids')
+        dimension = params.get('dimension')
         filtered_matrix_name = params.get('filtered_matrix_name')
 
         matrix_source = self.dfu.get_objects(
@@ -509,8 +504,8 @@ class MatrixUtil:
         matrix_type = self._find_between(matrix_info[2], '\.', '\-')
 
         value_data = matrix_data.get('data')
-        filter_ids = [x.strip() for x in filter_ids.split(',')]
-        filtered_value_data = self._filter_value_data(value_data, filter_ids)
+        remove_ids = [x.strip() for x in remove_ids.split(',')]
+        filtered_value_data = self._filter_value_data(value_data, remove_ids, dimension)
 
         # if the matrix has changed shape, update the mappings
         if len(filtered_value_data['row_ids']) < len(matrix_data['data']['row_ids']):
