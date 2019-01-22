@@ -12,7 +12,7 @@ RUN pip uninstall numpy -y \
     && pip install numpy==1.14.5 \
     && pip install networkx==2.1
 
-RUN pip install pandas \
+RUN pip install pandas==0.23.4 \
     && pip install xlrd \
     && pip install openpyxl \
     && pip install xlsxwriter \
