@@ -377,10 +377,10 @@ class MatrixUtil:
 
         if dimension == 'row':
             filtered_df = val_df.drop(remove_ids, axis=0, errors='ignore')
-            filtered_df = val_df.filter([_norm_id(x) for x in remove_ids], axis=0, errors='ignore')
+            filtered_df = filtered_df.drop([_norm_id(x) for x in remove_ids], axis=0, errors='ignore')
         elif dimension == 'col':
-            filtered_df = val_df.drop(remove_ids, axis=1)
-            filtered_df = val_df.filter([_norm_id(x) for x in remove_ids], axis=1, errors='ignore')
+            filtered_df = val_df.drop(remove_ids, axis=1, errors='ignore')
+            filtered_df = filtered_df.drop([_norm_id(x) for x in remove_ids], axis=1, errors='ignore')
         else:
             raise ValueError('Unexpected dimension: {}'.format(dimension))
 
