@@ -11,6 +11,7 @@ import plotly.graph_objs as go
 from matplotlib import pyplot as plt
 from plotly.offline import plot
 from scipy import stats
+from natsort import natsorted
 
 from installed_clients.DataFileUtilClient import DataFileUtil
 from GenericsAPI.Utils.DataUtil import DataUtil
@@ -338,6 +339,8 @@ class CorrelationUtil:
         """
 
         df.fillna(0, inplace=True)
+        df.reindex(index=natsorted(df.index))
+        df.reindex(columns=natsorted(df.columns))
         matrix_data = {'row_ids': df.index.tolist(),
                        'col_ids': df.columns.tolist(),
                        'values': df.values.tolist()}

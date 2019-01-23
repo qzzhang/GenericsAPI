@@ -162,10 +162,10 @@ $(document).ready( function ()
         var search_text= document.getElementById('col_search').value.toUpperCase();
         var headers = table.columns().header();
 
-        var visible_idx = [0]
-        var invisible_idx = []
+        var visible_idx = [0];
+        var invisible_idx = [];
 
-        var headers_length = headers.length
+        var headers_length = headers.length;
         for (var i = 1; i < headers_length; i++) {
             var header = headers[i].innerHTML.toUpperCase();
             if (header.indexOf(search_text) > -1) {
