@@ -353,8 +353,8 @@ class CorrelationUtil:
                     drop_idx.append(idx)
             df.drop(index=drop_idx, inplace=True, errors='ignore')
 
-        df.reindex(index=natsorted(df.index))
-        df.reindex(columns=natsorted(df.columns))
+        df = df.reindex(index=natsorted(df.index))
+        df = df.reindex(columns=natsorted(df.columns))
         matrix_data = {'row_ids': df.index.tolist(),
                        'col_ids': df.columns.tolist(),
                        'values': df.values.tolist()}
