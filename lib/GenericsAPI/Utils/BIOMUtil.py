@@ -215,7 +215,7 @@ class BiomUtil:
 
             if isinstance(lineage, str):
                 delimiter = csv.Sniffer().sniff(lineage).delimiter
-                lineage = list(set([x.strip() for x in lineage.split(delimiter)]))
+                lineage = [x.strip() for x in lineage.split(delimiter)]
             if lineage:
                 taxonomy.update({'lineage': lineage})
                 # retrieve 'taxonomy_ref' info
