@@ -333,12 +333,26 @@ class CorrelationUtil:
 
         return sig_df
 
-    def _df_to_list(self, df):
+    def _df_to_list(self, df, threshold=None):
         """
         _df_to_list: convert Dataframe to FloatMatrix2D matrix data
         """
 
         df.fillna(0, inplace=True)
+
+        if threshold:
+            drop_cols = list()
+            for col in df.columns:
+                if all(df[col] < threshold) and all(df[col] > -threshold):
+                    drop_cols.append(col)
+            df.drop(columns=drop_cols, inplace=True, errors='ignore')
+
+            drop_idx = list()
+            for idx in df.index:
+                if all(df.loc[idx] < threshold) and all(df.loc[idx] > -threshold):
+                    drop_idx.append(idx)
+            df.drop(index=drop_idx, inplace=True, errors='ignore')
+
         df.reindex(index=natsorted(df.index))
         df.reindex(columns=natsorted(df.columns))
         matrix_data = {'row_ids': df.index.tolist(),
@@ -348,7 +362,7 @@ class CorrelationUtil:
         return matrix_data
 
     def _save_corr_matrix(self, workspace_name, corr_matrix_name, corr_df, sig_df, method,
-                          matrix_ref=None):
+                          matrix_ref=None, corr_threshold=None):
         """
         _save_corr_matrix: save KBaseExperiments.CorrelationMatrix object
         """
@@ -361,7 +375,8 @@ class CorrelationUtil:
 
         corr_data = {}
 
-        corr_data.update({'coefficient_data': self._df_to_list(corr_df)})
+        corr_data.update({'coefficient_data': self._df_to_list(corr_df,
+                                                               threshold=corr_threshold)})
         corr_data.update({'correlation_parameters': {'method': method}})
         if matrix_ref:
             corr_data.update({'original_matrix_ref': matrix_ref})
@@ -697,6 +712,7 @@ class CorrelationUtil:
         matrix_ref_2 = params.get('matrix_ref_2')
         workspace_name = params.get('workspace_name')
         corr_matrix_name = params.get('corr_matrix_name')
+        corr_threshold = params.get('corr_threshold')
 
         method = params.get('method', 'pearson')
         if method not in CORR_METHOD:
@@ -723,7 +739,7 @@ class CorrelationUtil:
             corr_matrix_plot_path = None
 
         corr_matrix_obj_ref = self._save_corr_matrix(workspace_name, corr_matrix_name, corr_df,
-                                                     sig_df, method)
+                                                     sig_df, method, corr_threshold=corr_threshold)
 
         returnVal = {'corr_matrix_obj_ref': corr_matrix_obj_ref}
 
@@ -785,7 +801,7 @@ class CorrelationUtil:
             scatter_plot_path = None
 
         corr_matrix_obj_ref = self._save_corr_matrix(workspace_name, corr_matrix_name, corr_df,
-                                                     sig_df, method, input_obj_ref)
+                                                     sig_df, method, matrix_ref=input_obj_ref)
 
         returnVal = {'corr_matrix_obj_ref': corr_matrix_obj_ref}
 
