@@ -58,16 +58,17 @@
       }
     },
     {
-      "id": "compute_significance",
-      "optional":false,
-      "advanced":true,
-      "allow_multiple":false,
-      "default_values":[0],
-      "field_type" : "checkbox",
-      "checkbox_options":{
-        "checked_value": 1,
-        "unchecked_value": 0
-        }
+      "id": "corr_threshold",
+      "optional": false,
+      "advanced": true,
+      "allow_multiple": false,
+      "default_values": [ "0.2" ],
+      "field_type": "text",
+      "text_options": {
+        "validate_as": "float",
+        "min_float" : 0.0,
+        "max_integer" : 1.0
+      }
     },
     {
       "id" : "corr_matrix_name",
@@ -111,8 +112,8 @@
           "target_property" : "plot_corr_matrix"
         },
         {
-          "input_parameter" : "compute_significance",
-          "target_property" : "compute_significance"
+          "input_parameter" : "corr_threshold",
+          "target_property" : "corr_threshold"
         },
         {
           "input_parameter" : "corr_matrix_name",

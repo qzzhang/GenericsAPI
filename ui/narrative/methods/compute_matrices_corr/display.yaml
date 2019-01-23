@@ -44,13 +44,13 @@ parameters :
         long-hint  : |
             Correlation method, one of ['pearson', 'kendall', 'spearman']
 
-    compute_significance:
+    corr_threshold:
         ui-name: |
-            Compute Significance
+            Correlation Coefficient Threshold
         short-hint : |
-            Also compute Significance in addition to correlation matrix
+            Remove columns having all coefficient below this threshold or anti-coefficient above negative of the threshold
         long-hint  : |
-            Also compute Significance in addition to correlation matrix
+            Remove columns having all coefficient below this threshold or anti-coefficient above negative of the threshold
 
     corr_matrix_name:
         ui-name: |
