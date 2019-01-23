@@ -302,6 +302,8 @@ class CorrelationUtil:
 
         data_matrix = self.data_util.fetch_data({'obj_ref': input_obj_ref}).get('data_matrix')
         data_df = pd.read_json(data_matrix)
+        data_df = data_df.reindex(index=natsorted(data_df.index))
+        data_df = data_df.reindex(columns=natsorted(data_df.columns))
 
         if "AmpliconMatrix" in obj_type:
                 amplicon_set_ref = obj_data.get('amplicon_set_ref')
@@ -353,8 +355,6 @@ class CorrelationUtil:
                     drop_idx.append(idx)
             df.drop(index=drop_idx, inplace=True, errors='ignore')
 
-        df = df.reindex(index=natsorted(df.index))
-        df = df.reindex(columns=natsorted(df.columns))
         matrix_data = {'row_ids': df.index.tolist(),
                        'col_ids': df.columns.tolist(),
                        'values': df.values.tolist()}
@@ -494,6 +494,8 @@ class CorrelationUtil:
         if "KBaseMatrices" in obj_type:
             data_matrix = self.data_util.fetch_data({'obj_ref': matrix_ref}).get('data_matrix')
             data_df = pd.read_json(data_matrix)
+            data_df = data_df.reindex(index=natsorted(data_df.index))
+            data_df = data_df.reindex(columns=natsorted(data_df.columns))
             if "AmpliconMatrix" in obj_type:
                 amplicon_set_ref = obj_data.get('amplicon_set_ref')
                 if amplicon_set_ref:
