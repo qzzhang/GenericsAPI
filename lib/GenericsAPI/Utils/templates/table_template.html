@@ -160,14 +160,14 @@ $(document).ready( function ()
     $('#col_search').keyup(function() {
         // search each column header
         var search_text= document.getElementById('col_search').value.toUpperCase();
-        var headers = table.columns().header();
+        var headers = table.table().header().innerText.split('\t');
 
         var visible_idx = [0]
         var invisible_idx = []
 
         var headers_length = headers.length
         for (var i = 1; i < headers_length; i++) {
-            var header = headers[i].innerHTML.toUpperCase();
+            var header = headers[i].toUpperCase();
             if (header.indexOf(search_text) > -1) {
                 visible_idx.push(i);
             } else {
@@ -175,8 +175,15 @@ $(document).ready( function ()
             }
         }
 
-        table.columns(visible_idx).visible(true);
-        table.columns(invisible_idx).visible(false);
+        var visible_idx_length = visible_idx.length
+        for (var i = 0; i < visible_idx_length; i++) {
+            table.column(visible_idx[i]).visible(true)
+        }
+
+        var invisible_idx_length = invisible_idx.length
+        for (var i = 0; i < invisible_idx_length; i++) {
+            table.column(invisible_idx[i]).visible(false)
+        }
     });
 
     $('#row_search').keyup( function() {
