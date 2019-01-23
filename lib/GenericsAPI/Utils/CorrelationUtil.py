@@ -18,6 +18,7 @@ from GenericsAPI.Utils.DataUtil import DataUtil
 from installed_clients.KBaseReportClient import KBaseReport
 
 CORR_METHOD = ['pearson', 'kendall', 'spearman']  # correlation method
+HIDDEN_SEARCH_THRESHOLD = 1500
 
 
 class CorrelationUtil:
@@ -97,7 +98,8 @@ class CorrelationUtil:
 
             data_array.append(value_array)
 
-        total_rec = len(data_array)
+        total_rec = len(row_ids)
+        hidden = (total_rec > HIDDEN_SEARCH_THRESHOLD) or (len(col_ids) > HIDDEN_SEARCH_THRESHOLD)
 
         json_dict = {'draw': 1,
                      'recordsTotal': total_rec,
@@ -118,6 +120,9 @@ class CorrelationUtil:
                                                           data_file_name)
                 report_template = report_template.replace('deferLoading_size',
                                                           str(total_rec))
+                if hidden:
+                    report_template = report_template.replace('<div id="search">',
+                                                              '<div hidden id="search">')
                 result_file.write(report_template)
 
         return page_content
