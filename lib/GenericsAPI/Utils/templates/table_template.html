@@ -20,6 +20,10 @@ td, th {
     float: right;
 }
 
+#filter {
+    float: right;
+}
+
 </style>
 <meta charset="UTF-8">
 <title>Correlation Report</title>
@@ -32,12 +36,19 @@ td, th {
 <div id="search">
     <table border="0" cellspacing="5" cellpadding="5">
         <tbody><tr>
-                <td>Column Search:</td>
-                <td><input type="text" id="col_search" name="col_search"></td>
+                <td>Column Header Search:</td>
+                <td style="width:100px"><input type="text" id="col_search" name="col_search"></td>
             </tr>
             <tr>
-                <td>Row Search:</td>
-                <td><input type="text" id="row_search" name="row_search"></td>
+                <td>Row Header Search:</td>
+                <td style="width:100px"><input type="text" id="row_search" name="row_search"></td>
+            </tr>
+            <tr>
+                <td>Data Filter Between:</td>
+                <td style="width:100px">
+                <input type="text" id="min" name="min">
+                And
+                <input type="text" id="max" name="max"> </td>
             </tr>
         </tbody>
     </table>
@@ -49,6 +60,9 @@ td, th {
 <script type="text/javascript" src="https://cdn.datatables.net/v/bs4-4.1.1/jq-3.3.1/dt-1.10.18/b-1.5.4/b-colvis-1.5.4/b-flash-1.5.4/b-html5-1.5.4/b-print-1.5.4/fc-3.2.5/datatables.min.js"></script>
 
 <script>
+
+var col_idx = [];
+
 $.fn.dataTable.ext.search.push(
     function(settings, data, dataIndex) {
         var search_text= $('#row_search').val().toUpperCase();
@@ -58,6 +72,34 @@ $.fn.dataTable.ext.search.push(
             return true;
         }
         return false;
+    }
+);
+
+$.fn.dataTable.ext.search.push(
+    function(settings, data, dataIndex) {
+        var min = parseFloat($('#min').val());
+        var col_idx_length = col_idx.length;
+        for (var i = 0; i < col_idx_length; i++) {
+            var data_value = parseFloat(data[col_idx[i]]);
+            if (data_value < min) {
+                return false;
+            }
+        }
+        return true;
+    }
+);
+
+$.fn.dataTable.ext.search.push(
+    function(settings, data, dataIndex) {
+        var max = parseFloat($('#max').val());
+        var col_idx_length = col_idx.length;
+        for (var i = 0; i < col_idx_length; i++) {
+            var data_value = parseFloat(data[col_idx[i]]);
+            if (data_value > max) {
+                return false;
+            }
+        }
+        return true;
     }
 );
 
@@ -97,15 +139,9 @@ $(document).ready( function ()
         'columnDefs': [
         {
             'targets': [0],
-            'searchable': true,
-            'createdCell': function (td, cellData, rowData, row, col)
-            {
-                $(td).css('font-weight', 'normal');
-            }
         },
         {
             'targets': '_all',
-            'searchable': false,
             'createdCell': function (td, cellData, rowData, row, col)
             {
                 var cellData = parseFloat(cellData)
@@ -157,26 +193,46 @@ $(document).ready( function ()
     $('#col_search').keyup(function() {
         // search each column header
         var search_text= document.getElementById('col_search').value.toUpperCase();
-        table.columns().every( function () {
-            var that = this;
-            var visIdx = that.index();
-            if (visIdx != 0) {
-                if (search_text.length == 0) {
-                    that.visible(true)
-                } else {
-                    var title = that.header().innerHTML.toUpperCase();
-                    if (title.indexOf(search_text) > -1) {
-                        that.visible(true)
-                    }
-                    else {
-                        that.visible(false)
-                    }
-                }
+        var headers = table.columns().header();
+
+        var visible_idx = [0]
+        var invisible_idx = []
+
+        var headers_length = headers.length
+        for (var i = 1; i < headers_length; i++) {
+            var header = headers[i].innerHTML.toUpperCase();
+            if (header.indexOf(search_text) > -1) {
+                visible_idx.push(i);
+            } else {
+                invisible_idx.push(i);
             }
-        });
+        }
+
+        table.columns(visible_idx).visible(true);
+        table.columns(invisible_idx).visible(false);
     });
 
     $('#row_search').keyup( function() {
+        table.draw();
+    });
+
+    $('#min').keyup( function() {
+        var visible_cols = table.columns().visible()
+        col_idx = visible_cols.reduce(
+            (out, bool, index) => bool ? out.concat(index) : out,
+            []
+            );
+        delete col_idx[0];
+        table.draw();
+    });
+
+    $('#max').keyup( function() {
+        var visible_cols = table.columns().visible()
+        col_idx = visible_cols.reduce(
+            (out, bool, index) => bool ? out.concat(index) : out,
+            []
+            );
+        delete col_idx[0];
         table.draw();
     });
 });
