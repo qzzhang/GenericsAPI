@@ -43,13 +43,6 @@ td, th {
                 <td>Row Header Search:</td>
                 <td style="width:100px"><input type="text" id="row_search" name="row_search"></td>
             </tr>
-            <tr>
-                <td>Data Filter Between:</td>
-                <td style="width:100px">
-                <input type="text" id="min" name="min">
-                And
-                <input type="text" id="max" name="max"> </td>
-            </tr>
         </tbody>
     </table>
 </div>
@@ -61,8 +54,6 @@ td, th {
 
 <script>
 
-var col_idx = [];
-
 $.fn.dataTable.ext.search.push(
     function(settings, data, dataIndex) {
         var search_text= $('#row_search').val().toUpperCase();
@@ -72,34 +63,6 @@ $.fn.dataTable.ext.search.push(
             return true;
         }
         return false;
-    }
-);
-
-$.fn.dataTable.ext.search.push(
-    function(settings, data, dataIndex) {
-        var min = parseFloat($('#min').val());
-        var col_idx_length = col_idx.length;
-        for (var i = 0; i < col_idx_length; i++) {
-            var data_value = parseFloat(data[col_idx[i]]);
-            if (data_value < min) {
-                return false;
-            }
-        }
-        return true;
-    }
-);
-
-$.fn.dataTable.ext.search.push(
-    function(settings, data, dataIndex) {
-        var max = parseFloat($('#max').val());
-        var col_idx_length = col_idx.length;
-        for (var i = 0; i < col_idx_length; i++) {
-            var data_value = parseFloat(data[col_idx[i]]);
-            if (data_value > max) {
-                return false;
-            }
-        }
-        return true;
     }
 );
 
@@ -139,6 +102,10 @@ $(document).ready( function ()
         'columnDefs': [
         {
             'targets': [0],
+            'createdCell': function (td, cellData, rowData, row, col)
+            {
+                $(td).css('font-weight', 'normal');
+            }
         },
         {
             'targets': '_all',
@@ -216,25 +183,6 @@ $(document).ready( function ()
         table.draw();
     });
 
-    $('#min').keyup( function() {
-        var visible_cols = table.columns().visible()
-        col_idx = visible_cols.reduce(
-            (out, bool, index) => bool ? out.concat(index) : out,
-            []
-            );
-        delete col_idx[0];
-        table.draw();
-    });
-
-    $('#max').keyup( function() {
-        var visible_cols = table.columns().visible()
-        col_idx = visible_cols.reduce(
-            (out, bool, index) => bool ? out.concat(index) : out,
-            []
-            );
-        delete col_idx[0];
-        table.draw();
-    });
 });
 </script>
 
