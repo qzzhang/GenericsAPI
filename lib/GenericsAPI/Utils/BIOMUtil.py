@@ -140,7 +140,7 @@ class BiomUtil:
         logic borrowed from: GFU.GenomeInterface
         https://github.com/kbaseapps/GenomeFileUtil/blob/master/lib/GenomeFileUtil/core/GenomeInterface.py#L216
         """
-        taxonomy_ref = None
+        taxonomy_id = None
 
         search_params = {
             "object_types": ["taxon"],
@@ -162,33 +162,40 @@ class BiomUtil:
 
         objects = self.kbse.search_objects(search_params)['objects']
 
-        if objects:
-            taxonomy_ref = '{}/{}'.format(self.taxon_wsname, objects[0].get('object_name'))
-        else:
+        if not objects:
             search_params['match_filter']['lookup_in_keys'] = {
                 "aliases": {"value": scientific_name}
             }
             objects = self.kbse.search_objects(search_params)['objects']
-            if objects:
-                taxonomy_ref = '{}/{}'.format(self.taxon_wsname, objects[0].get('object_name'))
+        if objects:
+            taxonomy_id = objects[0].get('object_name')
 
-        return taxonomy_ref
+        return taxonomy_id
 
-    def _fetch_taxonomy_ref(self, lineage):
+    def _fetch_taxonomy(self, datarow):
+        lineage = self._retrieve_value([], datarow, 'taxonomy')
+        if isinstance(lineage, str):
+            delimiter = csv.Sniffer().sniff(lineage).delimiter
+            lineage = [x.strip() for x in lineage.split(delimiter)]
 
-        logging.info('start retrieving taxonomy ref from taxonomy service')
+        taxonomy = {'lineage': lineage}
 
-        taxonomy_ref = None
-        scientific_name = None
+        for key in ['taxonomy_id', 'score', 'taxonomy_source', 'species_name']:
+            val = self._retrieve_value([], datarow, key)
+            if val:
+                taxonomy[key] = val
 
         for item in lineage[::-1]:
             scientific_name = item.split('__')[-1]
             if scientific_name:
-                taxonomy_ref = self._search_taxon(scientific_name)
-                if taxonomy_ref:
-                    return taxonomy_ref, scientific_name
+                taxonomy_id = self._search_taxon(scientific_name)
+                if taxonomy_id:
+                    taxonomy_ref = f"{self.taxon_wsname}/{taxonomy_id}"
+                    taxonomy.update({'taxonomy_ref': taxonomy_ref,
+                                     'taxonomy_id': taxonomy_id,
+                                     'scientific_name': scientific_name})
 
-        return taxonomy_ref, scientific_name
+        return taxonomy
 
     def _retrieve_tsv_amplicon_set_data(self, tsv_file):
         amplicons = dict()
@@ -206,52 +213,10 @@ class BiomUtil:
 
         logging.info('start processing each row in TSV')
         for observation_id in df.index:
-            amplicon = dict()
-            taxonomy = dict()
+            taxonomy = self._fetch_taxonomy(df.loc[observation_id])
 
-            # retrieve 'lineage'/'taxonomy' info
-            lineage = self._retrieve_value([], df.loc[observation_id],
-                                           'taxonomy')
-
-            if isinstance(lineage, str):
-                delimiter = csv.Sniffer().sniff(lineage).delimiter
-                lineage = [x.strip() for x in lineage.split(delimiter)]
-            if lineage:
-                taxonomy.update({'lineage': lineage})
-                # retrieve 'taxonomy_ref' info
-                taxonomy_ref, scientific_name = self._fetch_taxonomy_ref(lineage)
-                if taxonomy_ref:
-                    taxonomy.update({'taxonomy_ref': taxonomy_ref})
-                    taxonomy.update({'scientific_name': scientific_name})
-
-            # retrieve 'taxonomy_id' info
-            taxonomy_id = self._retrieve_value([], df.loc[observation_id],
-                                               'taxonomy_id')
-            if taxonomy_id:
-                taxonomy.update({'taxonomy_id': taxonomy_id})
-
-            # retrieve 'score' info
-            score = self._retrieve_value([], df.loc[observation_id],
-                                         'taxonomy_id')
-            if score:
-                taxonomy.update({'score': score})
-
-            # retrieve 'taxonomy_source' info
-            taxonomy_source = self._retrieve_value([], df.loc[observation_id],
-                                                   'taxonomy_source')
-            if taxonomy_source:
-                taxonomy.update({'taxonomy_source': taxonomy_source})
-
-            # retrieve 'species_name' info
-            species_name = self._retrieve_value([], df.loc[observation_id],
-                                                'species_name')
-            if species_name:
-                taxonomy.update({'species_name': species_name})
-
-            amplicon.update({'consensus_sequence': df.loc[observation_id,
-                                                          'consensus_sequence']})
-
-            amplicon.update({'taxonomy': taxonomy})
+            amplicon = {'consensus_sequence': df.loc[observation_id, 'consensus_sequence'],
+                        'taxonomy': taxonomy}
 
             amplicons.update({observation_id: amplicon})
 
@@ -279,50 +244,11 @@ class BiomUtil:
         for observation_id in df.index:
             if observation_id not in fastq_dict:
                 raise ValueError('FASTA file does not have [{}] OTU id'.format(observation_id))
-            amplicon = dict()
-            taxonomy = dict()
 
-            # retrieve 'lineage'/'taxonomy' info
-            lineage = self._retrieve_value([], df.loc[observation_id],
-                                           'taxonomy')
-            if isinstance(lineage, str):
-                delimiter = csv.Sniffer().sniff(lineage).delimiter
-                lineage = list(set([x.strip() for x in lineage.split(delimiter)]))
-            if lineage:
-                taxonomy.update({'lineage': lineage})
-                # retrieve 'taxonomy_ref' info
-                taxonomy_ref, scientific_name = self._fetch_taxonomy_ref(lineage)
-                if taxonomy_ref:
-                    taxonomy.update({'taxonomy_ref': taxonomy_ref})
-                    taxonomy.update({'scientific_name': scientific_name})
+            taxonomy = self._fetch_taxonomy(df.loc[observation_id])
 
-            # retrieve 'taxonomy_id' info
-            taxonomy_id = self._retrieve_value([], df.loc[observation_id],
-                                               'taxonomy_id')
-            if taxonomy_id:
-                taxonomy.update({'taxonomy_id': taxonomy_id})
-
-            # retrieve 'score' info
-            score = self._retrieve_value([], df.loc[observation_id],
-                                         'taxonomy_id')
-            if score:
-                taxonomy.update({'score': score})
-
-            # retrieve 'taxonomy_source' info
-            taxonomy_source = self._retrieve_value([], df.loc[observation_id],
-                                                   'taxonomy_source')
-            if taxonomy_source:
-                taxonomy.update({'taxonomy_source': taxonomy_source})
-
-            # retrieve 'species_name' info
-            species_name = self._retrieve_value([], df.loc[observation_id],
-                                                'species_name')
-            if species_name:
-                taxonomy.update({'species_name': species_name})
-
-            amplicon.update({'consensus_sequence': str(fastq_dict.get(observation_id).seq)})
-
-            amplicon.update({'taxonomy': taxonomy})
+            amplicon = {'consensus_sequence': str(fastq_dict.get(observation_id).seq),
+                        'taxonomy': taxonomy}
 
             amplicons.update({observation_id: amplicon})
 
@@ -347,51 +273,11 @@ class BiomUtil:
         for index, observation_id in enumerate(observation_ids):
             if observation_id not in fastq_dict:
                 raise ValueError('FASTA file does not have [{}] OTU id'.format(observation_id))
-            amplicon = dict()
-            taxonomy = dict()
 
-            # retrieve 'lineage'/'taxonomy' info
-            lineage = self._retrieve_value(observation_metadata[index], [],
-                                           'taxonomy')
+            taxonomy = self._fetch_taxonomy(observation_metadata[index])
 
-            if isinstance(lineage, str):
-                delimiter = csv.Sniffer().sniff(lineage).delimiter
-                lineage = list(set([x.strip() for x in lineage.split(delimiter)]))
-            if lineage:
-                taxonomy.update({'lineage': lineage})
-                # retrieve 'taxonomy_ref' info
-                taxonomy_ref, scientific_name = self._fetch_taxonomy_ref(lineage)
-                if taxonomy_ref:
-                    taxonomy.update({'taxonomy_ref': taxonomy_ref})
-                    taxonomy.update({'scientific_name': scientific_name})
-
-            # retrieve 'taxonomy_id' info
-            taxonomy_id = self._retrieve_value(observation_metadata[index], [],
-                                               'taxonomy_id')
-            if taxonomy_id:
-                taxonomy.update({'taxonomy_id': taxonomy_id})
-
-            # retrieve 'score' info
-            score = self._retrieve_value(observation_metadata[index], [],
-                                         'taxonomy_id')
-            if score:
-                taxonomy.update({'score': score})
-
-            # retrieve 'taxonomy_source' info
-            taxonomy_source = self._retrieve_value(observation_metadata[index], [],
-                                                   'taxonomy_source')
-            if taxonomy_source:
-                taxonomy.update({'taxonomy_source': taxonomy_source})
-
-            # retrieve 'species_name' info
-            species_name = self._retrieve_value(observation_metadata[index], [],
-                                                'species_name')
-            if species_name:
-                taxonomy.update({'species_name': species_name})
-
-            amplicon.update({'consensus_sequence': str(fastq_dict.get(observation_id).seq)})
-
-            amplicon.update({'taxonomy': taxonomy})
+            amplicon = {'consensus_sequence': str(fastq_dict.get(observation_id).seq),
+                        'taxonomy': taxonomy}
 
             amplicons.update({observation_id: amplicon})
 
@@ -421,56 +307,13 @@ class BiomUtil:
         for index, observation_id in enumerate(observation_ids):
             if observation_id not in df.index:
                 raise ValueError('TSV file does not have [{}] OTU id'.format(observation_id))
-            amplicon = dict()
-            taxonomy = dict()
 
-            # retrieve 'lineage'/'taxonomy' info
-            lineage = self._retrieve_value(observation_metadata[index],
-                                           df.loc[observation_id],
-                                           'taxonomy')
-            if isinstance(lineage, str):
-                delimiter = csv.Sniffer().sniff(lineage).delimiter
-                lineage = list(set([x.strip() for x in lineage.split(delimiter)]))
-            if lineage:
-                taxonomy.update({'lineage': lineage})
-                # retrieve 'taxonomy_ref' info
-                taxonomy_ref, scientific_name = self._fetch_taxonomy_ref(lineage)
-                if taxonomy_ref:
-                    taxonomy.update({'taxonomy_ref': taxonomy_ref})
-                    taxonomy.update({'scientific_name': scientific_name})
+            taxonomy = self._fetch_taxonomy(df.loc[observation_id])
 
-            # retrieve 'taxonomy_id' info
-            taxonomy_id = self._retrieve_value(observation_metadata[index],
-                                               df.loc[observation_id],
-                                               'taxonomy_id')
-            if taxonomy_id:
-                taxonomy.update({'taxonomy_id': taxonomy_id})
+            amplicon = {'consensus_sequence': df.loc[observation_id, 'consensus_sequence'],
+                        'taxonomy': taxonomy}
 
-            # retrieve 'score' info
-            score = self._retrieve_value(observation_metadata[index],
-                                         df.loc[observation_id],
-                                         'taxonomy_id')
-            if score:
-                taxonomy.update({'score': score})
-
-            # retrieve 'taxonomy_source' info
-            taxonomy_source = self._retrieve_value(observation_metadata[index],
-                                                   df.loc[observation_id],
-                                                   'taxonomy_source')
-            if taxonomy_source:
-                taxonomy.update({'taxonomy_source': taxonomy_source})
-
-            # retrieve 'species_name' info
-            species_name = self._retrieve_value(observation_metadata[index],
-                                                df.loc[observation_id],
-                                                'species_name')
-            if species_name:
-                taxonomy.update({'species_name': species_name})
-
-            amplicon.update({'consensus_sequence': df.loc[observation_id,
-                                                          'consensus_sequence']})
-
-            amplicon.update({'taxonomy': taxonomy})
+            amplicons.update({observation_id: amplicon})
 
             amplicons.update({observation_id: amplicon})
 
