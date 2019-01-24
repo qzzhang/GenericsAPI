@@ -305,7 +305,7 @@ module KBaseExperiments {
     */
     typedef structure {
       string taxonomy_id;
-      string taxonomy_ref;
+      WSRef taxonomy_ref;
       list<string> lineage;
       float score;
       taxonomy_source taxonomy_source;
