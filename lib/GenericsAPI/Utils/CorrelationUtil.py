@@ -11,12 +11,14 @@ import plotly.graph_objs as go
 from matplotlib import pyplot as plt
 from plotly.offline import plot
 from scipy import stats
+from natsort import natsorted
 
 from installed_clients.DataFileUtilClient import DataFileUtil
 from GenericsAPI.Utils.DataUtil import DataUtil
 from installed_clients.KBaseReportClient import KBaseReport
 
 CORR_METHOD = ['pearson', 'kendall', 'spearman']  # correlation method
+HIDDEN_SEARCH_THRESHOLD = 1500
 
 
 class CorrelationUtil:
@@ -96,7 +98,8 @@ class CorrelationUtil:
 
             data_array.append(value_array)
 
-        total_rec = len(data_array)
+        total_rec = len(row_ids)
+        hidden = (total_rec > HIDDEN_SEARCH_THRESHOLD) or (len(col_ids) > HIDDEN_SEARCH_THRESHOLD)
 
         json_dict = {'draw': 1,
                      'recordsTotal': total_rec,
@@ -117,6 +120,9 @@ class CorrelationUtil:
                                                           data_file_name)
                 report_template = report_template.replace('deferLoading_size',
                                                           str(total_rec))
+                if hidden:
+                    report_template = report_template.replace('<div id="search">',
+                                                              '<div hidden id="search">')
                 result_file.write(report_template)
 
         return page_content
@@ -301,6 +307,8 @@ class CorrelationUtil:
 
         data_matrix = self.data_util.fetch_data({'obj_ref': input_obj_ref}).get('data_matrix')
         data_df = pd.read_json(data_matrix)
+        data_df = data_df.reindex(index=natsorted(data_df.index))
+        data_df = data_df.reindex(columns=natsorted(data_df.columns))
 
         if "AmpliconMatrix" in obj_type:
                 amplicon_set_ref = obj_data.get('amplicon_set_ref')
@@ -332,12 +340,26 @@ class CorrelationUtil:
 
         return sig_df
 
-    def _df_to_list(self, df):
+    def _df_to_list(self, df, threshold=None):
         """
         _df_to_list: convert Dataframe to FloatMatrix2D matrix data
         """
 
         df.fillna(0, inplace=True)
+
+        if threshold:
+            drop_cols = list()
+            for col in df.columns:
+                if all(df[col] < threshold) and all(df[col] > -threshold):
+                    drop_cols.append(col)
+            df.drop(columns=drop_cols, inplace=True, errors='ignore')
+
+            drop_idx = list()
+            for idx in df.index:
+                if all(df.loc[idx] < threshold) and all(df.loc[idx] > -threshold):
+                    drop_idx.append(idx)
+            df.drop(index=drop_idx, inplace=True, errors='ignore')
+
         matrix_data = {'row_ids': df.index.tolist(),
                        'col_ids': df.columns.tolist(),
                        'values': df.values.tolist()}
@@ -345,7 +367,7 @@ class CorrelationUtil:
         return matrix_data
 
     def _save_corr_matrix(self, workspace_name, corr_matrix_name, corr_df, sig_df, method,
-                          matrix_ref=None):
+                          matrix_ref=None, corr_threshold=None):
         """
         _save_corr_matrix: save KBaseExperiments.CorrelationMatrix object
         """
@@ -358,7 +380,8 @@ class CorrelationUtil:
 
         corr_data = {}
 
-        corr_data.update({'coefficient_data': self._df_to_list(corr_df)})
+        corr_data.update({'coefficient_data': self._df_to_list(corr_df,
+                                                               threshold=corr_threshold)})
         corr_data.update({'correlation_parameters': {'method': method}})
         if matrix_ref:
             corr_data.update({'original_matrix_ref': matrix_ref})
@@ -476,6 +499,8 @@ class CorrelationUtil:
         if "KBaseMatrices" in obj_type:
             data_matrix = self.data_util.fetch_data({'obj_ref': matrix_ref}).get('data_matrix')
             data_df = pd.read_json(data_matrix)
+            data_df = data_df.reindex(index=natsorted(data_df.index))
+            data_df = data_df.reindex(columns=natsorted(data_df.columns))
             if "AmpliconMatrix" in obj_type:
                 amplicon_set_ref = obj_data.get('amplicon_set_ref')
                 if amplicon_set_ref:
@@ -694,6 +719,7 @@ class CorrelationUtil:
         matrix_ref_2 = params.get('matrix_ref_2')
         workspace_name = params.get('workspace_name')
         corr_matrix_name = params.get('corr_matrix_name')
+        corr_threshold = params.get('corr_threshold')
 
         method = params.get('method', 'pearson')
         if method not in CORR_METHOD:
@@ -720,7 +746,7 @@ class CorrelationUtil:
             corr_matrix_plot_path = None
 
         corr_matrix_obj_ref = self._save_corr_matrix(workspace_name, corr_matrix_name, corr_df,
-                                                     sig_df, method)
+                                                     sig_df, method, corr_threshold=corr_threshold)
 
         returnVal = {'corr_matrix_obj_ref': corr_matrix_obj_ref}
 
@@ -782,7 +808,7 @@ class CorrelationUtil:
             scatter_plot_path = None
 
         corr_matrix_obj_ref = self._save_corr_matrix(workspace_name, corr_matrix_name, corr_df,
-                                                     sig_df, method, input_obj_ref)
+                                                     sig_df, method, matrix_ref=input_obj_ref)
 
         returnVal = {'corr_matrix_obj_ref': corr_matrix_obj_ref}
 

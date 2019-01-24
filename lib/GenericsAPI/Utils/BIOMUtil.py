@@ -249,7 +249,6 @@ class BiomUtil:
 
             amplicon = {'consensus_sequence': str(fastq_dict.get(observation_id).seq),
                         'taxonomy': taxonomy}
-
             amplicons.update({observation_id: amplicon})
 
         logging.info('finished processing files')
@@ -312,8 +311,6 @@ class BiomUtil:
 
             amplicon = {'consensus_sequence': df.loc[observation_id, 'consensus_sequence'],
                         'taxonomy': taxonomy}
-
-            amplicons.update({observation_id: amplicon})
 
             amplicons.update({observation_id: amplicon})
 
