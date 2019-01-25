@@ -465,21 +465,14 @@ class CorrelationUtil:
         replace_index = list()
 
         for idx in index:
-            lineage = None
+            scientific_name = None
             try:
-                lineage = amplicons.get(idx).get('taxonomy').get('lineage')
+                scientific_name = amplicons.get(idx).get('taxonomy').get('scientific_name')
             except Exception:
                 pass
 
-            if lineage:
-                scientific_name = None
-                for item in lineage[::-1]:
-                    scientific_name = item.split('__')[-1]
-                    if scientific_name:
-                        replace_index.append(scientific_name + '_' + idx)
-                        break
-                if not scientific_name:
-                    replace_index.append(idx)
+            if scientific_name:
+                replace_index.append(scientific_name + '_' + idx)
             else:
                 replace_index.append(idx)
 
