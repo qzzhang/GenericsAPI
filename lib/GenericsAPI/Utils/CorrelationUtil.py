@@ -132,19 +132,19 @@ class CorrelationUtil:
             table_content = """\n"""
             # build header and footer
             table_content += """\n<thead>\n<tr>\n"""
-            table_content += """\n <td>Amplicon</td>\n"""
-            table_content += """\n <td>Metabolite</td>\n"""
-            table_content += """\n <td>Correlation</td>\n"""
+            table_content += """\n <th>Amplicon</th>\n"""
+            table_content += """\n <th>Metabolite</th>\n"""
+            table_content += """\n <th>Correlation</th>\n"""
             if taxons:
-                table_content += """\n <td>Taxon</td>\n"""
+                table_content += """\n <th>Taxon</th>\n"""
             table_content += """\n</tr>\n</thead>\n"""
 
             table_content += """\n<tfoot>\n<tr>\n"""
-            table_content += """\n <td>Amplicon</td>\n"""
-            table_content += """\n <td>Metabolite</td>\n"""
-            table_content += """\n <td>Correlation</td>\n"""
+            table_content += """\n <th>Amplicon</th>\n"""
+            table_content += """\n <th>Metabolite</th>\n"""
+            table_content += """\n <th>Correlation</th>\n"""
             if taxons:
-                table_content += """\n <td>Taxon</td>\n"""
+                table_content += """\n <th>Taxon</th>\n"""
             table_content += """\n</tr>\n</tfoot>\n"""
         else:
             table_headers = links.columns.tolist()
@@ -152,12 +152,12 @@ class CorrelationUtil:
             # build header and footer
             table_content += """\n<thead>\n<tr>\n"""
             for table_header in table_headers:
-                table_content += """\n <td>{}</td>\n""".format(table_header)
+                table_content += """\n <th>{}</th>\n""".format(table_header)
             table_content += """\n</tr>\n</thead>\n"""
 
             table_content += """\n<tfoot>\n<tr>\n"""
             for table_header in table_headers:
-                table_content += """\n <td>{}</td>\n""".format(table_header)
+                table_content += """\n <th>{}</th>\n""".format(table_header)
             table_content += """\n</tr>\n</tfoot>\n"""
 
         logging.info('start generating table json file')

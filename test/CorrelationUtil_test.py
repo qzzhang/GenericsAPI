@@ -340,9 +340,9 @@ class CorrUtilTest(unittest.TestCase):
 
         self.assertEqual(obj_data.get('correlation_parameters').get('method'), 'pearson')
 
-        expected_index = ['Escherichia_GG_OTU_1', 'Dolichospermum_GG_OTU_2',
-                          'Methanosarcina_GG_OTU_3', 'Halanaerobium_GG_OTU_4',
-                          'Escherichia_GG_OTU_5']
+        expected_index = ['GG_OTU_1', 'GG_OTU_2',
+                          'GG_OTU_3', 'GG_OTU_4',
+                          'GG_OTU_5']
 
         self.assertCountEqual(obj_data.get('coefficient_data').get('row_ids'), expected_index)
         self.assertCountEqual(obj_data.get('coefficient_data').get('col_ids'), expected_index)
