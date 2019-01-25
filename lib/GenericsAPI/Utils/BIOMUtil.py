@@ -194,6 +194,7 @@ class BiomUtil:
                     taxonomy.update({'taxonomy_ref': taxonomy_ref,
                                      'taxonomy_id': taxonomy_id,
                                      'scientific_name': scientific_name})
+                    break
 
         return taxonomy
 
