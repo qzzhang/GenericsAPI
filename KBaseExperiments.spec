@@ -190,7 +190,7 @@ module KBaseExperiments {
       @optional significance_data original_matrix_ref
 
       @metadata ws genome_ref as genome
-      @metadata ws original_matrix_ref as original_matrix_ref
+      @metadata ws length(original_matrix_ref) as original_matrix_size
       @metadata ws length(coefficient_data.row_ids) as matrix_size
     */
     typedef structure {
