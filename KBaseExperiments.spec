@@ -196,7 +196,7 @@ module KBaseExperiments {
     typedef structure {
       string description;
       mapping<string, string> correlation_parameters;
-      WSRef original_matrix_ref;
+      list<WSRef> original_matrix_ref;
       GenomeRef genome_ref;
       mapping<string, list<string>> feature_mapping;
       FloatMatrix2D coefficient_data;

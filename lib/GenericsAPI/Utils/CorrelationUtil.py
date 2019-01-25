@@ -63,7 +63,27 @@ class CorrelationUtil:
             if p not in params:
                 raise ValueError('"{}" parameter is required, but missing'.format(p))
 
-    def _build_table_content(self, matrix_2D, output_directory, type='corr'):
+    def _fetch_taxon(self, amplicon_set_ref, amplicon_ids):
+        logging.info('start fetching taxon info from AmpliconSet')
+        taxons = dict()
+        amplicon_set_data = self.dfu.get_objects(
+                                            {'object_refs': [amplicon_set_ref]})['data'][0]['data']
+
+        amplicons = amplicon_set_data.get('amplicons')
+
+        for amplicon_id in amplicon_ids:
+            scientific_name = 'None'
+            try:
+                scientific_name = amplicons.get(amplicon_id).get('taxonomy').get('scientific_name')
+            except Exception:
+                pass
+
+            taxons.update({amplicon_id: scientific_name})
+
+        return taxons
+
+    def _build_table_content(self, matrix_2D, output_directory, original_matrix_ref=[],
+                             type='corr'):
         """
         _build_table_content: generate HTML table content for FloatMatrix2D object
         """
@@ -81,26 +101,69 @@ class CorrelationUtil:
         col_ids = matrix_2D.get('col_ids')
         values = matrix_2D.get('values')
 
-        table_content = """\n"""
-        # build header row
-        table_content += """\n<thead>\n<tr>\n"""
-        table_content += """\n <td></td>\n"""
-        for col_id in col_ids:
-            table_content += """\n <td>{}</td>\n""".format(col_id)
-        table_content += """\n</tr>\n</thead>\n"""
+        df = pd.DataFrame(values, index=row_ids, columns=col_ids)
+        df = df.T
+
+        links = df.stack().reset_index()
+        if type == 'corr':
+            links.columns = ['Source', 'Target', 'Correlation']
+        elif type == 'sig':
+            links.columns = ['Source', 'Target', 'Significance']
+        else:
+            links.columns = ['Source', 'Target', 'Value']
+
+        taxons = None
+        if original_matrix_ref:
+            for matrix_ref in original_matrix_ref:
+                res = self.dfu.get_objects({'object_refs': [matrix_ref]})['data'][0]
+                obj_type = res['info'][2]
+                obj_data = res['data']
+
+                if "AmpliconMatrix" in obj_type:
+                    amplicon_set_ref = obj_data.get('amplicon_set_ref')
+                    if amplicon_set_ref:
+                        taxons = self._fetch_taxon(amplicon_set_ref, col_ids)
+                        break
+
+        if taxons:
+            links['Taxon'] = links['Source'].map(taxons)
+
+        if len(original_matrix_ref) == 2:  # TODO check matrix type
+            table_content = """\n"""
+            # build header and footer
+            table_content += """\n<thead>\n<tr>\n"""
+            table_content += """\n <td>Amplicon</td>\n"""
+            table_content += """\n <td>Metabolite</td>\n"""
+            table_content += """\n <td>Correlation</td>\n"""
+            if taxons:
+                table_content += """\n <td>Taxon</td>\n"""
+            table_content += """\n</tr>\n</thead>\n"""
+
+            table_content += """\n<tfoot>\n<tr>\n"""
+            table_content += """\n <td>Amplicon</td>\n"""
+            table_content += """\n <td>Metabolite</td>\n"""
+            table_content += """\n <td>Correlation</td>\n"""
+            if taxons:
+                table_content += """\n <td>Taxon</td>\n"""
+            table_content += """\n</tr>\n</tfoot>\n"""
+        else:
+            table_headers = links.columns.tolist()
+            table_content = """\n"""
+            # build header and footer
+            table_content += """\n<thead>\n<tr>\n"""
+            for table_header in table_headers:
+                table_content += """\n <td>{}</td>\n""".format(table_header)
+            table_content += """\n</tr>\n</thead>\n"""
+
+            table_content += """\n<tfoot>\n<tr>\n"""
+            for table_header in table_headers:
+                table_content += """\n <td>{}</td>\n""".format(table_header)
+            table_content += """\n</tr>\n</tfoot>\n"""
 
         logging.info('start generating table json file')
-        data_array = []
-        for idx, value in enumerate(values):
-            value_array = list()
-            value_array.append(row_ids[idx])
-            value_array.extend(value)
+        data_array = links.values.tolist()
 
-            data_array.append(value_array)
-
-        total_rec = len(row_ids)
-        hidden = (total_rec > HIDDEN_SEARCH_THRESHOLD) or (len(col_ids) > HIDDEN_SEARCH_THRESHOLD)
-
+        total_rec = len(data_array)
         json_dict = {'draw': 1,
                      'recordsTotal': total_rec,
                      'recordsFiltered': total_rec,
@@ -120,9 +183,6 @@ class CorrelationUtil:
                                                           data_file_name)
                 report_template = report_template.replace('deferLoading_size',
                                                           str(total_rec))
-                if hidden:
-                    report_template = report_template.replace('<div id="search">',
-                                                              '<div hidden id="search">')
                 result_file.write(report_template)
 
         return page_content
@@ -146,13 +206,16 @@ class CorrelationUtil:
 
         coefficient_data = corr_data.get('coefficient_data')
         significance_data = corr_data.get('significance_data')
+        original_matrix_ref = corr_data.get('original_matrix_ref')
 
         tab_def_content += """
         <div class="tab">
             <button class="tablinks" onclick="openTab(event, 'CorrelationMatrix')" id="defaultOpen">Correlation Matrix</button>
         """
 
-        corr_table_content = self._build_table_content(coefficient_data, output_directory, type='corr')
+        corr_table_content = self._build_table_content(coefficient_data, output_directory,
+                                                       original_matrix_ref=original_matrix_ref,
+                                                       type='corr')
         tab_content += """
         <div id="CorrelationMatrix" class="tabcontent">{}</div>""".format(corr_table_content)
 
@@ -160,7 +223,9 @@ class CorrelationUtil:
             tab_def_content += """
             <button class="tablinks" onclick="openTab(event, 'SignificanceMatrix')">Significance Matrix</button>
             """
-            sig_table_content = self._build_table_content(significance_data, output_directory, type='sig')
+            sig_table_content = self._build_table_content(significance_data, output_directory,
+                                                          original_matrix_ref=original_matrix_ref,
+                                                          type='sig')
             tab_content += """
             <div id="SignificanceMatrix" class="tabcontent">{}</div>""".format(sig_table_content)
 
@@ -300,20 +365,10 @@ class CorrelationUtil:
         """
         _corr_for_matrix: compute correlation matrix df for KBaseMatrices object
         """
-
-        res = self.dfu.get_objects({'object_refs': [input_obj_ref]})['data'][0]
-        obj_type = res['info'][2]
-        obj_data = res['data']
-
         data_matrix = self.data_util.fetch_data({'obj_ref': input_obj_ref}).get('data_matrix')
         data_df = pd.read_json(data_matrix)
         data_df = data_df.reindex(index=natsorted(data_df.index))
         data_df = data_df.reindex(columns=natsorted(data_df.columns))
-
-        if "AmpliconMatrix" in obj_type:
-                amplicon_set_ref = obj_data.get('amplicon_set_ref')
-                if amplicon_set_ref:
-                    data_df = self._update_taxonomy_index(data_df, amplicon_set_ref)
 
         corr_df = self.df_to_corr(data_df, method=method, dimension=dimension)
 
@@ -487,17 +542,12 @@ class CorrelationUtil:
 
         res = self.dfu.get_objects({'object_refs': [matrix_ref]})['data'][0]
         obj_type = res['info'][2]
-        obj_data = res['data']
 
         if "KBaseMatrices" in obj_type:
             data_matrix = self.data_util.fetch_data({'obj_ref': matrix_ref}).get('data_matrix')
             data_df = pd.read_json(data_matrix)
             data_df = data_df.reindex(index=natsorted(data_df.index))
             data_df = data_df.reindex(columns=natsorted(data_df.columns))
-            if "AmpliconMatrix" in obj_type:
-                amplicon_set_ref = obj_data.get('amplicon_set_ref')
-                if amplicon_set_ref:
-                    data_df = self._update_taxonomy_index(data_df, amplicon_set_ref)
 
             return data_df
         else:
@@ -739,7 +789,9 @@ class CorrelationUtil:
             corr_matrix_plot_path = None
 
         corr_matrix_obj_ref = self._save_corr_matrix(workspace_name, corr_matrix_name, corr_df,
-                                                     sig_df, method, corr_threshold=corr_threshold)
+                                                     sig_df, method,
+                                                     matrix_ref=[matrix_ref_1, matrix_ref_2],
+                                                     corr_threshold=corr_threshold)
 
         returnVal = {'corr_matrix_obj_ref': corr_matrix_obj_ref}
 
@@ -801,7 +853,7 @@ class CorrelationUtil:
             scatter_plot_path = None
 
         corr_matrix_obj_ref = self._save_corr_matrix(workspace_name, corr_matrix_name, corr_df,
-                                                     sig_df, method, matrix_ref=input_obj_ref)
+                                                     sig_df, method, matrix_ref=[input_obj_ref])
 
         returnVal = {'corr_matrix_obj_ref': corr_matrix_obj_ref}
 

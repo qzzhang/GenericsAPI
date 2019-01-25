@@ -16,10 +16,6 @@ td, th {
     padding: 8px;
 }
 
-#search {
-    float: right;
-}
-
 </style>
 <meta charset="UTF-8">
 <title>Correlation Report</title>
@@ -29,19 +25,6 @@ td, th {
 
 <p></p>
 
-<div id="search">
-    <table border="0" cellspacing="5" cellpadding="5">
-        <tbody><tr>
-                <td>Column Header Search:</td>
-                <td style="width:100px"><input type="text" id="col_search" name="col_search"></td>
-            </tr>
-            <tr>
-                <td>Row Header Search:</td>
-                <td style="width:100px"><input type="text" id="row_search" name="row_search"></td>
-            </tr>
-        </tbody>
-    </table>
-</div>
 <table id="table" class="display" style="width:100%">
     <p>table_header</p>
 </table>
@@ -50,37 +33,37 @@ td, th {
 
 <script>
 
-$.fn.dataTable.ext.search.push(
-    function(settings, data, dataIndex) {
-        var search_text= $('#row_search').val().toUpperCase();
-        var row_name = data[0].toUpperCase();
-
-        if ((row_name.indexOf(search_text) > -1)) {
-            return true;
-        }
-        return false;
-    }
-);
-
 $(document).ready( function ()
 {
+
+    // Setup - add a text input to each footer cell
+    $('#table tfoot th').each( function () {
+        var title = $(this).text();
+        $(this).html( '<input type="text" placeholder="Search '+title+'" />' );
+    } );
+
     var table = $('.display').DataTable(
     {
-        'dom': "<'row'<'col-sm-6'B>>t<'row'<'col-sm-4'i><'col-sm-8'p>>",
+        'dom': "<'row'<'col-sm-6'B>>ft<'row'<'col-sm-4'i><'col-sm-8'p>>",
         'buttons': [
             {
-                extend: 'copy',
-                exportOptions:
+                'extend': 'copy',
+                'exportOptions':
                 {
-                    columns: ':visible'
+                    'columns': ':visible'
                 }
             },
             {
-                extend: 'csv',
-                exportOptions:
+                'extend': 'csv',
+                'exportOptions':
                 {
-                    columns: ':visible'
+                    'columns': ':visible'
                 }
+            },
+            {
+                'extend': 'colvis',
+                'text': 'Column Visibility'
+
             }
         ],
         'scrollY': '50vh',
@@ -91,20 +74,10 @@ $(document).ready( function ()
         'ajax': 'ajax_file_path',
         'deferLoading': deferLoading_size,
         'deferRender': true,
-        'fixedColumns':
-        {
-            'leftColumns': 1
-        },
+        'order': [[2, "desc"]],
         'columnDefs': [
         {
-            'targets': [0],
-            'createdCell': function (td, cellData, rowData, row, col)
-            {
-                $(td).css('font-weight', 'normal');
-            }
-        },
-        {
-            'targets': '_all',
+            'targets': [2],
             'createdCell': function (td, cellData, rowData, row, col)
             {
                 var cellData = parseFloat(cellData)
@@ -153,32 +126,18 @@ $(document).ready( function ()
         }]
     });
 
-    $('#col_search').keyup(function() {
-        // search each column header
-        var search_text= document.getElementById('col_search').value.toUpperCase();
-        var headers = table.columns().header();
+    // Apply the search
+    table.columns().every( function () {
+        var that = this;
 
-        var visible_idx = [0];
-        var invisible_idx = [];
-
-        var headers_length = headers.length;
-        for (var i = 1; i < headers_length; i++) {
-            var header = headers[i].innerHTML.toUpperCase();
-            if (header.indexOf(search_text) > -1) {
-                visible_idx.push(i);
-            } else {
-                invisible_idx.push(i);
+        $( 'input', this.footer() ).on( 'keyup change', function () {
+            if ( that.search() !== this.value ) {
+                that
+                    .search( this.value )
+                    .draw();
             }
-        }
-
-        table.columns(visible_idx).visible(true);
-        table.columns(invisible_idx).visible(false);
+        } );
     });
-
-    $('#row_search').keyup( function() {
-        table.draw();
-    });
-
 });
 </script>
 
