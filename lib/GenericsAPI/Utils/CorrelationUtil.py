@@ -106,11 +106,11 @@ class CorrelationUtil:
 
         links = df.stack().reset_index()
         if type == 'corr':
-            links.columns = ['Source', 'Target', 'Correlation']
+            links.columns = ['Variable 1', 'Variable 2', 'Correlation']
         elif type == 'sig':
-            links.columns = ['Source', 'Target', 'Significance']
+            links.columns = ['Variable 1', 'Variable 2', 'Significance']
         else:
-            links.columns = ['Source', 'Target', 'Value']
+            links.columns = ['Variable 1', 'Variable 2', 'Value']
 
         taxons = None
         if original_matrix_ref:
@@ -126,7 +126,7 @@ class CorrelationUtil:
                         break
 
         if taxons:
-            links['Taxon'] = links['Source'].map(taxons)
+            links['Taxon'] = links['Variable 1'].map(taxons)
 
         if len(original_matrix_ref) == 2:  # TODO check matrix type
             table_content = """\n"""
