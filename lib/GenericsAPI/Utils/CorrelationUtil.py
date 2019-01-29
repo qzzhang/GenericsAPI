@@ -103,62 +103,56 @@ class CorrelationUtil:
 
         df = pd.DataFrame(values, index=row_ids, columns=col_ids)
         df = df.T
-
         links = df.stack().reset_index()
-        if type == 'corr':
-            links.columns = ['Variable 1', 'Variable 2', 'Correlation']
-        elif type == 'sig':
-            links.columns = ['Variable 1', 'Variable 2', 'Significance']
-        else:
-            links.columns = ['Variable 1', 'Variable 2', 'Value']
 
+        columns = list()
         taxons = None
-        if original_matrix_ref:
-            for matrix_ref in original_matrix_ref:
+        if len(original_matrix_ref) == 1:
+            res = self.dfu.get_objects({'object_refs': [original_matrix_ref[0]]})['data'][0]
+            obj_type = res['info'][2]
+            matrix_type = obj_type.split('Matrix')[0].split('.')[-1]
+            if matrix_type == 'Amplicon':
+                amplicon_set_ref = res['data'].get('amplicon_set_ref')
+                if amplicon_set_ref:
+                    taxons = self._fetch_taxon(amplicon_set_ref, col_ids)
+            columns.extend(['{} 1'.format(matrix_type), '{} 2'.format(matrix_type)])
+        elif len(original_matrix_ref) == 2:
+            for matrix_ref in original_matrix_ref[::-1]:
                 res = self.dfu.get_objects({'object_refs': [matrix_ref]})['data'][0]
                 obj_type = res['info'][2]
-                obj_data = res['data']
-
-                if "AmpliconMatrix" in obj_type:
-                    amplicon_set_ref = obj_data.get('amplicon_set_ref')
+                matrix_type = obj_type.split('Matrix')[0].split('.')[-1]
+                if matrix_type == 'Amplicon':
+                    amplicon_set_ref = res['data'].get('amplicon_set_ref')
                     if amplicon_set_ref:
                         taxons = self._fetch_taxon(amplicon_set_ref, col_ids)
-                        break
+                columns.append(matrix_type)
+        else:
+            links.columns = ['Variable 1', 'Variable 2']
+
+        if type == 'corr':
+            columns.append('Correlation')
+        elif type == 'sig':
+            columns.append('Significance')
+        else:
+            columns.append('Value')
+
+        links.columns = columns
 
         if taxons:
-            links['Taxon'] = links['Variable 1'].map(taxons)
+            links['Taxon'] = links[columns[0]].map(taxons)
 
-        if len(original_matrix_ref) == 2:  # TODO check matrix type
-            table_content = """\n"""
-            # build header and footer
-            table_content += """\n<thead>\n<tr>\n"""
-            table_content += """\n <th>Amplicon</th>\n"""
-            table_content += """\n <th>Metabolite</th>\n"""
-            table_content += """\n <th>Correlation</th>\n"""
-            if taxons:
-                table_content += """\n <th>Taxon</th>\n"""
-            table_content += """\n</tr>\n</thead>\n"""
+        table_headers = links.columns.tolist()
+        table_content = """\n"""
+        # build header and footer
+        table_content += """\n<thead>\n<tr>\n"""
+        for table_header in table_headers:
+            table_content += """\n <th>{}</th>\n""".format(table_header)
+        table_content += """\n</tr>\n</thead>\n"""
 
-            table_content += """\n<tfoot>\n<tr>\n"""
-            table_content += """\n <th>Amplicon</th>\n"""
-            table_content += """\n <th>Metabolite</th>\n"""
-            table_content += """\n <th>Correlation</th>\n"""
-            if taxons:
-                table_content += """\n <th>Taxon</th>\n"""
-            table_content += """\n</tr>\n</tfoot>\n"""
-        else:
-            table_headers = links.columns.tolist()
-            table_content = """\n"""
-            # build header and footer
-            table_content += """\n<thead>\n<tr>\n"""
-            for table_header in table_headers:
-                table_content += """\n <th>{}</th>\n""".format(table_header)
-            table_content += """\n</tr>\n</thead>\n"""
-
-            table_content += """\n<tfoot>\n<tr>\n"""
-            for table_header in table_headers:
-                table_content += """\n <th>{}</th>\n""".format(table_header)
-            table_content += """\n</tr>\n</tfoot>\n"""
+        table_content += """\n<tfoot>\n<tr>\n"""
+        for table_header in table_headers:
+            table_content += """\n <th>{}</th>\n""".format(table_header)
+        table_content += """\n</tr>\n</tfoot>\n"""
 
         logging.info('start generating table json file')
         data_array = links.values.tolist()
