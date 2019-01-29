@@ -139,7 +139,7 @@ class CorrelationUtil:
         links.columns = columns
 
         if taxons:
-            links['Taxon'] = links[columns[0]].map(taxons)
+            links['Taxon'] = links.iloc[:, 0].map(taxons)
 
         table_headers = links.columns.tolist()
         table_content = """\n"""
