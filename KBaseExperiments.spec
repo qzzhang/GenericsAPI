@@ -248,7 +248,7 @@ module KBaseExperiments {
 
       @metadata ws length(nodes) as n_nodes
       @metadata ws length(edges) as n_edges
-      @metadata ws original_matrix_ref as original_matrix_ref
+      @metadata ws length(original_matrix_ref) as original_matrix_size
       @metadata ws corr_matrix_ref as corr_matrix_ref
     */
     typedef structure {
@@ -256,8 +256,8 @@ module KBaseExperiments {
       list<Edge> edges;
       mapping<node_id, Node> nodes;
       mapping<string, string> network_properties;
-      WSRef original_matrix_ref;
       WSRef corr_matrix_ref;
+      list<WSRef> original_matrix_ref;
     } Network;
 
     /*

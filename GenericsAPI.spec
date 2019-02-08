@@ -343,6 +343,7 @@ module GenericsAPI {
       string method;
       boolean plot_corr_matrix;
       boolean compute_significance;
+      float corr_threshold;
   } CompCorrMetriceParams;
 
   /* compute_correlation_across_matrices: compute correlation matrix across matrices*/
