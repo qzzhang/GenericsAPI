@@ -2,7 +2,7 @@ name     : Build Correlation Network
 subtitle : Create a Network with filtered CorrelationMatrix object
 tooltip  : Create a Network with filtered CorrelationMatrix object
 
-icon: data-blue.png
+icon: analysis.png
 
 screenshots :
     []

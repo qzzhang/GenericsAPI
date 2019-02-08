@@ -2,7 +2,7 @@ name     : Update Matrix Attribute Mapping
 subtitle : Append attribute mapping information retrieved from file to existing matrix attribute mapping
 tooltip  : Append attribute mapping information retrieved from file to existing matrix attribute mapping
 
-icon: data-blue.png
+icon: upload.png
 
 screenshots :
     []

@@ -2,7 +2,7 @@ name     : Import Metabolite Matrix from CSV/Excel/TSV File in Staging Area
 subtitle : Import a CSV, Excel or TSV file from your staging area into your Narrative as an MetaboliteMatrix data object
 tooltip  : Import a CSV, Excel or TSV file from your staging area into your Narrative as an MetaboliteMatrix data object
 
-icon: data-blue.png
+icon: upload.png
 
 screenshots :
     []

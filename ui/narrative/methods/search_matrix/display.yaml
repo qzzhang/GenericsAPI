@@ -2,7 +2,7 @@ name     : Search Matrix
 subtitle : Search a Matrix object with condition set info
 tooltip  : Search a Matrix object with condition set info
 
-icon: data-blue.png
+icon: upload.png
 
 screenshots :
     []

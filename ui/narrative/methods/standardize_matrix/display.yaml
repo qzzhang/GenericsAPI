@@ -2,7 +2,7 @@ name     : Standardize Matrix
 subtitle : Create a new standardization matrix from input matrix
 tooltip  : Create a new standardization matrix from input matrix
 
-icon: data-blue.png
+icon: upload.png
 
 screenshots :
     []
