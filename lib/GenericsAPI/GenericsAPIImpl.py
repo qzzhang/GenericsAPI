@@ -31,7 +31,7 @@ class GenericsAPI:
     ######################################### noqa
     VERSION = "1.0.0"
     GIT_URL = "git@github.com:Tianhao-Gu/GenericsAPI.git"
-    GIT_COMMIT_HASH = "70e518644670ad45614bd0394d969763a1d8ae1f"
+    GIT_COMMIT_HASH = "e9ba5bb55710710a6b47541645fd203a3f76d841"
 
     #BEGIN_CLASS_HEADER
     #END_CLASS_HEADER
@@ -625,7 +625,8 @@ class GenericsAPI:
            String, parameter "dimension" of String, parameter "method" of
            String, parameter "plot_corr_matrix" of type "boolean" (A boolean
            - 0 for false, 1 for true.), parameter "compute_significance" of
-           type "boolean" (A boolean - 0 for false, 1 for true.)
+           type "boolean" (A boolean - 0 for false, 1 for true.), parameter
+           "corr_threshold" of Double
         :returns: instance of type "CompCorrOutput" -> structure: parameter
            "report_name" of String, parameter "report_ref" of String,
            parameter "corr_matrix_obj_ref" of type "obj_ref" (An X/Y/Z style
