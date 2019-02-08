@@ -2,7 +2,7 @@ name     : Reconstruct Matrix
 subtitle : Create a sub-matrix with given ids
 tooltip  : Create a sub-matrix with given ids
 
-icon: data-blue.png
+icon: upload.png
 
 screenshots :
     []

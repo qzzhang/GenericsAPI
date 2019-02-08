@@ -2,7 +2,7 @@ name     : Compute Correlation Matrix Between Two Matrices
 subtitle : Compute Correlation Matrix Between Two Matrices
 tooltip  : Compute Correlation Matrix Between Two Matrices
 
-icon: data-blue.png
+icon: analysis.png
 
 screenshots :
     []
