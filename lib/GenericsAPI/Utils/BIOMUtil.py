@@ -178,7 +178,7 @@ class BiomUtil:
                                'c': 'Class', 'o': 'Order', 'f': 'Family', 'g': 'Genus',
                                's': 'Species'}
 
-        return taxon_level_mapping.get(taxon_char[0].lower())
+        return taxon_level_mapping.get(taxon_char[0].lower(), 'Unknown')
 
     def _fetch_taxonomy(self, datarow):
         lineage = self._retrieve_value([], datarow, 'taxonomy')
