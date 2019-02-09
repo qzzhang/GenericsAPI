@@ -88,6 +88,7 @@ class CorrelationUtil:
             taxons.update({amplicon_id: scientific_name})
             taxons_level.update({amplicon_id: level})
 
+        # default empty taxons and taxons_level
         if set(taxons.values()) == {'None'}:
             taxons = None
 
