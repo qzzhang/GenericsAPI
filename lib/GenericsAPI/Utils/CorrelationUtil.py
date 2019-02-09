@@ -115,6 +115,7 @@ class CorrelationUtil:
 
         columns = list()
         taxons = None
+        taxons_level = None
         if len(original_matrix_ref) == 1:
             res = self.dfu.get_objects({'object_refs': [original_matrix_ref[0]]})['data'][0]
             obj_type = res['info'][2]
@@ -148,6 +149,9 @@ class CorrelationUtil:
 
         if taxons:
             links['Taxon'] = links.iloc[:, 0].map(taxons)
+
+        if taxons_level:
+            links['Taxon Level'] = links.iloc[:, 0].map(taxons_level)
 
         table_headers = links.columns.tolist()
         table_content = """\n"""
