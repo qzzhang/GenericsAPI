@@ -88,6 +88,12 @@ class CorrelationUtil:
             taxons.update({amplicon_id: scientific_name})
             taxons_level.update({amplicon_id: level})
 
+        if set(taxons.values()) == {'None'}:
+            taxons = None
+
+        if set(taxons_level.values()) == {'Unknown'}:
+            taxons_level = None
+
         return taxons, taxons_level
 
     def _build_table_content(self, matrix_2D, output_directory, original_matrix_ref=[],
