@@ -66,6 +66,7 @@ class CorrelationUtil:
     def _fetch_taxon(self, amplicon_set_ref, amplicon_ids):
         logging.info('start fetching taxon info from AmpliconSet')
         taxons = dict()
+        taxons_level = dict()
         amplicon_set_data = self.dfu.get_objects(
                                             {'object_refs': [amplicon_set_ref]})['data'][0]['data']
 
@@ -73,14 +74,21 @@ class CorrelationUtil:
 
         for amplicon_id in amplicon_ids:
             scientific_name = 'None'
+            level = 'Unknown'
             try:
                 scientific_name = amplicons.get(amplicon_id).get('taxonomy').get('scientific_name')
             except Exception:
                 pass
 
-            taxons.update({amplicon_id: scientific_name})
+            try:
+                level = amplicons.get(amplicon_id).get('taxonomy').get('taxon_level')
+            except Exception:
+                pass
 
-        return taxons
+            taxons.update({amplicon_id: scientific_name})
+            taxons_level.update({amplicon_id: level})
+
+        return taxons, taxons_level
 
     def _build_table_content(self, matrix_2D, output_directory, original_matrix_ref=[],
                              type='corr'):
@@ -114,7 +122,7 @@ class CorrelationUtil:
             if matrix_type == 'Amplicon':
                 amplicon_set_ref = res['data'].get('amplicon_set_ref')
                 if amplicon_set_ref:
-                    taxons = self._fetch_taxon(amplicon_set_ref, col_ids)
+                    taxons, taxons_level = self._fetch_taxon(amplicon_set_ref, col_ids)
             columns.extend(['{} 1'.format(matrix_type), '{} 2'.format(matrix_type)])
         elif len(original_matrix_ref) == 2:
             for matrix_ref in original_matrix_ref[::-1]:
@@ -124,7 +132,7 @@ class CorrelationUtil:
                 if matrix_type == 'Amplicon':
                     amplicon_set_ref = res['data'].get('amplicon_set_ref')
                     if amplicon_set_ref:
-                        taxons = self._fetch_taxon(amplicon_set_ref, col_ids)
+                        taxons, taxons_level = self._fetch_taxon(amplicon_set_ref, col_ids)
                 columns.append(matrix_type)
         else:
             links.columns = ['Variable 1', 'Variable 2']
