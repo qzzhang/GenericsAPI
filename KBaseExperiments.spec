@@ -296,16 +296,17 @@ module KBaseExperiments {
     typedef string taxonomy_source;
 
     /*
-      taxonomy_id: optional - always attempt to look this up from the lineage
-      taxonomy_ref: optional - always attempt to look this up from the lineage
+      taxon_id: optional - always attempt to look this up from the lineage
+      taxon_ref: optional - always attempt to look this up from the lineage
       taxonomy_source: one of [rdp, silva, ncbi, greengenes, other]
       lineage: taxonomy array
 
-      @optional taxonomy_id taxonomy_ref lineage score species_name taxonomy_source scientific_name
+      @optional taxon_id taxon_ref lineage score species_name taxonomy_source scientific_name taxon_level
     */
     typedef structure {
-      string taxonomy_id;
-      WSRef taxonomy_ref;
+      string taxon_id;
+      WSRef taxon_ref;
+      string taxon_level;
       list<string> lineage;
       float score;
       taxonomy_source taxonomy_source;

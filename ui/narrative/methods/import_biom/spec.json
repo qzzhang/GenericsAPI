@@ -85,7 +85,7 @@
       "optional" : true,
       "advanced" : false,
       "allow_multiple" : false,
-      "default_values" : ["taxonomy_id, taxonomy, score, taxonomy_source, species_name"],
+      "default_values" : ["taxonomy, score, taxonomy_source, species_name"],
       "field_type" : "textarea"
     },
     {
@@ -93,7 +93,7 @@
       "optional" : true,
       "advanced" : false,
       "allow_multiple" : false,
-      "default_values" : ["taxonomy_id, taxonomy, score, taxonomy_source, species_name, consensus_sequence"],
+      "default_values" : ["taxonomy, score, taxonomy_source, species_name, consensus_sequence"],
       "field_type" : "textarea"
     },
     {

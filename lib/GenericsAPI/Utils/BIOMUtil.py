@@ -17,7 +17,7 @@ from installed_clients.KBaseSearchEngineClient import KBaseSearchEngine
 
 TYPE_ATTRIBUTES = {'description', 'scale', 'row_normalization', 'col_normalization'}
 SCALE_TYPES = {'raw', 'ln', 'log2', 'log10'}
-DEFAULT_META_KEYS = ["taxonomy_id", "lineage", "score", "taxonomy_source", "species_name",
+DEFAULT_META_KEYS = ["lineage", "score", "taxonomy_source", "species_name",
                      "consensus_sequence"]
 
 
@@ -140,7 +140,7 @@ class BiomUtil:
         logic borrowed from: GFU.GenomeInterface
         https://github.com/kbaseapps/GenomeFileUtil/blob/master/lib/GenomeFileUtil/core/GenomeInterface.py#L216
         """
-        taxonomy_id = None
+        taxon_id = None
 
         search_params = {
             "object_types": ["taxon"],
@@ -168,9 +168,17 @@ class BiomUtil:
             }
             objects = self.kbse.search_objects(search_params)['objects']
         if objects:
-            taxonomy_id = objects[0].get('object_name')
+            taxon_id = objects[0].get('object_name')
 
-        return taxonomy_id
+        return taxon_id
+
+    def _fetch_taxon_level(self, taxon_char):
+
+        taxon_level_mapping = {'l': 'Life', 'd': 'Domain', 'k': 'Kingdom', 'p': 'Phylum',
+                               'c': 'Class', 'o': 'Order', 'f': 'Family', 'g': 'Genus',
+                               's': 'Species'}
+
+        return taxon_level_mapping.get(taxon_char[0].lower())
 
     def _fetch_taxonomy(self, datarow):
         lineage = self._retrieve_value([], datarow, 'taxonomy')
@@ -180,20 +188,24 @@ class BiomUtil:
 
         taxonomy = {'lineage': lineage}
 
-        for key in ['taxonomy_id', 'score', 'taxonomy_source', 'species_name']:
+        for key in ['score', 'taxonomy_source', 'species_name']:
             val = self._retrieve_value([], datarow, key)
             if val:
                 taxonomy[key] = val
 
         for item in lineage[::-1]:
-            scientific_name = item.split('__')[-1]
+            scientific_name = item.split('_')[-1]
+            taxon_level_char = item.split('_')[0]
             if scientific_name:
-                taxonomy_id = self._search_taxon(scientific_name)
-                if taxonomy_id:
-                    taxonomy_ref = f"{self.taxon_wsname}/{taxonomy_id}"
-                    taxonomy.update({'taxonomy_ref': taxonomy_ref,
-                                     'taxonomy_id': taxonomy_id,
-                                     'scientific_name': scientific_name})
+                taxon_id = self._search_taxon(scientific_name)
+                if taxon_id:
+                    taxon_ref = f"{self.taxon_wsname}/{taxon_id}"
+                    taxon_level = self._fetch_taxon_level(taxon_level_char)
+
+                    taxonomy.update({'taxon_ref': taxon_ref,
+                                     'taxon_id': taxon_id,
+                                     'scientific_name': scientific_name,
+                                     'taxon_level': taxon_level})
                     break
 
         return taxonomy
@@ -569,23 +581,27 @@ class BiomUtil:
         amplicons = am_set_data.get('amplicons')
 
         meta_index = list()
-        meta_columns = ['taxonomy_id', 'taxonomy', 'score', 'taxonomy_source', 'species_name',
-                        'consensus_sequence']
+
+        meta_columns = ['taxonomy', 'taxon_id', 'taxon_ref', 'taxon_level', 'score',
+                        'taxonomy_source', 'species_name', 'consensus_sequence']
         meta_values = list()
         for otu_id, amplicon in amplicons.items():
             meta_index.append(otu_id)
 
             taxonomy_data = amplicon.get('taxonomy')
-            taxonomy_id = taxonomy_data.get('taxonomy_id')
+
             taxonomy = taxonomy_data.get('lineage')
+            taxon_id = taxonomy_data.get('taxon_id')
+            taxon_ref = taxonomy_data.get('taxon_ref')
+            taxon_level = taxonomy_data.get('taxon_level')
             score = taxonomy_data.get('score')
             taxonomy_source = taxonomy_data.get('taxonomy_source')
             species_name = taxonomy_data.get('species_name')
 
             consensus_sequence = amplicon.get('consensus_sequence')
 
-            meta_values.append([taxonomy_id, taxonomy, score, taxonomy_source, species_name,
-                                consensus_sequence])
+            meta_values.append([taxonomy, taxon_id, taxon_ref, taxon_level, score, taxonomy_source,
+                                species_name, consensus_sequence])
 
         meta_df = pd.DataFrame(meta_values, index=meta_index, columns=meta_columns)
 
