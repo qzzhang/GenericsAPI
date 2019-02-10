@@ -127,9 +127,9 @@ class BiomUtil:
     def _retrieve_value(self, biom_metadata_dict, tsv_metadata_df, key, required=False):
 
         if key in biom_metadata_dict:
-            return biom_metadata_dict.get(key)
+            return {k.lower(): v for k, v in biom_metadata_dict.items()}.get(key)
         elif key in tsv_metadata_df:
-            return tsv_metadata_df.get(key)
+            return {k.lower(): v for k, v in tsv_metadata_df.items()}.get(key)
         elif required:
             raise ValueError('missing necessary [{}] from file'.format(key))
         else:
