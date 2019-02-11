@@ -201,6 +201,7 @@ class MatrixUtil:
                     raise ValueError('Cannot parse file. Please provide valide tsv, excel or csv file')
 
         df.index = df.index.astype('str')
+        df.columns = df.columns.astype('str')
         # fill NA with "None" so that they are properly represented as nulls in the KBase Object
         df = df.where((pd.notnull(df)), None)
 
