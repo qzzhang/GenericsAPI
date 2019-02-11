@@ -374,4 +374,62 @@ module KBaseMatrices{
       FloatMatrix2D data;
       ws_ref amplicon_set_ref;
     } AmpliconMatrix;
+    /*
+      A wrapper around a FloatMatrix2D designed for matrices of trait data for use in population
+      studies. The columns represent traits while the rows correspond to individual genotypes
+
+      KBaseMatrices Fields:
+      description - short optional description of the dataset
+      scale - raw, ln, log2, log10
+      col_normalization - mean_center, median_center, mode_center, zscore
+      row_normalization - mean_center, median_center, mode_center, zscore
+      col_mapping - map from col_id to an id in the col_condition_set
+      row_mapping - map from row_id to a id in the row_condition_set
+      col_attributemapping_ref - a reference to a AttributeMapping that relates to the columns
+      row_attributemapping_ref - a reference to a AttributeMapping that relates to the rows
+      attributes - a mapping of additional information pertaining to the object
+      search_attributes - a mapping of object information used by search
+
+      data - contains values for (amplicons,condition) pairs, where
+             amplicons correspond to rows and conditions are columns
+             (ie data.values[amplicons][condition])
+
+      Additional Fields:
+
+      Validation:
+      @unique data.row_ids
+      @unique data.col_ids
+      @conditionally_required row_attributemapping_ref row_mapping
+      @conditionally_required col_attributemapping_ref col_mapping
+      @contains data.row_ids row_mapping
+      @contains data.col_ids col_mapping
+      @contains values(row_mapping) row_attributemapping_ref:instances
+      @contains values(col_mapping) col_attributemapping_ref:instances
+
+      @optional description row_normalization col_normalization
+      @optional col_mapping row_mapping col_attributemapping_ref row_attributemapping_ref
+      @optional attributes search_attributes
+
+      @metadata ws scale
+      @metadata ws row_normalization
+      @metadata ws col_normalization
+      @metadata ws col_attributemapping_ref as col_attribute_mapping
+      @metadata ws row_attributemapping_ref as row_attribute_mapping
+      @metadata ws length(data.row_ids) as genotype_count
+      @metadata ws length(data.col_ids) as trait_count
+    */
+    typedef structure {
+      string description;
+      string scale;
+      string row_normalization;
+      string col_normalization;
+      mapping<string, string> col_mapping;
+      ws_attributemapping_id col_attributemapping_ref;
+      mapping<string, string> row_mapping;
+      ws_attributemapping_id row_attributemapping_ref;
+      mapping<string, string> attributes;
+      list<string> search_attributes;
+      FloatMatrix2D data;
+      ws_ref amplicon_set_ref;
+    } TraitMatrix;
 };
