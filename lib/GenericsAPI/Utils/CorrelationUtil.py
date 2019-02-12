@@ -145,6 +145,9 @@ class CorrelationUtil:
         else:
             links.columns = ['Variable 1', 'Variable 2']
 
+        # remove self-comparison
+        links = links[links.iloc[:, 0] != links.iloc[:, 1]]
+
         if type == 'corr':
             columns.append('Correlation')
         elif type == 'sig':
