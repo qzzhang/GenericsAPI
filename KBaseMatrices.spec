@@ -376,7 +376,7 @@ module KBaseMatrices{
     } AmpliconMatrix;
     /*
       A wrapper around a FloatMatrix2D designed for matrices of trait data for use in population
-      studies. The columns represent traits while the rows correspond to individual genotypes
+      studies. The columns represent genotypes while the rows correspond to traits
 
       KBaseMatrices Fields:
       description - short optional description of the dataset
@@ -390,8 +390,8 @@ module KBaseMatrices{
       attributes - a mapping of additional information pertaining to the object
       search_attributes - a mapping of object information used by search
 
-      data - contains values for (amplicons,condition) pairs, where
-             amplicons correspond to rows and conditions are columns
+      data - contains values for (genotype,trait) pairs, where
+             traits correspond to the rows and genotypes are columns
              (ie data.values[amplicons][condition])
 
       Additional Fields:
@@ -405,9 +405,11 @@ module KBaseMatrices{
       @contains data.col_ids col_mapping
       @contains values(row_mapping) row_attributemapping_ref:instances
       @contains values(col_mapping) col_attributemapping_ref:instances
+      @contains set(trait_id,trait_description) row_attributemapping_ref:attributes.[*].attribute
+      @contains set(individual_id,family_id,paternal_id,maternal_id,sex) col_attributemapping_ref:attributes.[*].attribute
 
       @optional description row_normalization col_normalization
-      @optional col_mapping row_mapping col_attributemapping_ref row_attributemapping_ref
+      @optional col_mapping row_mapping
       @optional attributes search_attributes
 
       @metadata ws scale
@@ -430,6 +432,5 @@ module KBaseMatrices{
       mapping<string, string> attributes;
       list<string> search_attributes;
       FloatMatrix2D data;
-      ws_ref amplicon_set_ref;
     } TraitMatrix;
 };

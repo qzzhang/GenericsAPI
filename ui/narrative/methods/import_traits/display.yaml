@@ -55,19 +55,23 @@ parameters :
 
     col_attributemapping_ref :
         ui-name : |
-            Column AttributeMapping Reference
+            Genotype AttributeMapping Reference
         short-hint : |
-            Provide a AttributeMapping associated with column in data set
+            Provide a AttributeMapping associated with the genotypes in the data set. It should
+            contain the following attributes: individual_id, family_id, paternal_id, maternal_id, sex.
         long-hint : |
-            Provide a AttributeMapping associated with column in data set
+            Provide a AttributeMapping associated with the genotypes in the data set. It should
+            contain the following attributes: individual_id, family_id, paternal_id, maternal_id, sex.
 
     row_attributemapping_ref :
         ui-name : |
-            Row AttributeMapping Reference
+            Trait AttributeMapping Reference
         short-hint : |
-            Provide a AttributeMapping associated with row in data set
+            Provide a AttributeMapping associated with the traits in data set. It should
+            contain the following attributes: trait_id, trait_description.
         long-hint : |
-            Provide a AttributeMapping associated with row in data set
+            Provide a AttributeMapping associated with the traits in data set. It should
+            contain the following attributes: trait_id, trait_description.
 
 
 description : |
