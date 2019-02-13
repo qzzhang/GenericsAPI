@@ -53,6 +53,8 @@ class PCAUtil:
         _df_to_list: convert Dataframe to FloatMatrix2D matrix data
         """
 
+        df.index = df.index.astype('str')
+        df.columns = df.columns.astype('str')
         df.fillna(0, inplace=True)
         matrix_data = {'row_ids': df.index.tolist(),
                        'col_ids': df.columns.tolist(),
