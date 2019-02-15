@@ -21,6 +21,7 @@ class AttributeUtilsTest(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
+        cls.maxDiff = 70000
         token = os.environ.get('KB_AUTH_TOKEN', None)
         config_file = os.environ.get('KB_DEPLOYMENT_CONFIG', None)
         cls.cfg = {}
@@ -214,6 +215,7 @@ class AttributeUtilsTest(unittest.TestCase):
         })['data'][0]['data']
         self.assertEqual(data, self.attribute_mapping_2)
 
+    #@unittest.skip("only works on CI")
     def test_isa_import_1(self):
         self.maxDiff = None
         params = {'output_ws_id': self.wsId,
@@ -229,20 +231,21 @@ class AttributeUtilsTest(unittest.TestCase):
         self.assertEqual(len(data['attributes']), 18)
         self.assertEqual(data['attributes'][-1],
                          {'attribute': 'Factor Value[time]',
-                          'attribute_ont_id': 'Custom:Term',
-                          'attribute_ont_ref': 'KbaseOntologies/Custom',
+                          'attribute_ont_id': 'PATO:0000165',
+                          'attribute_ont_ref': '6308/11/2',
                           'unit': 'day',
-                          'unit_ont_id': 'Custom:Unit',
-                          'unit_ont_ref': 'KbaseOntologies/Custom'})
+                          'unit_ont_id': 'UO:0000033',
+                          'unit_ont_ref': '6308/15/6'})
         self.assertEqual(data['attributes'][-2],
                          {'attribute': 'Factor Value[compound]',
                           'attribute_ont_id': 'Custom:Term',
                           'attribute_ont_ref': 'KbaseOntologies/Custom',
-                          'categories': {'orotic acid': {'attribute_ont_id': 'CHEBI:16742.0',
+                          'categories': {'orotic acid': {'attribute_ont_id': 'CHEBI:16742',
+                                                         'attribute_ont_ref': '6308/19/1',
                                                          'value': 'orotic acid'},
-                                         'vehicle': {'attribute_ont_id': ':',
+                                         'vehicle': {'attribute_ont_id': 'Custom:Term',
+                                                     'attribute_ont_ref': 'KbaseOntologies/Custom',
                                                      'value': 'vehicle'}}})
-
     def test_isa_import_2(self):
         params = {'output_ws_id': self.wsId,
                   'input_file_path': 'data/test_ISA_2.tsv',
@@ -261,7 +264,8 @@ class AttributeUtilsTest(unittest.TestCase):
                           'attribute_ont_ref': 'KbaseOntologies/Custom',
                           'categories': {
                               'deoxyribonucleic acid': {'attribute_ont_id': 'CHEBI:16991',
-                                                         'value': 'deoxyribonucleic acid'}}})
+                                                        'attribute_ont_ref': '6308/19/1',
+                                                        'value': 'deoxyribonucleic acid'}}})
 
     def test_excel_import(self):
         shock_file = '/AM1.xlsx'

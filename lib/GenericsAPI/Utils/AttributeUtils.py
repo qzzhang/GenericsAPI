@@ -59,24 +59,18 @@ class AttributesUtil:
             ).get('file_path')
         else:
             raise ValueError("Must supply either a input_shock_id or input_file_path")
-        try:
-            df = pd.read_excel(scratch_file_path)
-        except XLRDError:
-            df = pd.read_csv(scratch_file_path, sep=None)
-        df = df.fillna(value='').astype('str')
-        if df.columns[1].lower() == "attribute ontology id":
-            comp_set = self._df_to_am_obj(df)
-        else:
-            comp_set = self._isa_df_to_am_object(df)
+        attr_mapping = self._file_to_am_obj(scratch_file_path)
         info = self.dfu.save_objects({
             "id": params['output_ws_id'],
             "objects": [{
                 "type": "KBaseExperiments.AttributeMapping",
-                "data": comp_set,
+                "data": attr_mapping,
                 "name": params['output_obj_name']
             }]
         })[0]
         return {"attribute_mapping_ref": "%s/%s/%s" % (info[6], info[0], info[4])}
+
+
 
     def append_file_to_attribute_mapping(self, staging_file_subdir_path, old_am_ref, output_ws_id,
                                          new_am_name=None):
@@ -89,15 +83,7 @@ class AttributesUtil:
         scratch_file_path = self.dfu.download_staging_file(
                         download_staging_file_params).get('copy_file_path')
 
-        try:
-            df = pd.read_excel(scratch_file_path)
-        except XLRDError:
-            df = pd.read_csv(scratch_file_path, sep=None)
-        df = df.fillna(value='').astype('str')
-        if df.columns[1].lower() == "attribute ontology id":
-            append_am_data = self._df_to_am_obj(df)
-        else:
-            append_am_data = self._isa_df_to_am_object(df)
+        append_am_data = self._file_to_am_obj(scratch_file_path)
 
         old_am_obj = self.dfu.get_objects({'object_refs': [old_am_ref]})['data'][0]
 
@@ -285,6 +271,18 @@ class AttributesUtil:
 
         return name, cs_df, obj_type
 
+    def _file_to_am_obj(self, scratch_file_path):
+        try:
+            df = pd.read_excel(scratch_file_path, dtype='str')
+        except XLRDError:
+            df = pd.read_csv(scratch_file_path, sep=None, dtype='str')
+        df = df.replace('nan', '')
+        if df.columns[1].lower() == "attribute ontology id":
+            am_obj = self._df_to_am_obj(df)
+        else:
+            am_obj = self._isa_df_to_am_object(df)
+        return am_obj
+
     def _df_to_am_obj(self, am_df):
         """Converts a dataframe from a user file to a compound set object"""
         attribute_mapping = {'ontology_mapping_method': "User Curation"}
@@ -359,7 +357,12 @@ class AttributesUtil:
                 last_attr['_unit'] = col
 
             elif col not in skip_columns:
-                attributes.append({"attribute": col})
+                split_col = col.split("|", 1)
+                if len(split_col) > 1:
+                    attributes.append({"attribute": split_col[0],
+                                       "attribute_ont_id": split_col[1]})
+                else:
+                    attributes.append({"attribute": col})
 
         # handle the categories for each attribute
         for i, attribute in enumerate(attributes):
@@ -369,8 +372,9 @@ class AttributesUtil:
                 category_df['attribute_ont_id'] = category_df.iloc[:, 1].str.cat(
                     category_df.iloc[:, 2], ":")
                 category_df['value'] = category_df[attribute['attribute']]
-                attribute['categories'] = category_df.set_index(
+                cats = category_df.set_index(
                     attribute['attribute'])[['value', 'attribute_ont_id']].to_dict('index')
+                attribute['categories'] = {k: self._add_ontology_info(v) for k, v in cats.items()}
 
             if '_unit' in attribute:
                 units = isa_df[attribute.pop('_unit')].unique()
@@ -378,7 +382,6 @@ class AttributesUtil:
                     raise ValueError("More than one unit type is supplied for attribute {}: {}"
                                      .format(attribute['attribute'], units))
                 attribute['unit'] = units[0]
-
                 if '_unit_ont' in attribute:
                     unit_ont = isa_df[attribute.pop('_unit_ont')].str.cat(
                         isa_df[attribute.pop('_unit_accession')], ":").unique()
