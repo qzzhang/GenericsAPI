@@ -178,7 +178,7 @@ class DataTableUtil:
             am_data = self.dfu.get_objects({'object_refs': [row_am_ref]})['data'][0]['data']
             instances = am_data['instances']
             columns = [x['attribute'] for x in am_data['attributes']]
-            row_am_df = pd.DataFrame(instances.values(), index=instances.keys(), columns=columns)
+            row_am_df = pd.DataFrame(list(instances.values()), index=instances.keys(), columns=columns)
 
             # row_am = self.data_util.fetch_data({'obj_ref': row_am_ref}).get('data_matrix')
             # row_am_df = pd.read_json(row_am)
