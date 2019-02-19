@@ -187,6 +187,7 @@ class DataTableUtil:
 
         matrix_df.index.name = 'ID'
         matrix_df.reset_index(inplace=True)
+        matrix_df = matrix_df.astype(str)
 
         return matrix_df
 
