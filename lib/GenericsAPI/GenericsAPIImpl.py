@@ -31,7 +31,7 @@ class GenericsAPI:
     ######################################### noqa
     VERSION = "1.0.0"
     GIT_URL = "git@github.com:Tianhao-Gu/GenericsAPI.git"
-    GIT_COMMIT_HASH = "fcd5e3de5baf940c0d27daeece5dbff4b3234332"
+    GIT_COMMIT_HASH = "a94564de7a034e0c12c73a14c0e35356c3fb0cbc"
 
     #BEGIN_CLASS_HEADER
     #END_CLASS_HEADER
@@ -720,7 +720,7 @@ class GenericsAPI:
 
     def view_matrix(self, ctx, params):
         """
-        run_pca: PCA analysis on matrix
+        view_matrix: generate a report for matrix viewer
         :param params: instance of type "ViewMatrixParams" -> structure:
            parameter "input_matrix_ref" of type "obj_ref" (An X/Y/Z style
            reference), parameter "workspace_name" of String, parameter

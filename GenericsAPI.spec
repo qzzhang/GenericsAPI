@@ -419,7 +419,7 @@ module GenericsAPI {
     string report_ref;
   } ViewMatrixOutput;
 
-  /* run_pca: PCA analysis on matrix*/
+  /* view_matrix: generate a report for matrix viewer*/
   funcdef view_matrix (ViewMatrixParams params) returns (ViewMatrixOutput returnVal) authentication required;
 
 
