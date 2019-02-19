@@ -10,6 +10,7 @@ from GenericsAPI.Utils.DataUtil import DataUtil
 from GenericsAPI.Utils.MatrixUtil import MatrixUtil
 from GenericsAPI.Utils.NetworkUtil import NetworkUtil
 from GenericsAPI.Utils.PCAUtil import PCAUtil
+from GenericsAPI.Utils.DataTableUtil import DataTableUtil
 from installed_clients.GenericsServiceClient import GenericsService
 #END_HEADER
 
@@ -20,7 +21,7 @@ class GenericsAPI:
     GenericsAPI
 
     Module Description:
-    
+
     '''
 
     ######## WARNING FOR GEVENT USERS ####### noqa
@@ -31,7 +32,7 @@ class GenericsAPI:
     ######################################### noqa
     VERSION = "1.0.0"
     GIT_URL = "git@github.com:Tianhao-Gu/GenericsAPI.git"
-    GIT_COMMIT_HASH = "e9ba5bb55710710a6b47541645fd203a3f76d841"
+    GIT_COMMIT_HASH = "a94564de7a034e0c12c73a14c0e35356c3fb0cbc"
 
     #BEGIN_CLASS_HEADER
     #END_CLASS_HEADER
@@ -51,6 +52,8 @@ class GenericsAPI:
         self.network_util = NetworkUtil(self.config)
         self.biom_util = BiomUtil(self.config)
         self.pca_util = PCAUtil(self.config)
+        self.data_table_util = DataTableUtil(self.config)
+
         logging.basicConfig(format='%(created)s %(levelname)s: %(message)s',
                             level=logging.INFO)
         #END_CONSTRUCTOR
@@ -714,6 +717,30 @@ class GenericsAPI:
         # At some point might do deeper type checking...
         if not isinstance(returnVal, dict):
             raise ValueError('Method run_pca return value ' +
+                             'returnVal is not type dict as required.')
+        # return the results
+        return [returnVal]
+
+    def view_matrix(self, ctx, params):
+        """
+        view_matrix: generate a report for matrix viewer
+        :param params: instance of type "ViewMatrixParams" -> structure:
+           parameter "input_matrix_ref" of type "obj_ref" (An X/Y/Z style
+           reference), parameter "workspace_name" of String, parameter
+           "with_attribute_info" of type "boolean" (A boolean - 0 for false,
+           1 for true.)
+        :returns: instance of type "ViewMatrixOutput" -> structure: parameter
+           "report_name" of String, parameter "report_ref" of String
+        """
+        # ctx is the context object
+        # return variables are: returnVal
+        #BEGIN view_matrix
+        returnVal = self.data_table_util.view_matrix_as_table(params)
+        #END view_matrix
+
+        # At some point might do deeper type checking...
+        if not isinstance(returnVal, dict):
+            raise ValueError('Method view_matrix return value ' +
                              'returnVal is not type dict as required.')
         # return the results
         return [returnVal]

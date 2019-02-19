@@ -408,4 +408,19 @@ module GenericsAPI {
   /* run_pca: PCA analysis on matrix*/
   funcdef run_pca (PCAParams params) returns (PCAOutput returnVal) authentication required;
 
+  typedef structure {
+    obj_ref input_matrix_ref;
+    string workspace_name;
+    boolean with_attribute_info;
+  } ViewMatrixParams;
+
+  typedef structure {
+    string report_name;
+    string report_ref;
+  } ViewMatrixOutput;
+
+  /* view_matrix: generate a report for matrix viewer*/
+  funcdef view_matrix (ViewMatrixParams params) returns (ViewMatrixOutput returnVal) authentication required;
+
+
 };
