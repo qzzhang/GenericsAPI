@@ -2,6 +2,9 @@ import logging
 import uuid
 import os
 import json
+import pandas as pd
+import errno
+from natsort import natsorted
 
 from installed_clients.DataFileUtilClient import DataFileUtil
 from GenericsAPI.Utils.AttributeUtils import AttributesUtil
@@ -11,27 +14,35 @@ from installed_clients.KBaseReportClient import KBaseReport
 
 class DataTableUtil:
 
-    def _build_table_content(self, output_directory, input_matrix_ref, with_attribute_info):
+    def _mkdir_p(self, path):
+        """
+        _mkdir_p: make directory for given path
+        """
+        if not path:
+            return
+        try:
+            os.makedirs(path)
+        except OSError as exc:
+            if exc.errno == errno.EEXIST and os.path.isdir(path):
+                pass
+            else:
+                raise
+
+    def _build_table_content(self, output_directory, matrix_df):
         """
         _build_table_content: generate HTML table content for FloatMatrix2D object
         """
 
+        logging.info('Start generating table content page')
+
         page_content = """\n"""
 
-        table_file_name = 'matrix_data_viewer.html'
-        data_file_name = 'matrix_data.json'
+        table_file_name = 'matrix_data_viewer_{}.html'.format(str(uuid.uuid4()))
+        data_file_name = 'matrix_data_{}.json'.format(str(uuid.uuid4()))
 
         page_content += """<iframe height="900px" width="100%" """
         page_content += """src="{}" """.format(table_file_name)
         page_content += """style="border:none;"></iframe>\n"""
-
-        # row_ids = matrix_2D.get('row_ids')
-        # col_ids = matrix_2D.get('col_ids')
-        # values = matrix_2D.get('values')
-
-        # df = pd.DataFrame(values, index=row_ids, columns=col_ids)
-        # df = df.T
-        matrix_df = df.stack().reset_index()
 
         table_headers = matrix_df.columns.tolist()
         table_content = """\n"""
@@ -60,7 +71,8 @@ class DataTableUtil:
 
         logging.info('start generating table html')
         with open(os.path.join(output_directory, table_file_name), 'w') as result_file:
-            with open(os.path.join(os.path.dirname(__file__), 'templates', 'table_template.html'),
+            with open(os.path.join(os.path.dirname(__file__), 'templates',
+                                   'matrix_table_viewer_template.html'),
                       'r') as report_template_file:
                 report_template = report_template_file.read()
                 report_template = report_template.replace('<p>table_header</p>',
@@ -73,8 +85,7 @@ class DataTableUtil:
 
         return page_content
 
-    def _generate_visualization_content(self, output_directory, input_matrix_ref,
-                                        with_attribute_info):
+    def _generate_visualization_content(self, output_directory, matrix_df):
 
         tab_def_content = ''
         tab_content = ''
@@ -84,8 +95,7 @@ class DataTableUtil:
         <button class="tablinks" onclick="openTab(event, 'MatrixData')" id="defaultOpen">Matrix Data</button>
         """
 
-        corr_table_content = self._build_table_content(output_directory, input_matrix_ref,
-                                                       with_attribute_info)
+        corr_table_content = self._build_table_content(output_directory, matrix_df)
         tab_content += """\n<div id="MatrixData" class="tabcontent">{}</div>\n""".format(
                                                                                 corr_table_content)
 
@@ -93,7 +103,7 @@ class DataTableUtil:
 
         return tab_def_content + tab_content
 
-    def _generate_matrix_html_report(self, input_matrix_ref, with_attribute_info):
+    def _generate_matrix_html_report(self, matrix_df):
 
         """
         _generate_matrix_html_report: generate html summary report for matrix
@@ -106,9 +116,7 @@ class DataTableUtil:
         self._mkdir_p(output_directory)
         result_file_path = os.path.join(output_directory, 'matrix_report.html')
 
-        visualization_content = self._generate_visualization_content(output_directory,
-                                                                     input_matrix_ref,
-                                                                     with_attribute_info)
+        visualization_content = self._generate_visualization_content(output_directory, matrix_df)
 
         with open(result_file_path, 'w') as result_file:
             with open(os.path.join(os.path.dirname(__file__), 'templates', 'matrix_template.html'),
@@ -128,14 +136,13 @@ class DataTableUtil:
                             })
         return html_report
 
-    def _generate_corr_report(self, workspace_name, input_matrix_ref, with_attribute_info):
+    def _generate_corr_report(self, workspace_name, matrix_df):
         """
         _generate_report: generate summary report
         """
         logging.info('Start creating report')
 
-        output_html_files = self._generate_matrix_html_report(input_matrix_ref,
-                                                              with_attribute_info)
+        output_html_files = self._generate_matrix_html_report(matrix_df)
 
         report_params = {'message': '',
                          'workspace_name': workspace_name,
@@ -151,6 +158,38 @@ class DataTableUtil:
 
         return report_output
 
+    def _fetch_matrix_df(self, input_matrix_ref, with_attribute_info):
+        logging.info('Start fetch matrix content')
+
+        matrix_obj = self.dfu.get_objects({'object_refs': [input_matrix_ref]})['data'][0]
+        matrix_info = matrix_obj['info']
+        matrix_data = matrix_obj['data']
+
+        matrix_type = matrix_info[2].split('-')[0].split('.')[-1]
+        if matrix_type not in self.matrix_types:
+            raise ValueError('Unexpected matrix type: {}'.format(matrix_type))
+
+        data_matrix = self.data_util.fetch_data({'obj_ref': input_matrix_ref}).get('data_matrix')
+        matrix_df = pd.read_json(data_matrix)
+        matrix_df = matrix_df.reindex(index=natsorted(matrix_df.index))
+
+        row_am_ref = matrix_data.get('row_attributemapping_ref')
+        if with_attribute_info and row_am_ref:
+            # am_data = self.dfu.get_objects({'object_refs': [row_am_ref]})['data'][0]['data']
+            # instances = am_data['instances']
+            # columns = [x['attribute'] for x in am_data['attributes']]
+            # row_am_df = pd.DataFrame(instances.values(), index=instances.keys(), columns=columns)
+
+            row_am = self.data_util.fetch_data({'obj_ref': row_am_ref}).get('data_matrix')
+            row_am_df = pd.read_json(row_am)
+
+            matrix_df = matrix_df.join(row_am_df)
+
+        matrix_df.index.name = 'ID'
+        matrix_df.reset_index(inplace=True)
+
+        return matrix_df
+
     def __init__(self, config):
         self.callback_url = config['SDK_CALLBACK_URL']
         self.scratch = config['scratch']
@@ -164,16 +203,12 @@ class DataTableUtil:
     def view_matrix_as_table(self, params):
         input_matrix_ref = params.get('input_matrix_ref')
         workspace_name = params.get('workspace_name')
-        with_attribute_info = params.get('with_attribute_info', 1)
+        with_attribute_info = params.get('with_attribute_info', True)
 
-        if not isinstance(workspace_name, int):
-            workspace_id = self.dfu.ws_name_to_id(workspace_name)
-        else:
-            workspace_id = workspace_name
+        matrix_df = self._fetch_matrix_df(input_matrix_ref, with_attribute_info)
 
         returnVal = dict()
-        report_output = self._generate_corr_report(workspace_name, input_matrix_ref,
-                                                   with_attribute_info)
+        report_output = self._generate_corr_report(workspace_name, matrix_df)
 
         returnVal.update(report_output)
 

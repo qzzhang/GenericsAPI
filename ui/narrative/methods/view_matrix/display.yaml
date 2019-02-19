@@ -1,0 +1,40 @@
+name     : View Matrix As Table
+subtitle : View Matrix As Table
+tooltip  : View Matrix As Table
+
+icon: upload.png
+
+screenshots :
+    []
+
+suggestions :
+    apps:
+        related :
+            []
+        next :
+            []
+    methods:
+        related :
+            []
+        next :
+            []
+
+parameters :
+    input_matrix_ref :
+        ui-name: |
+            Matrix Object
+        short-hint : |
+            Matrix Object
+        long-hint  : |
+            Matrix Object
+
+    with_attribute_info:
+        ui-name: |
+            Include Row Attribute Information
+        short-hint : |
+            Include Row Attribute Information
+        long-hint  : |
+            Include Row Attribute Information
+
+description : |
+    <p> View Matrix As Table </p>
