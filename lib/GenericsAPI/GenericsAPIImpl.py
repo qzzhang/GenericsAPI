@@ -31,7 +31,7 @@ class GenericsAPI:
     ######################################### noqa
     VERSION = "1.0.0"
     GIT_URL = "git@github.com:Tianhao-Gu/GenericsAPI.git"
-    GIT_COMMIT_HASH = "e9ba5bb55710710a6b47541645fd203a3f76d841"
+    GIT_COMMIT_HASH = "fcd5e3de5baf940c0d27daeece5dbff4b3234332"
 
     #BEGIN_CLASS_HEADER
     #END_CLASS_HEADER
@@ -714,6 +714,29 @@ class GenericsAPI:
         # At some point might do deeper type checking...
         if not isinstance(returnVal, dict):
             raise ValueError('Method run_pca return value ' +
+                             'returnVal is not type dict as required.')
+        # return the results
+        return [returnVal]
+
+    def view_matrix(self, ctx, params):
+        """
+        run_pca: PCA analysis on matrix
+        :param params: instance of type "ViewMatrixParams" -> structure:
+           parameter "input_matrix_ref" of type "obj_ref" (An X/Y/Z style
+           reference), parameter "workspace_name" of String, parameter
+           "with_attribute_info" of type "boolean" (A boolean - 0 for false,
+           1 for true.)
+        :returns: instance of type "ViewMatrixOutput" -> structure: parameter
+           "report_name" of String, parameter "report_ref" of String
+        """
+        # ctx is the context object
+        # return variables are: returnVal
+        #BEGIN view_matrix
+        #END view_matrix
+
+        # At some point might do deeper type checking...
+        if not isinstance(returnVal, dict):
+            raise ValueError('Method view_matrix return value ' +
                              'returnVal is not type dict as required.')
         # return the results
         return [returnVal]

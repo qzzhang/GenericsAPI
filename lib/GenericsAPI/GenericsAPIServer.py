@@ -426,6 +426,10 @@ class Application(object):
                              name='GenericsAPI.run_pca',
                              types=[dict])
         self.method_authentication['GenericsAPI.run_pca'] = 'required'  # noqa
+        self.rpc_service.add(impl_GenericsAPI.view_matrix,
+                             name='GenericsAPI.view_matrix',
+                             types=[dict])
+        self.method_authentication['GenericsAPI.view_matrix'] = 'required'  # noqa
         self.rpc_service.add(impl_GenericsAPI.status,
                              name='GenericsAPI.status',
                              types=[dict])
