@@ -11,16 +11,6 @@ from installed_clients.KBaseReportClient import KBaseReport
 
 class DataTableUtil:
 
-    def __init__(self, config):
-        self.callback_url = config['SDK_CALLBACK_URL']
-        self.scratch = config['scratch']
-        self.token = config['KB_AUTH_TOKEN']
-        self.dfu = DataFileUtil(self.callback_url)
-        self.data_util = DataUtil(config)
-        self.attr_util = AttributesUtil(config)
-        self.matrix_types = [x.split(".")[1].split('-')[0]
-                             for x in self.data_util.list_generic_types()]
-
     def _build_table_content(self, output_directory, input_matrix_ref, with_attribute_info):
         """
         _build_table_content: generate HTML table content for FloatMatrix2D object
@@ -160,6 +150,16 @@ class DataTableUtil:
         report_output = {'report_name': output['name'], 'report_ref': output['ref']}
 
         return report_output
+
+    def __init__(self, config):
+        self.callback_url = config['SDK_CALLBACK_URL']
+        self.scratch = config['scratch']
+        self.token = config['KB_AUTH_TOKEN']
+        self.dfu = DataFileUtil(self.callback_url)
+        self.data_util = DataUtil(config)
+        self.attr_util = AttributesUtil(config)
+        self.matrix_types = [x.split(".")[1].split('-')[0]
+                             for x in self.data_util.list_generic_types()]
 
     def view_matrix_as_table(self, params):
         input_matrix_ref = params.get('input_matrix_ref')

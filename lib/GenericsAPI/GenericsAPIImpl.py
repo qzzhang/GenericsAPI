@@ -10,6 +10,7 @@ from GenericsAPI.Utils.DataUtil import DataUtil
 from GenericsAPI.Utils.MatrixUtil import MatrixUtil
 from GenericsAPI.Utils.NetworkUtil import NetworkUtil
 from GenericsAPI.Utils.PCAUtil import PCAUtil
+from GenericsAPI.Utils.PCAUtil import DataTableUtil
 from installed_clients.GenericsServiceClient import GenericsService
 #END_HEADER
 
@@ -20,7 +21,7 @@ class GenericsAPI:
     GenericsAPI
 
     Module Description:
-    
+
     '''
 
     ######## WARNING FOR GEVENT USERS ####### noqa
@@ -51,6 +52,8 @@ class GenericsAPI:
         self.network_util = NetworkUtil(self.config)
         self.biom_util = BiomUtil(self.config)
         self.pca_util = PCAUtil(self.config)
+        self.data_table_util = DataTableUtil(self.config)
+
         logging.basicConfig(format='%(created)s %(levelname)s: %(message)s',
                             level=logging.INFO)
         #END_CONSTRUCTOR
@@ -732,6 +735,7 @@ class GenericsAPI:
         # ctx is the context object
         # return variables are: returnVal
         #BEGIN view_matrix
+        returnVal = self.data_table_util.view_matrix_as_table(params)
         #END view_matrix
 
         # At some point might do deeper type checking...
