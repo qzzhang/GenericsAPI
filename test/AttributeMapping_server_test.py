@@ -246,6 +246,7 @@ class AttributeUtilsTest(unittest.TestCase):
                                          'vehicle': {'attribute_ont_id': 'Custom:Term',
                                                      'attribute_ont_ref': 'KbaseOntologies/Custom',
                                                      'value': 'vehicle'}}})
+
     def test_isa_import_2(self):
         params = {'output_ws_id': self.wsId,
                   'input_file_path': 'data/test_ISA_2.tsv',
@@ -284,6 +285,23 @@ class AttributeUtilsTest(unittest.TestCase):
         for load_attr, expect_attr in zip(data['attributes'], self.attribute_mapping['attributes']):
             for key in ('attribute', 'attribute_ont_id', 'unit', 'unit_ont_id'):
                 self.assertEqual(load_attr.get(key), expect_attr.get(key))
+
+    def test_attribute_validation_1(self):
+        file_path = 'data/AM_bad_attributes.tsv'
+        params = {'output_ws_id': self.getWsId(),
+                  'input_file_path': file_path,
+                  'output_obj_name': 'BAD_AM'}
+        with self.assertRaisesRegex(ValueError, "attributes failed validation: mass, inchikey"):
+            ret = self.getImpl().file_to_attribute_mapping(self.getContext(), params)[0]
+
+    def test_attribute_validation_isa(self):
+        file_path = 'data/test_ISA_bad_attributes.tsv'
+        params = {'output_ws_id': self.getWsId(),
+                  'input_file_path': file_path,
+                  'output_obj_name': 'BAD_AM'}
+        with self.assertRaisesRegex(ValueError, "attributes failed validation: mass, inchikey"):
+            ret = self.getImpl().file_to_attribute_mapping(self.getContext(), params)[0]
+
 
     def test_excel_infer_column(self):
         shock_file = '/gene_attributes.xlsx'
