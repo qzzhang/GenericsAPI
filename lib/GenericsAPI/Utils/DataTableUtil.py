@@ -7,7 +7,6 @@ import errno
 from natsort import natsorted
 
 from installed_clients.DataFileUtilClient import DataFileUtil
-from GenericsAPI.Utils.AttributeUtils import AttributesUtil
 from GenericsAPI.Utils.DataUtil import DataUtil
 from installed_clients.KBaseReportClient import KBaseReport
 
@@ -197,7 +196,6 @@ class DataTableUtil:
         self.token = config['KB_AUTH_TOKEN']
         self.dfu = DataFileUtil(self.callback_url)
         self.data_util = DataUtil(config)
-        self.attr_util = AttributesUtil(config)
         self.matrix_types = [x.split(".")[1].split('-')[0]
                              for x in self.data_util.list_generic_types()]
 
