@@ -134,7 +134,7 @@ class CorrUtilTest(unittest.TestCase):
 
     def test_init_ok(self):
         self.start_test()
-        class_attri = ['scratch', 'token', 'callback_url', 'dfu', 'attr_util', 'matrix_types']
+        class_attri = ['scratch', 'token', 'callback_url', 'dfu', 'matrix_types']
 
         data_table_util = self.getDataTableUtil()
         self.assertTrue(set(class_attri) <= set(data_table_util.__dict__.keys()))
