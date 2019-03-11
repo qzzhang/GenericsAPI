@@ -8,6 +8,7 @@ import pandas as pd
 from xlrd.biffh import XLRDError
 from copy import deepcopy
 
+from GenericsAPI.Utils import AttributeValidation
 from installed_clients.DataFileUtilClient import DataFileUtil
 from installed_clients.KBaseSearchEngineClient import KBaseSearchEngine
 from installed_clients.WorkspaceClient import Workspace as workspaceService
@@ -69,8 +70,6 @@ class AttributesUtil:
             }]
         })[0]
         return {"attribute_mapping_ref": "%s/%s/%s" % (info[6], info[0], info[4])}
-
-
 
     def append_file_to_attribute_mapping(self, staging_file_subdir_path, old_am_ref, output_ws_id,
                                          new_am_name=None):
@@ -285,9 +284,9 @@ class AttributesUtil:
 
     def _df_to_am_obj(self, am_df):
         """Converts a dataframe from a user file to a compound set object"""
-        attribute_mapping = {'ontology_mapping_method': "User Curation"}
         if not len(am_df):
             raise ValueError("No attributes in supplied files")
+
         attribute_df = am_df.filter(regex="[Uu]nit|[Aa]ttribute")
         instance_df = am_df.drop(attribute_df.columns, axis=1)
         if not len(instance_df.columns):
@@ -299,9 +298,11 @@ class AttributesUtil:
             raise ValueError("Unable to find a 'attribute' column in supplied file")
         attribute_fields = ('attribute', 'unit', 'attribute_ont_id', 'unit_ont_id')
         attributes = attribute_df.filter(items=attribute_fields).to_dict('records')
+        self._validate_attribute_values(am_df.set_index(attribute_df.attribute).iterrows())
 
-        attribute_mapping['attributes'] = [self._add_ontology_info(f) for f in attributes]
-        attribute_mapping['instances'] = instance_df.to_dict('list')
+        attribute_mapping = {'ontology_mapping_method': "User Curation",
+                             'attributes': [self._add_ontology_info(f) for f in attributes],
+                             'instances': instance_df.to_dict('list')}
 
         return attribute_mapping
 
@@ -317,6 +318,8 @@ class AttributesUtil:
         else:
             raise ValueError("Unable to detect an ID column that was unigue for each row. "
                              f"Considered 'Sample Names', 'Assay Names' and {isa_df.columns[0]}")
+        self._validate_attribute_values(isa_df.iteritems())
+
         attribute_mapping = {'ontology_mapping_method': "User Curation - ISA format"}
         attribute_mapping['attributes'], new_skip_cols = self._get_attributes_from_isa(
             isa_df, skip_columns)
@@ -324,6 +327,24 @@ class AttributesUtil:
         attribute_mapping['instances'] = reduced_isa.T.to_dict('list')
 
         return attribute_mapping
+
+    def _validate_attribute_values(self, attribute_series):
+        errors = {}
+        for attr, vals in attribute_series:
+            try:
+                validator = getattr(AttributeValidation, attr)
+                attr_errors = validator(vals)
+                if attr_errors:
+                    errors[attr] = attr_errors
+            except AttributeError:
+                continue
+
+        if errors:
+            for attr, attr_errors in errors.items():
+                logging.error(f'Attribute {attr} had the following validation errors:\n'
+                              "\n".join(attr_errors) + '\n')
+                raise ValueError(f'The following attributes failed validation: {", ".join(errors)}'
+                                 f'\n See the log for details')
 
     def _get_attributes_from_isa(self, isa_df, skip_columns):
         attributes = []
