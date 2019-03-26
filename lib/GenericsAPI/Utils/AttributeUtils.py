@@ -296,7 +296,8 @@ class AttributesUtil:
                             inplace=True)
         if "attribute" not in attribute_df.columns:
             raise ValueError("Unable to find a 'attribute' column in supplied file")
-        attribute_fields = ('attribute', 'unit', 'attribute_ont_id', 'unit_ont_id')
+        attribute_df['source'] = 'upload'
+        attribute_fields = ('attribute', 'unit', 'attribute_ont_id', 'unit_ont_id', 'source')
         attributes = attribute_df.filter(items=attribute_fields).to_dict('records')
         self._validate_attribute_values(am_df.set_index(attribute_df.attribute).iterrows())
 
@@ -381,9 +382,10 @@ class AttributesUtil:
                 split_col = col.split("|", 1)
                 if len(split_col) > 1:
                     attributes.append({"attribute": split_col[0],
-                                       "attribute_ont_id": split_col[1]})
+                                       "attribute_ont_id": split_col[1],
+                                       "source": "upload"})
                 else:
-                    attributes.append({"attribute": col})
+                    attributes.append({"attribute": col, "source": "upload"})
 
         # handle the categories for each attribute
         for i, attribute in enumerate(attributes):

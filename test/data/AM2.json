@@ -396,32 +396,38 @@
     {
       "attribute_ont_ref": "6308/19/1",
       "attribute_ont_id": "EFO:0002091",
-      "attribute": "biological replicate"
+      "attribute": "biological replicate",
+      "source": "upload"
     },
     {
       "attribute_ont_ref": "6308/2/3",
       "attribute_ont_id": "PO:0009012",
-      "attribute": "developmental stage"
+      "attribute": "developmental stage",
+      "source": "upload"
     },
     {
       "attribute_ont_ref": "6308/19/1",
       "attribute_ont_id": "EFO:0005148",
-      "attribute": "Accession"
+      "attribute": "Accession",
+      "source": "upload"
     },
     {
       "attribute_ont_ref": "KbaseOntologies/Custom",
       "attribute_ont_id": "Custom:Term",
-      "attribute": "genotype"
+      "attribute": "genotype",
+      "source": "upload"
     },
     {
       "attribute_ont_ref": "KbaseOntologies/Custom",
       "attribute_ont_id": "Custom:Term",
-      "attribute": "organism"
+      "attribute": "organism",
+      "source": "upload"
     },
     {
       "attribute_ont_ref": "6308/19/1",
       "attribute_ont_id": "EFO:0000470",
-      "attribute": "environmental stress"
+      "attribute": "environmental stress",
+      "source": "upload"
     },
     {
       "unit_ont_id": "UO:0000032",
@@ -429,7 +435,8 @@
       "attribute_ont_id": "EFO:0001779",
       "attribute": "time series design",
       "unit_ont_ref": "6308/15/6",
-      "unit": "hour"
+      "unit": "hour",
+      "source": "upload"
     },
     {
       "unit_ont_id": "UO:0000034",
@@ -437,7 +444,8 @@
       "attribute_ont_id": "PATO:0000011",
       "attribute": "age",
       "unit_ont_ref": "6308/15/6",
-      "unit": "week"
+      "unit": "week",
+      "source": "upload"
     }
   ]
 }

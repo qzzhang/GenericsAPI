@@ -63,15 +63,16 @@ module KBaseExperiments {
     /*
         This stores categorical values (in which case the unit information will not be used) and
         is also a return format for attributes
-        @optional value_ont_ref value_ont_id unit unit_ont_id unit_ont_ref
+        @optional ws_obj_ref value_ont_ref value_ont_id unit unit_ont_id unit_ont_ref
     */
 
     typedef structure{
         string value;
-        string value_ont_ref;
+        WSRef ws_obj_ref;
+        WSRef value_ont_ref;
         string value_ont_id;
         string unit;
-        string unit_ont_ref;
+        WSRef unit_ont_ref;
         string unit_ont_id;
     } AttributeValue;
 
@@ -89,6 +90,7 @@ module KBaseExperiments {
         string unit_ont_ref;
         string unit_ont_id;
         mapping<string, AttributeValue> categories;
+        string source;
     } Attribute;
 
     /*
