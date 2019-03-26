@@ -231,6 +231,7 @@ class AttributeUtilsTest(unittest.TestCase):
         self.assertEqual(len(data['attributes']), 18)
         self.assertEqual(data['attributes'][-1],
                          {'attribute': 'Factor Value[time]',
+                          'source': 'upload',
                           'attribute_ont_id': 'PATO:0000165',
                           'attribute_ont_ref': '6308/11/2',
                           'unit': 'day',
@@ -238,6 +239,7 @@ class AttributeUtilsTest(unittest.TestCase):
                           'unit_ont_ref': '6308/15/6'})
         self.assertEqual(data['attributes'][-2],
                          {'attribute': 'Factor Value[compound]',
+                          'source': 'upload',
                           'attribute_ont_id': 'Custom:Term',
                           'attribute_ont_ref': 'KbaseOntologies/Custom',
                           'categories': {'orotic acid': {'attribute_ont_id': 'CHEBI:16742',
@@ -261,6 +263,7 @@ class AttributeUtilsTest(unittest.TestCase):
         self.assertEqual(len(data['attributes']), 12)
         self.assertEqual(data['attributes'][4],
                          {'attribute': 'Material Type',
+                          'source': 'upload',
                           'attribute_ont_id': 'Custom:Term',
                           'attribute_ont_ref': 'KbaseOntologies/Custom',
                           'categories': {
