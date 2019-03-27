@@ -2,23 +2,19 @@
   "attributes": [
     {
       "attribute": "BODY_SITE",
-      "attribute_ont_id": "Custom:Term",
-      "attribute_ont_ref": "KbaseOntologies/Custom"
+      "source": "upload"
     },
     {
       "attribute": "BarcodeSequence",
-      "attribute_ont_id": "Custom:Term",
-      "attribute_ont_ref": "KbaseOntologies/Custom"
+      "source": "upload"
     },
     {
       "attribute": "Description",
-      "attribute_ont_id": "Custom:Term",
-      "attribute_ont_ref": "KbaseOntologies/Custom"
+      "source": "upload"
     },
     {
       "attribute": "LinkerPrimerSequence",
-      "attribute_ont_id": "Custom:Term",
-      "attribute_ont_ref": "KbaseOntologies/Custom"
+      "source": "upload"
     }
   ],
   "instances": {

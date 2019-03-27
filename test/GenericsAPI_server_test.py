@@ -87,14 +87,11 @@ class GenericsAPITest(unittest.TestCase):
                                                 'test_instance_2': ['2-1', '2-2', '2-3'],
                                                 'test_instance_3': ['3-1', '3-2', '3-3']},
                                   'attributes': [{'attribute': 'test_attribute_1',
-                                                  'attribute_ont_ref': 'attribute_ont_ref_1',
-                                                  'attribute_ont_id': 'attribute_ont_id_1'},
+                                                  'source': 'upload'},
                                                  {'attribute': 'test_attribute_2',
-                                                  'attribute_ont_ref': 'attribute_ont_ref_2',
-                                                  'attribute_ont_id': 'attribute_ont_id_2'},
+                                                  'source': 'upload'},
                                                  {'attribute': 'test_attribute_3',
-                                                  'attribute_ont_ref': 'attribute_ont_ref_3',
-                                                  'attribute_ont_id': 'attribute_ont_id_3'}],
+                                                  'source': 'upload'}],
                                   'ontology_mapping_method': 'user curation'}
         save_object_params = {
             'id': workspace_id,

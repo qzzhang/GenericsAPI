@@ -29,7 +29,6 @@ class AttributesUtil:
         self.kbse = KBaseSearchEngine(config['search-url'])
         self.data_util = DataUtil(config)
         self.wsClient = workspaceService(self.ws_url, token=self.token)
-        self.DEFAULT_ONTOLOGY_REF = "KbaseOntologies/Custom"
         self.DEFAULT_ONTOLOGY_ID = "Custom:Term"
         self.DEFAULT_UNIT_ID = "Custom:Unit"
         self.ONT_LABEL_DEL = " - "
@@ -299,6 +298,7 @@ class AttributesUtil:
         attribute_df['source'] = 'upload'
         attribute_fields = ('attribute', 'unit', 'attribute_ont_id', 'unit_ont_id', 'source')
         attributes = attribute_df.filter(items=attribute_fields).to_dict('records')
+        print(attributes)
         self._validate_attribute_values(am_df.set_index(attribute_df.attribute).iterrows())
 
         attribute_mapping = {'ontology_mapping_method': "User Curation",
@@ -455,18 +455,17 @@ class AttributesUtil:
         if ont_info:
             attribute['attribute_ont_ref'] = ont_info['ontology_ref']
             attribute['attribute_ont_id'] = ont_info['id']
-        else:
-            attribute['attribute_ont_ref'] = self.DEFAULT_ONTOLOGY_REF
-            attribute['attribute_ont_id'] = self.DEFAULT_ONTOLOGY_ID
+        elif not attribute.get('attribute_ont_id') or attribute['attribute_ont_id'] == ":":
+            del attribute['attribute_ont_id']
 
         if attribute.get('unit'):
             ont_info = self._search_ontologies(attribute.get('unit_ont_id', '').replace("_", ":"))
             if ont_info:
                 attribute['unit_ont_ref'] = ont_info['ontology_ref']
                 attribute['unit_ont_id'] = ont_info['id']
-            else:
-                attribute['unit_ont_ref'] = self.DEFAULT_ONTOLOGY_REF
-                attribute['unit_ont_id'] = self.DEFAULT_UNIT_ID
+            elif not attribute.get('attribute_ont_id') or attribute['unit_ont_id'] == ":":
+                del attribute['unit_ont_id']
+
         return attribute
 
     def to_tsv(self, params):

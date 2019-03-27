@@ -412,15 +412,12 @@
       "source": "upload"
     },
     {
-      "attribute_ont_ref": "KbaseOntologies/Custom",
-      "attribute_ont_id": "Custom:Term",
       "attribute": "genotype",
       "source": "upload"
     },
     {
-      "attribute_ont_ref": "KbaseOntologies/Custom",
-      "attribute_ont_id": "Custom:Term",
       "attribute": "organism",
+      "attribute_ont_id": "STY",
       "source": "upload"
     },
     {
