@@ -40,10 +40,9 @@
   },
   "attributes": [
     {
-      "attribute_ont_id": "Custom:Term",
+      "attribute_ont_id": "OBI_0500020",
       "unit_ont_id": "UO:0000032",
       "unit_ont_ref": "KbaseOntologies/unit_ontology",
-      "attribute_ont_ref": "KbaseOntologies/Custom",
       "unit": "Hour",
       "attribute": "Time series design",
       "source": "upload"

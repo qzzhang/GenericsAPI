@@ -240,14 +240,10 @@ class AttributeUtilsTest(unittest.TestCase):
         self.assertEqual(data['attributes'][-2],
                          {'attribute': 'Factor Value[compound]',
                           'source': 'upload',
-                          'attribute_ont_id': 'Custom:Term',
-                          'attribute_ont_ref': 'KbaseOntologies/Custom',
                           'categories': {'orotic acid': {'attribute_ont_id': 'CHEBI:16742',
                                                          'attribute_ont_ref': '6308/19/1',
                                                          'value': 'orotic acid'},
-                                         'vehicle': {'attribute_ont_id': 'Custom:Term',
-                                                     'attribute_ont_ref': 'KbaseOntologies/Custom',
-                                                     'value': 'vehicle'}}})
+                                         'vehicle': {'value': 'vehicle'}}})
 
     def test_isa_import_2(self):
         params = {'output_ws_id': self.wsId,
@@ -264,8 +260,6 @@ class AttributeUtilsTest(unittest.TestCase):
         self.assertEqual(data['attributes'][4],
                          {'attribute': 'Material Type',
                           'source': 'upload',
-                          'attribute_ont_id': 'Custom:Term',
-                          'attribute_ont_ref': 'KbaseOntologies/Custom',
                           'categories': {
                               'deoxyribonucleic acid': {'attribute_ont_id': 'CHEBI:16991',
                                                         'attribute_ont_ref': '6308/19/1',
@@ -304,7 +298,6 @@ class AttributeUtilsTest(unittest.TestCase):
                   'output_obj_name': 'BAD_AM'}
         with self.assertRaisesRegex(ValueError, "attributes failed validation: mass, inchikey"):
             ret = self.getImpl().file_to_attribute_mapping(self.getContext(), params)[0]
-
 
     def test_excel_infer_column(self):
         shock_file = '/gene_attributes.xlsx'

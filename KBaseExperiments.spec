@@ -79,7 +79,7 @@ module KBaseExperiments {
     /*
         Internally this is used to store attribute information. Categorical attributes will possess a
         categories field mapping all values. Quantitative attributes should possess unit information
-        @optional unit unit_ont_id unit_ont_ref categories
+        @optional unit attribute_ont_ref attribute_ont_id unit_ont_id unit_ont_ref categories
     */
 
     typedef structure{

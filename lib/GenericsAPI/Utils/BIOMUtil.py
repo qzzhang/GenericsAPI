@@ -481,10 +481,7 @@ class BiomUtil:
     def _meta_df_to_attribute_mapping(self, axis_ids, metadata_df, obj_name, ws_id):
         data = {'ontology_mapping_method': "TSV file", 'instances': {}}
         attribute_keys = metadata_df.columns.tolist()
-        data['attributes'] = [{'attribute': key,
-                               'attribute_ont_id': self.attr_util.DEFAULT_ONTOLOGY_ID,
-                               'attribute_ont_ref': self.attr_util.DEFAULT_ONTOLOGY_REF,
-                               } for key in attribute_keys]
+        data['attributes'] = [{'attribute': key, 'source': 'upload'} for key in attribute_keys]
 
         for axis_id in axis_ids:
             data['instances'][axis_id] = metadata_df.loc[axis_id].tolist()
@@ -505,10 +502,7 @@ class BiomUtil:
         data = {'ontology_mapping_method': "BIOM file", 'instances': {}}
         sample_set = metadata[0:min(len(metadata), 25)]
         metadata_keys = sorted(set((k for m_dict in sample_set for k in m_dict)))
-        data['attributes'] = [{'attribute': key,
-                               'attribute_ont_id': self.attr_util.DEFAULT_ONTOLOGY_ID,
-                               'attribute_ont_ref': self.attr_util.DEFAULT_ONTOLOGY_REF,
-                               } for key in metadata_keys]
+        data['attributes'] = [{'attribute': key, 'source': 'upload'} for key in metadata_keys]
         for inst, meta in zip(instances, metadata):
             data['instances'][inst] = [str(meta[attr]) for attr in metadata_keys]
 
