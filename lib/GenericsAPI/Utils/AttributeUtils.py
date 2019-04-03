@@ -456,7 +456,7 @@ class AttributesUtil:
             attribute['attribute_ont_ref'] = ont_info['ontology_ref']
             attribute['attribute_ont_id'] = ont_info['id']
         elif not attribute.get('attribute_ont_id') or attribute['attribute_ont_id'] == ":":
-            del attribute['attribute_ont_id']
+            attribute.pop('attribute_ont_id', None)
 
         if attribute.get('unit'):
             ont_info = self._search_ontologies(attribute.get('unit_ont_id', '').replace("_", ":"))
@@ -464,7 +464,7 @@ class AttributesUtil:
                 attribute['unit_ont_ref'] = ont_info['ontology_ref']
                 attribute['unit_ont_id'] = ont_info['id']
             elif not attribute.get('attribute_ont_id') or attribute['unit_ont_id'] == ":":
-                del attribute['unit_ont_id']
+                attribute.pop('unit_ont_id', None)
 
         return attribute
 
