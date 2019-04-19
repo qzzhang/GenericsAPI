@@ -20,6 +20,8 @@ RUN pip install pandas==0.23.4 \
     && pip install matplotlib \
     && pip install scipy
 
+RUN pip install scikit-bio
+
 RUN pip install natsort
 
 RUN conda install -yc bioconda biom-format
