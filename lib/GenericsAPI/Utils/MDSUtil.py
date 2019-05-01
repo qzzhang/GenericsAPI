@@ -65,7 +65,7 @@ class MDSUtil:
 
         return matrix_data
 
-    def _mds_df_to_excel(self, mds_df, components_df, result_dir, mds_matrix_ref):
+    def _mds_df_to_excel(self, mds_df, bcd_df, result_dir, mds_matrix_ref):
         """
         write MDS matrix df into excel
         """
@@ -75,12 +75,11 @@ class MDSUtil:
         mds_matrix_name = mds_matrix_info[1]
 
         file_path = os.path.join(result_dir, mds_matrix_name + ".xlsx")
-
         writer = pd.ExcelWriter(file_path)
 
-        mds_df.to_excel(writer, "principal_component_matrix", index=True)
-        if components_df is not None:
-            components_df.to_excel(writer, "component_variance_matrix", index=True)
+        mds_df.to_excel(writer, "mds_matrix", index=True)
+        if bcd_df:
+            bcd_df.to_excel(writer, "mds_bcd_matrix", index=True)
 
         writer.close()
 
@@ -174,9 +173,9 @@ class MDSUtil:
 
         return "%s/%s/%s" % (info[6], info[0], info[4])
 
-    def _bray_curtis_distance(df_table, sample1_id, sample2_id):
+    def _bray_curtis_distance(self, df_table, sample1_id, sample2_id):
         """
-        _bray_curtis_distance: calculate the bray_curtis_distance between two columns of table
+        _bray_curtis_distance: calculate the bray_curtis_distance between two columns of a table
         :param df_table: a Pandas.DataFrame
         :sample1_id, sample2_id: the sample ids to calculate BC-distance between df_table[sample1_id]
                                  and df_table[sample2_id]
@@ -190,12 +189,13 @@ class MDSUtil:
             denominator += sample1_count + sample2_count
         return numerator / denominator
 
-    def _df_to_distances(df_table, pairwise_distance_fn):
+    def _df_to_distance_matrix(self, df_table, pairwise_distance_fn):
         """
-        _df_to_distances: computes pairwise distances between all pairs of samples to
-                          get a distance matrix.
-        :param df_table: a Pandas.DataFrame
-        :pairwise_distance_fn: function that calculates pairwise distances between df_table's samples
+        _df_to_distances: computes pairwise distances between ALL pairs of samples to
+                          get a square distance matrix of order n, where n equals to the number of
+                          rows of the input table (i.e., df_table)
+        :param df_table: a Pandas.DataFrame (or table)
+        :param pairwise_distance_fn: function that calculates pairwise distances between df_table's samples
         """
         sample_ids = df_table.columns
         num_samples = len(sample_ids)
@@ -205,11 +205,14 @@ class MDSUtil:
                 data[i, j] = data[j, i] = pairwise_distance_fn(df_table, sample1_id, sample2_id)
         return DistanceMatrix(data, sample_ids)
 
-    def _mds_for_matrix(self, input_obj_ref, n_components, dimension, metrics=False):
+    def _mds_project_clusters(self, input_obj_ref, n_components, dimension='row', metrics=False):
         """
         _mds_for_matrix: perform MDS analysis for matrix object
+        :param input_obj_ref: KBase object reference to a data matrix
+        :param n_components: int, dimentionality of the reduced space
+        :param dimension: string, "col" or "row" indicating the data dimension mds is analyze on
+        :param metrics: boolean, metrics=False indicating the nonmetric multidimensional scaling
         """
-
         data_matrix = self.data_util.fetch_data({'obj_ref': input_obj_ref}).get('data_matrix')
 
         data_df = pd.read_json(data_matrix)
@@ -222,8 +225,8 @@ class MDSUtil:
             err_msg += 'Please choose either "col" or "row"'
             raise ValueError(err_msg)
 
-        if n_components > min(data_df.index.size, data_df.columns.size):
-            raise ValueError('Number of components should be less than min(n_samples, n_features)')
+        if n_components > data_df.index.size:
+            raise ValueError('Number of components should be less than n_samples')
 
         # normalize sample
         # logging.info("Standardizing the matrix")
@@ -231,31 +234,19 @@ class MDSUtil:
         # skip normalizing sample
         s_values = data_df.values
 
-        # Projection to ND
-        mds = MDS(n_components=n_components, whiten=True)
-        principalComponents = mds.fit_transform(s_values)
-        explained_variance = list(mds.explained_variance_)
-        explained_variance_ratio = list(mds.explained_variance_ratio_)
+        # calcuate the distance matrix
+        distance_mat = self._df_to_distance_matrix(s_values, self._bray_curtis_distance)
 
-        components = mds.components_
-        singular_values = list(mds.singular_values_)
+        # Projection
+        seed = np.random.RandomState(seed=3)
+        mds = MDS(n_components=n_components, max_iter=3000, eps=1e-9, random_state=seed,
+                  dissimilarity="precomputed", n_jobs=1)
+        pos = mds.fit(distance_mat).embedding_
+        nmds = MDS(n_components=n_components, metric=False, max_iter=3000, eps=1e-12,
+                   dissimilarity="precomputed", random_state=seed, n_jobs=1, n_init=1)
+        npos = nmds.fit_transform(distance_mat, init=pos)
 
-        col = list()
-        for i in range(n_components):
-            col.append('principal_component_{}'.format(i+1))
-
-        rotation_matrix_df = pd.DataFrame(data=principalComponents,
-                                          columns=col,
-                                          index=data_df.index)
-
-        components_df = pd.DataFrame(data=components,
-                                     columns=data_df.columns,
-                                     index=col).transpose()
-
-        rotation_matrix_df.fillna(0, inplace=True)
-
-        return (rotation_matrix_df, components_df, explained_variance, explained_variance_ratio,
-                singular_values)
+        return npos
 
     def _generate_mds_html_report(self, mds_plots, n_components):
 
@@ -572,18 +563,16 @@ class MDSUtil:
 
     def run_mds(self, params):
         """
-        perform MDS analysis on matrix
-
-        input_obj_ref: object reference of a matrix
-        workspace_name: the name of the workspace
-        mds_matrix_name: name of MDS (KBaseExperiments.MDSMatrix) object
-
-        n_components - number of components (default 2)
-        dimension: compute correlation on column or row, one of ['col', 'row']
+        run_mds: perform MDS analysis on matrix
+        :param input_obj_ref: object reference of a matrix
+        :param workspace_name: the name of the workspace
+        :param mds_matrix_name: name of MDS (KBaseExperiments.MDSMatrix) object
+        :param n_components - dimentionality of the reduced space (default 2)
+        :param dimension: compute correlation on column or row, one of ['col', 'row']
         """
 
         logging.info('--->\nrunning NetworkUtil.build_network\n' +
-            'params:\n{}'.format(json.dumps(params, indent=1)))
+                     'params:\n{}'.format(json.dumps(params, indent=1)))
 
         self._validate_run_mds_params(params)
 
@@ -604,9 +593,9 @@ class MDSUtil:
         if "KBaseMatrices" in obj_type:
 
             (rotation_matrix_df, components_df, explained_variance,
-             explained_variance_ratio, singular_values) = self._mds_for_matrix(input_obj_ref,
-                                                                               n_components,
-                                                                               dimension)
+             explained_variance_ratio, singular_values) = self._project_clusters(input_obj_ref,
+                                                                                 n_components,
+                                                                                 dimension)
         else:
             err_msg = 'Ooops! [{}] is not supported.\n'.format(obj_type)
             err_msg += 'Please supply KBaseMatrices object'

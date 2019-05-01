@@ -293,6 +293,36 @@ module KBaseExperiments {
     } PCAMatrix;
 
     /*
+      A wrapper around a FloatMatrix2D designed for simple matricies of MDS data.
+
+      MDSMatrix Fields:
+      description - short optional description of the dataset
+      rotation_matrix  - result rotation matrix
+      components_matrix - Principal axes in feature space, representing the directions of maximum variance in the data
+      singular_values - The singular values are equal to the 2-norms of the n_components variables in the lower-dimensional space.
+      explained_variance - The amount of variance explained by each of the selected components
+      explained_variance_ratio - Percentage of variance explained by each of the selected components
+      mds_parameters - arguments used to perform MDS analysis
+
+      @optional description mds_parameters
+      @optional components_matrix singular_values explained_variance_ratio explained_variance original_matrix_ref
+
+      @metadata ws length(rotation_matrix.row_ids) as matrix_size
+      @metadata ws length(rotation_matrix.col_ids) as n_components
+      @metadata ws original_matrix_ref as original_matrix_ref
+    */
+    typedef structure {
+      string description;
+      mapping<string, string> mds_parameters;
+      FloatMatrix2D rotation_matrix;
+      FloatMatrix2D components_matrix;
+      list<float> singular_values;
+      list<float> explained_variance;
+      list<float> explained_variance_ratio;
+      WSRef original_matrix_ref;
+    } MDSMatrix;
+
+    /*
       one of [rdp, silva, ncbi, greengenes, other]
     */
     typedef string taxonomy_source;
