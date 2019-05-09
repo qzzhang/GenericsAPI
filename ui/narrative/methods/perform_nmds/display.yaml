@@ -1,0 +1,88 @@
+name     : Perform NMDS Analysis
+subtitle : Perform NMDS analysis on Matrix object
+tooltip  : Perform NMDS analysis on Matrix object
+
+icon: analysis.png
+
+screenshots :
+    []
+
+suggestions :
+    apps:
+        related :
+            []
+        next :
+            []
+    methods:
+        related :
+            []
+        next :
+            []
+
+parameters :
+    input_obj_ref :
+        ui-name: |
+            Matrix Object
+        short-hint : |
+            One of KBaseMatrices object
+        long-hint  : |
+            One of KBaseMatrices object
+
+    n_components :
+        ui-name : |
+            Number of Component
+        short-hint : |
+            Number of Component
+
+    dimension:
+        ui-name: |
+            Perform NMDS Analysis On
+        short-hint : |
+            Perform NMDS on column or row
+        long-hint  : |
+            Perform NMDS on column or row
+
+    attribute_mapping_obj_ref:
+        ui-name: |
+            AttributeMapping Object
+        short-hint : |
+            Select associated KBaseExperiments.AttributeMapping object
+        long-hint  : |
+            Select associated KBaseExperiments.AttributeMapping object
+
+    attribute_color:
+        ui-name: |
+            Attribute
+        short-hint : |
+            Select an attribute for plot coloring
+        long-hint  : |
+            Select an attribute for plot coloring
+
+    attribute_size:
+        ui-name: |
+            Attribute
+        short-hint : |
+            Select an attribute for plot sizing
+        long-hint  : |
+            Select an attribute for plot sizing
+
+    MDS_matrix_name:
+        ui-name: |
+            MDS Matrix Object Name
+        short-hint : |
+            Output KBaseExperiments.MDSMatrix object name
+        long-hint  : |
+            Output KBaseExperiments.MDSMatrix object name
+
+parameter-groups :
+    color_marker_by:
+        ui-name : Group Marker By
+        short-hint :  Select an attribute for plot coloring
+    scale_size_by:
+        ui-name : Scale Marker Size By
+        short-hint :  Select an attribute for plot sizing
+
+
+
+description : |
+    <p> Perform NMDS analysis on Matrix object </p>
